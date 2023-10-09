@@ -1,0 +1,69 @@
+{
+    "name": "axm/framework",
+    "type": "framework",
+    "description": "The AXM framework PHP",
+    "keywords": [
+        "framework",
+        "mvc",
+        "rapid development",
+        "web development",
+        "axm",
+        "orm",
+        "form",
+        "validation",
+        "psr-7"
+    ],
+    "homepage": "https://axmphp.com",
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "ext-xml": "*",
+        "ext-openssl": "*",
+        "ext-zip": "*",
+        "ext-mbstring": "*",
+        "symfony/var-dumper": "^6.3.5",
+        "vlucas/phpdotenv": "^5.5",
+
+        "axm/http": "*",
+        "axm/views": "*",
+        "axm/exception": "*",
+        "axm/middlewares": "*",
+        "axm/session": "*",
+        "axm/console": "*",
+        "axm/helpers": "*",
+        "axm/fluent": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
+    },
+    "suggest": {
+        "ext-fileinfo": "Improves mime type detection for files"
+    },
+    "autoload": {
+        "psr-4": {
+			"Axm\\": "src"
+		},
+		"files": [
+			"src/Axm.php"
+		]
+    },  
+
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": false
+    },
+
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "phpunit"
+    },
+    "support": {
+        "forum":  "http://forum.Axmphp.com/",
+        "source": "https://github.com/Axmphp/Axmv1",
+        "slack":  "https://Axmchat.slack.com"
+    }
+}
