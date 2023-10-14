@@ -593,18 +593,18 @@ if (!function_exists('str')) {
 if (!function_exists('__')) {
 
 	/**
-	 * Create a FluentInterface instance for method chaining.
+	 * Create a Fluent instance for method chaining.
 	 *
-	 * This function is used to create a FluentInterface instance, allowing for method chaining
+	 * This function is used to create a Fluent instance, allowing for method chaining
 	 * on the provided object. It enhances the readability and expressiveness of code by enabling
 	 * a sequence of method calls on the object.
 	 * @param object $obj The object on which method chaining is desired.
-	 * @return \Axm\FluentInterface An instance of the FluentInterface class for method chaining.
+	 * @return Axm\Fluent\Fluent An instance of the Fluent class for method chaining.
 	 */
 	function __($obj)
 	{
 		// Return a new instance of the FluentInterface class for method chaining
-		return new Axm\FluentInterface($obj);
+		return new Axm\Fluent\Fluent($obj);
 	}
 }
 
