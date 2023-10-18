@@ -797,59 +797,62 @@ if (!function_exists('to_object')) {
 if (!function_exists('helpers')) {
 
 	/**
-	 * Load one or multiple helpers from the application or the Axm system.
+	 * Load one or multiple helpers.
 	 *
-	 * This function is used to load one or multiple helper files either from the application's Helpers folder
-	 * or the Axm system's helper files. Helper files contain functions that can assist with various tasks
-	 * and are commonly used to extend functionality.
 	 * @param string|array $helpers Names of the helpers to load, separated by spaces, commas, dots, or an array.
-	 * @param string|null $basePath The path to the folder containing the helper files. If not provided, the default location is used.
-	 * @param string $separator The separator used for helper names. Default is '_'.
+	 * @param string|null $customPath The path to custom helper files. If not provided, custom helpers are not loaded.
 	 * @return bool True if all helpers were loaded successfully, false otherwise.
-	 * @throws InvalidArgumentException If the $helpers variable is not an array.
-	 * @throws AxmException If a specified helper file does not exist in the given paths.
-	 *
-	 * @example
-	 * 1. Load a single helper:
-	 *    helpers('array');
-	 *
-	 * 2. Load multiple helpers separated by commas:
-	 *    helpers('array, text, integer, utility');
-	 *
-	 * 3. Load multiple helpers separated by dots:
-	 *    helpers('array.text.integer.utility');
-	 *
-	 * 4. Load multiple helpers separated by spaces:
-	 *    helpers('array text integer utility');
-	 *
-	 * 5. Load multiple helpers using an array:
-	 *    helpers(['array', 'text', 'integer', 'utility']);
+	 * @throws HelperNotFoundException If a specified helper file does not exist in the given paths.
 	 */
-	function helpers($helpers, string $separator = '_')
+	function helpers($helpers, string $customPath = null)
 	{
+		// Convert $helpers to an array if it's a string and split by spaces, commas, or dots
 		if (is_string($helpers)) {
 			$helpers = preg_split('/[\s,\.]+/', $helpers);
 		} elseif (!is_array($helpers)) {
 			throw new InvalidArgumentException('The $helpers variable must be an array.');
 		}
 
-		$appPath = APP_PATH . '/Helpers';
-		$axmHelpersPath = AXM_PATH . '/helpers/src';
-		foreach ($helpers as $helper) {
-			$helper = trim($helper . $separator . 'helper.php');
-			$helperFile = "$appPath/$helper";
+		// Define paths for helper files
+		$appPath = APP_PATH . '/Helpers'; // Default application path
+		$axmHelpersPath = AXM_PATH . '/helpers/src'; // Axm system path
 
-			// If the file is not found in the default location, try the secondary location
-			if (!is_file($helperFile)) {
-				$helperFile = "$axmHelpersPath/$helper";
-			}
-
-			if (!is_file($helperFile)) {
-				throw new AxmException(Axm::t('axm', 'The helper "%s" does not exist in %s or %s', [$helper, $appPath, $axmHelpersPath]));
-			}
-
-			require_once($helperFile);
+		// Load custom helpers from the provided path
+		if ($customPath) {
+			$customPath = rtrim($customPath, '/'); // Ensure the path does not end with a slash
 		}
+
+		foreach ($helpers as $helper) {
+			$helper = trim($helper) . 'helper.php';
+
+			// Try to load the helper from the custom path first
+			if ($customPath) {
+				$customHelperFile = "$customPath/$helper";
+				if (is_file($customHelperFile)) {
+					require_once($customHelperFile);
+					continue;
+				}
+			}
+
+			// Try to load the helper from the default application path
+			$appHelperFile = "$appPath/$helper";
+			if (is_file($appHelperFile)) {
+				require_once($appHelperFile);
+				continue;
+			}
+
+			// Try to load the helper from the Axm system path
+			$axmHelperFile = "$axmHelpersPath/$helper";
+			if (is_file($axmHelperFile)) {
+				require_once($axmHelperFile);
+				continue;
+			}
+
+			// If the helper is not found in any of the specified locations, throw an exception
+			throw new Exception("The helper '$helper' does not exist in any of the specified paths.");
+		}
+
+		return true;
 	}
 }
 
