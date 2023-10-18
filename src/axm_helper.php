@@ -146,10 +146,10 @@ if (!function_exists('env')) {
 
 	/**
 	 * Allows user to retrieve values from the environment
+	 * 
 	 * variables that have been set. Especially useful for
 	 * retrieving values set from the .env file for
 	 * use in config files.
-	 *
 	 * @param string|null $default
 	 * @return mixed
 	 */
@@ -807,7 +807,7 @@ if (!function_exists('helpers')) {
 	 * @param string $separator The separator used for helper names. Default is '_'.
 	 * @return bool True if all helpers were loaded successfully, false otherwise.
 	 * @throws InvalidArgumentException If the $helpers variable is not an array.
-	 * @throws AxmException If a specified helper file does not exist in the given path.
+	 * @throws AxmException If a specified helper file does not exist in the given paths.
 	 *
 	 * @example
 	 * 1. Load a single helper:
@@ -825,7 +825,7 @@ if (!function_exists('helpers')) {
 	 * 5. Load multiple helpers using an array:
 	 *    helpers(['array', 'text', 'integer', 'utility']);
 	 */
-	function helpers($helpers, $basePath = null, string $separator = '_')
+	function helpers($helpers, string $separator = '_')
 	{
 		if (is_string($helpers)) {
 			$helpers = preg_split('/[\s,\.]+/', $helpers);
@@ -834,14 +834,18 @@ if (!function_exists('helpers')) {
 		}
 
 		$appPath = APP_PATH . '/Helpers';
-		$helpersPath = !empty($basePath) ? $basePath : $appPath;
-
+		$axmHelpersPath = AXM_PATH . '/helpers/src';
 		foreach ($helpers as $helper) {
-			$helper     = trim($helper . $separator . 'helper.php');
-			$helperFile = "$helpersPath/$helper";
+			$helper = trim($helper . $separator . 'helper.php');
+			$helperFile = "$appPath/$helper";
+
+			// If the file is not found in the default location, try the secondary location
+			if (!is_file($helperFile)) {
+				$helperFile = "$axmHelpersPath/$helper";
+			}
 
 			if (!is_file($helperFile)) {
-				throw new AxmException(Axm::t('axm', 'The helper "%s" does not exist in %s ', [$helper, $helpersPath]));
+				throw new AxmException(Axm::t('axm', 'The helper "%s" does not exist in %s or %s', [$helper, $appPath, $axmHelpersPath]));
 			}
 
 			require_once($helperFile);
@@ -946,6 +950,7 @@ if (!function_exists('asset')) {
 
 	/**
 	 * Generate the URL of a resource using the path relative to the resource directory 
+	 * 
 	 * @param string $path Path relative to the resource directory 
 	 * @param bool $versioned Add a version hash to the filename 
 	 * @param bool $secure Force the use of HTTPS in the URL 

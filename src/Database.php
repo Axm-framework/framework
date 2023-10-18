@@ -17,17 +17,19 @@ use Illuminate\Container\Container;
  */
 class Database
 {
+    private static $conection;
+
     /**
      * Create a new database connection for models
      */
-    public static function connect()
+    public static function connect(string $n_driver = null)
     {
         #open config DataBase
         $config = app()->config(APP_PATH . '/Config/DataBase.php');
 
-        $driver = $config['db']['default'] ?? 'mysql';
+        $driver = $n_driver ?? $config['db']['default'] ?? 'mysql';
 
-        $capsule = new Capsule;
+        $capsule = static::$conection = new Capsule;
         $capsule->addConnection(
             $config['db']['connections'][$driver]
         );
@@ -37,5 +39,13 @@ class Database
 
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
+    }
+
+    /**
+     * get database connection
+     */
+    public static function get()
+    {
+        return static::$conection;
     }
 }
