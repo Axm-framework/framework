@@ -1,0 +1,97 @@
+name: Create Tag Automatically
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Add GitHub remote
+        run: |
+          if ! git remote -v | grep -q origin; then
+            git remote add origin https://github.com/${{ github.repository }}.git 
+          fi
+
+      - name: Check if at least one label exists
+        run: |
+          if ! git tag | grep -q "v[0-9]\+\.[0-9]\+\.[0-9]\+"; then
+              echo "No versioned tags found in repository" 
+              exit 0
+          fi
+        shell: bash
+
+      - name: Get Latest Tag
+        id: get_tag
+        run: |
+
+          if git describe --tags --abbrev=0 > /dev/null 2>&1; then
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+
+            if [[ $LATEST_TAG != v* ]]; then
+                LATEST_TAG="v$LATEST_TAG"
+            fi
+            else
+              git tag v1.0.0
+              LATEST_TAG="v1.0.0"
+            fi
+
+          VERSION=$(echo $LATEST_TAG | sed 's/^v//')
+          echo "Latest Tag: $LATEST_TAG"
+          echo "Version: $VERSION"
+          echo "tag=$LATEST_TAG" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Validate Version Format
+        run: |
+          LATEST_TAG=$tag
+          echo "Latest tag: $LATEST_TAG"
+
+          if [[ ! $LATEST_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid format"
+            exit 1 
+          fi
+
+      - name: Increment Tag Version
+        id: increment_version
+        run: |
+          VERSION=$version
+          IFS=. read -ra version_array <<< "$VERSION"
+          LAST_DIGIT=$((${version_array[2]} + 1))
+          NEW_VERSION="${version_array[0]}.${version_array[1]}.$LAST_DIGIT"
+          NEW_TAG="v$NEW_VERSION"
+          echo "new Tag: $NEW_TAG"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Check if tag already exists
+        run: |
+          echo "Checking tag: $NEW_TAG"
+
+          # Checks if the tag exists in the remote repository
+          tag_exists=$(git ls-remote --tags origin refs/tags/$NEW_TAG)
+
+          # If 'tag_exists' is not empty, then the tag already exists
+          if [ -n "$tag_exists" ]; then
+           echo "Tag $NEW_TAG already exists"
+           exit 1
+          else
+           echo "Tag $NEW_TAG does not exist"
+           exit 0
+          fi
+
+      - name: Create and Push Tag
+        run: |
+          NEW_TAG=$NEW_TAG
+          git tag $NEW_TAG
+          git push https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git --tags # Asegúrate de empujar las etiquetas con --tags.
+        shell: bash
