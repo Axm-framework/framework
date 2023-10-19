@@ -351,9 +351,8 @@ if (!function_exists('baseUrl')) {
 		$dir = (!empty($dir)) ? rtrim($dir, '\/') . '/' : '';
 
 		// Concatenate PUBLIC_PATH and $dir to form the full URL of the current site with the directory appended
-		$url = generateUrl($dir);
+		$url = generateUrl(trim("$dir/"));
 
-		// Return the URL
 		return $url;
 	}
 }
