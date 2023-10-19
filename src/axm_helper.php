@@ -800,7 +800,7 @@ if (!function_exists('helpers')) {
 	 * @return bool True if all helpers were loaded successfully, false otherwise.
 	 * @throws HelperNotFoundException If a specified helper file does not exist in the given paths.
 	 */
-	function helpers($helpers, string $customPath = null)
+	function helpers($helpers, string $customPath = null, string $separator = '_')
 	{
 		// Convert $helpers to an array if it's a string and split by spaces, commas, or dots
 		if (is_string($helpers)) {
@@ -819,7 +819,7 @@ if (!function_exists('helpers')) {
 		}
 
 		foreach ($helpers as $helper) {
-			$helper = trim($helper) . 'helper.php';
+			$helper = trim($helper) . $separator . 'helper.php';
 
 			// Try to load the helper from the custom path first
 			if ($customPath) {
