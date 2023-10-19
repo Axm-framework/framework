@@ -133,7 +133,7 @@ class Axm
 	/**
 	 * Displays CLI type exceptions.
 	 */
-	public static function throwCLIDisplay(\Throwable $e): AxmCLIException
+	public static function throwCLIDisplay(\Throwable $e)
 	{
 		return AxmCLIException::handleCLIException($e);
 	}
