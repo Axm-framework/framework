@@ -38,29 +38,18 @@ class AxmCLIException
 
         static::showHeaderBox($title, $message);
         CLI::newLine();
-        CLI::write("at " . CLI::color("$file:$line", 'green'));
+        CLI::write('at ' . CLI::color("$file:$line", 'green'));
         CLI::newLine();
     }
 
 
     private static function showHeaderBox(string $title, $message)
     {
-        // Ancho de la ventana
-        $windowWidth = CLI::getWidth() - 4;
-
-        // Construye la parte superior de la ventana
-        $top = str_repeat('-', $windowWidth);
-        CLI::write("+" . $top . "+");
-
-        // Calcula la cantidad de espacios en blanco para centrar el título
-        $titlePadding = str_repeat(' ', ($windowWidth - strlen($title)) / 2);
-        CLI::write("|" . $titlePadding . $title . $titlePadding . "|", 'light_red');
-
-        // Muestra el mensaje
-        CLI::write("|" . str_pad(" Message: $message ", $windowWidth, ' ') . "|", 'light_red');
-
-        // Construye la parte inferior de la ventana
-        CLI::write("+" . $top . "+");
+        CLI::newLine();
+        CLI::write('[ ' . $title . ' ]', 'light_gray', 'red');
+        CLI::newLine();
+        CLI::write($message);
+        CLI::newLine();
     }
 
 

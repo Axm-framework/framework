@@ -13,8 +13,9 @@ namespace Axm\Console;
  */
 
 use Axm;
-use Axm\Exception\AxmCLIException;
 use Axm\Console\CLI;
+use Axm\Console\Commands;
+use Axm\Exception\AxmCLIException;
 
 final class ConsoleApplication
 {
