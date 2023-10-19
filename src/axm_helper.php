@@ -4,7 +4,6 @@ use Axm\I18n\I18n;
 use Axm\Views\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
-use Axm\Exception\AxmException;
 
 if (!function_exists('extend')) {
 
@@ -433,7 +432,6 @@ if (!function_exists('post')) {
 	}
 }
 
-
 if (!function_exists('isLogged')) {
 
 	/**
@@ -504,7 +502,6 @@ if (!function_exists('getUser')) {
 	}
 }
 
-
 if (!function_exists('app')) {
 
 	/**
@@ -565,7 +562,6 @@ if (!function_exists('str')) {
 	 *
 	 * If no argument is provided, returns a new instance of a string helper class
 	 * that allows chaining string manipulation methods.
-	 *
 	 * If a string argument is provided, creates a Stringable instance for the given string.
 	 * @param string|null $string (Optional) The input string to operate on.
 	 * @return Stringable|object Returns a Stringable instance if a string argument is provided.
