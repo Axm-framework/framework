@@ -1,0 +1,30 @@
+{
+    "name": "axm/middlewares",
+	"description": "Simple, performant and powerful PHP micro-framework for rapid web app & API development",
+	"keywords": [
+		"library",
+		"rest",
+		"router",
+		"php",
+		"framework"
+	],
+	"homepage": "https://axmphp.com",
+	"type": "library",
+	"license": "MIT",
+    "authors": [
+        {
+            "name": "Juan Cristobal",
+            "email": "juancristobalgd1@gmail.com"
+        }
+    ],
+	"autoload": {
+		"psr-4": {
+			"Axm\\Middlewares\\": "src"
+		}
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
+    }
+}

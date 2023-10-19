@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Axm\Application;
+use Spatie\Ignition\Ignition;
 use Axm\Exception\AxmException;
 use Axm\Exception\AxmCLIException;
 
@@ -104,7 +105,8 @@ class Axm
 			return self::throwCLIDisplay($e);
 		}
 
-		return AxmException::handleException($e);
+		return Ignition::make()->register();
+		// return AxmException::handleException($e);
 	}
 
 	/**
@@ -192,7 +194,7 @@ class Axm
 
 	/**
 	 * Creates a console application instance.
-  	 *
+	 *
 	 * @param mixed $config application configuration.
 	 * If a string, it is treated as the path of the file that contains the configuration;
 	 * If an array, it is the actual configuration information.

@@ -1,0 +1,428 @@
+/* Reset CSS */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+font,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th {
+  text-align: left;
+  padding-bottom: 0.5rem;
+}
+
+td {
+  padding: 0.2rem 0.5rem 0.2rem 0;
+}
+
+tr:hover td {
+  background: #f1f1f1;
+}
+
+td pre {
+  white-space: pre-wrap;
+}
+
+body {
+  line-height: 1;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: none;
+}
+
+:focus {
+  outline: 0;
+}
+
+ins {
+  text-decoration: none;
+}
+
+del {
+  text-decoration: line-through;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: auto;
+}
+
+/* Base Styles */
+body {
+  font: normal 9pt "Verdana";
+  color: #000;
+  background: #fff;
+  line-height: 1.5;
+}
+
+h1 {
+  font: normal 19pt "Verdana";
+  color: #f00;
+  margin-bottom: 0.5em;
+  margin-top: 0.7em;
+  margin-left: 0.5em;
+}
+
+h2 {
+  font: normal 14pt "Verdana";
+  color: #800000;
+  margin-bottom: 0.5em;
+}
+
+h3 {
+  font: bold 11pt "Verdana";
+}
+
+pre {
+  font: normal 11pt Menlo, Consolas, "Lucida Console", Monospace;
+}
+
+pre span.error {
+  display: block;
+  background: #fce3e3;
+}
+
+pre span.ln {
+  color: #999;
+  padding-right: 0.5em;
+  border-right: 1px solid #ccc;
+}
+
+pre span.ln:hover {
+  background: var(--light-bg-color);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+pre span.error-ln {
+  font-weight: bold;
+}
+
+/* Container Styles */
+.container {
+  margin: 1em 4em;
+}
+
+/* Message Styles */
+.message,
+.solution {
+  color: #000;
+  padding: 1em;
+  font-size: 11pt;
+  background: #f3f3f3;
+  border-radius: 10px;
+  margin-bottom: 1em;
+  margin-left: 0.1em;
+  margin-top: 0.5em;
+  line-height: 160%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra en los mensajes */
+}
+
+/* Estilo para elementos con la clase 'message' */
+.message {
+  /* Otros estilos de 'message' aquí */
+  display: flex;
+  align-items: center;
+  padding-right: 20px; /* Espacio a la derecha del contenido para el icono */
+}
+
+/* Estilo para el icono */
+.message .copy-icons {
+  cursor: pointer; /* Cambiar el cursor al puntero al pasar el mouse sobre el icono */
+  margin-left: auto; /* Empujar el icono hacia la derecha para alinearlo a la derecha */
+  margin-right: 12px;
+  display: flex; /* Hacer que los elementos dentro de copy-icons se alineen verticalmente */
+  align-items: center; /* Centrar verticalmente los elementos dentro de copy-icons */
+  color: var(--brand-primary-color); /* Cambiar el color al pasar el mouse */
+}
+
+/* Estilo para el icono en el hover */
+.message .copy-icons:hover {
+  color: var(--brand-primary-color-hover); /* Cambiar el color al pasar el mouse */
+}
+
+/* Estilo para el párrafo dentro de 'message' */
+.message p {
+  margin: 0; /* Eliminar el margen predeterminado del párrafo para evitar espacio en blanco adicional */
+}
+
+.solution {
+  background: #d8ffd8;
+}
+
+/* Mejorado estilo para elementos con la clase 'file' */
+.source .file {
+  margin-bottom: 1em;
+  font-weight: bold;
+  color: #e06e3f; /* Cambio de color a un tono de naranja */
+  text-decoration: underline; /* Subrayado para destacar */
+  font-size: 1rem; /* Tamaño de fuente aumentado */
+}
+
+/* Source Code Styles */
+.code pre,
+.code span:hover {
+  box-shadow: 0 1px 1px rgba(82, 82, 82, 0.1);
+  border-radius: 5px; /* Bordes redondeados para el código */
+}
+
+/* Trace Styles */
+.traces {
+  margin: 2em 0;
+}
+
+.trace {
+  margin: 0.5em 0;
+  padding: 0.5em;
+}
+
+.trace.app {
+  border: 1px dashed #fafbfd;
+}
+
+.trace .number {
+  text-align: right;
+  width: 1em;
+  padding: 0.5em;
+}
+
+.trace .content {
+  padding: 0.5em;
+}
+
+.trace .plus,
+.trace .minus {
+  display: inline;
+  vertical-align: middle;
+  text-align: center;
+  border: 1px solid #000;
+  color: #000;
+  font-size: 10px;
+  line-height: 10px;
+  margin: 0;
+  padding: 0 1px;
+  width: 10px;
+  height: 10px;
+}
+
+.trace.collapsed .minus,
+.trace.expanded .plus,
+.trace.collapsed pre {
+  display: none;
+}
+
+.trace-file {
+  cursor: pointer;
+  padding: 0.2em;
+}
+
+.trace-file:hover {
+  background: #f0ffff;
+}
+
+/* Root Styles */
+:root {
+  --main-bg-color: #fff;
+  --main-text-color: #555;
+  --dark-text-color: #222;
+  --light-text-color: #c7c7c7;
+  --brand-primary-color: #e06e3f;
+  --light-bg-color: #ededee;
+  --dark-bg-color: #404040;
+}
+
+/* Header Styles */
+.header {
+  background: var(--light-bg-color);
+  color: var(--dark-text-color);
+  padding: 1rem 1.75rem 1.75rem 1.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra en el encabezado */
+  border-radius: 10px; /* Bordes redondeados para el encabezado */
+}
+
+/* Estilo para la fila que contiene el SVG y el h1 */
+.row {
+  display: flex;
+  align-items: center; /* Alinear verticalmente en el centro */
+}
+
+/* Estilo para el contenedor del icono SVG */
+.icon-container {
+  margin-right: 10px; /* Espacio entre el SVG y el h1 (ajusta según tu preferencia) */
+}
+
+/* Estilo para el título h1 */
+/* Estilo para el título h1 */
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 500;
+}
+
+.header p {
+  font-size: 1.2rem;
+  margin: 0;
+  line-height: 2.5;
+}
+
+.header a {
+  color: var(--brand-primary-color);
+  margin-left: 2rem;
+  display: none;
+  text-decoration: none;
+}
+
+.header:hover a {
+  display: inline;
+}
+
+/* Footer Styles */
+.footer {
+  background: var(--dark-bg-color);
+  color: var(--light-text-color);
+  border-top: 1px solid #e7e7e7;
+  margin-top: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra en el pie de página */
+  border-radius: 10px; /* Bordes redondeados para el pie de página */
+}
+
+.footer .container {
+  padding: 1rem;
+}
+
+/* Tab Styles */
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding-bottom: 1rem;
+  list-style: none;
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
+}
+
+.tab button {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+.tab button:hover {
+  background-color: #ddd;
+}
+
+.tab button.active {
+  background-color: #ccc;
+}
+
+.tab-content {
+  overflow-x: auto;
+  display: none;
+  padding: 6px 10px 6px 10px;
+  border: 1px solid #ccc;
+  border-top: none;
+  animation: fadeEffect 1s;
+}
+
+.tab li {
+  display: inline;
+}
+
+.tab a:link,
+.tab a:visited {
+  padding: 0rem 1rem;
+  line-height: 2.7;
+  text-decoration: none;
+  color: var(--dark-text-color);
+  background: var(--light-bg-color);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-bottom: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  display: inline-block;
+}
+
+.tab a:hover {
+  background: var(--light-bg-color);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.tab a.active {
+  background: var(--main-bg-color);
+  color: var(--main-text-color);
+}

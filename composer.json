@@ -34,7 +34,8 @@
         "axm/session": "*",
         "axm/console": "*",
         "axm/helpers": "*",
-        "axm/fluent": "*"
+        "axm/fluent": "*",
+        "spatie/ignition": "^1.11"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6"

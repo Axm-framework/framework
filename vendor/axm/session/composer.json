@@ -1,0 +1,30 @@
+{
+    "name": "axm/session",
+	"description": "Simple, performant and powerful PHP micro-framework for rapid web app & API development",
+	"keywords": [
+		"microframework",
+		"rest",
+		"router",
+		"php",
+		"framework"
+	],
+	"homepage": "https://axmphp.com",
+	"type": "library",
+	"license": "MIT",
+    "authors": [
+        {
+            "name": "Juan Cristobal",
+            "email": "juancristobalgd1@gmail.com"
+        }
+    ],
+	"autoload": {
+		"psr-4": {
+			"Axm\\Session\\": "src"
+		}
+	},
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
+    }
+}

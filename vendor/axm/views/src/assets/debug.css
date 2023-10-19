@@ -1,0 +1,74 @@
+
+.tab {
+	overflow: hidden;
+	border:   1px solid #ccc;
+	background-color: #f1f1f1;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	padding-bottom: 1rem;
+	list-style: none;
+	list-style-position: inside;
+	margin: 0;
+	padding: 0;
+}
+
+.tab button {
+	overflow: hidden;
+	border:   1px solid #ccc;
+	background-color: inherit;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	transition: 0.3s;
+}
+
+
+.tab button:hover {
+	background-color: #ddd;
+}
+
+.tab button.active {
+	background-color: #ccc;
+}
+
+.tab-content {
+	overflow-x: auto;
+	display: none;
+	padding: 6px 10px 6px 10px;
+	border: 1px solid #ccc;
+	border-top: none;
+	animation: fadeEffect 1s;
+}
+
+.tab li {
+	display: inline;
+}
+
+.tab a:link,
+.tab a:visited {
+	padding: 0rem 1rem;
+	line-height: 2.7;
+	text-decoration: none;
+	color: var(--dark-text-color);
+	background: var(--light-bg-color);
+	border: 1px solid rgba(0,0,0,0.15);
+	border-bottom: 0;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	display: inline-block;
+}
+
+.tab a:hover {
+	background: var(--light-bg-color);
+	border-color: rgba(0,0,0,0.15);
+}
+
+.tab a.active {
+	background: var(--main-bg-color);
+	color: var(--main-text-color);
+}
+
+
+

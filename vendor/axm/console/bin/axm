@@ -1,0 +1,48 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Axm command-line tools
+ *
+ * This script is the main entry point into the CLI system and allows you to run
+ * commands and perform maintenance on your application.
+ */
+
+use Axm\Console\CLI;
+use Axm\Exception\AxmException;
+
+// Comprueba si se ejecuta desde la línea de comandos
+if (PHP_SAPI !== 'cli') {
+    exit("This script can only be run from the command line!\n\n");
+}
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+try {
+
+    // Crea la aplicación de consola
+    $console = Axm::createConsoleApplication();
+
+    // Check if there are enough command line arguments
+    if (count($_SERVER['argv']) < 2) {
+        $console->showHeader();
+        CLI::error('>>> Missing command.');
+        CLI::info('>>> Usage: php axm [command] [--option]');
+        CLI::newLine();
+        exit(1);
+    }
+
+    // option to suppress the header information
+    $suppress = array_search('--no-header', $_SERVER['argv'], true);
+    if (is_int($suppress)) {
+        unset($_SERVER['argv'][$suppress]);
+        $console->showHeader(true);
+    } else {
+        $console->showHeader();
+    }
+
+    // Execute console command
+    $console->init();
+} catch (\Exception $e) {
+    throw new AxmException($e->getMessage());
+    exit(1);
+}
