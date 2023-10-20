@@ -10,6 +10,9 @@
                SETUP OUR PATH CONSTANTS
 --------------------------------------------------------- */
 
+// Define the root path
+defined('AXM_BEGIN_TIME') or define('AXM_BEGIN_TIME', time());
+
 // Defines the application charset
 const APP_CHARSET = 'UTF-8';
 
