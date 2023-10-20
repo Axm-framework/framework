@@ -1,13 +1,8 @@
 vendor
 composer.lock
 
-#-------------------------
-# IDE / Development Files
-#-------------------------
-
 # phpenv local config
 .php-version
 
 /results/
-phpunit.xml.dist
 .phpunit.result.cache
