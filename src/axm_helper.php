@@ -61,6 +61,9 @@ if (!function_exists('raxm')) {
 		// Get the Raxm instance from the application.
 		$raxm = app('raxm');
 
+		// Boot the Raxm instance if necessary.
+		$raxm->boot();
+
 		// Initialize and use the specified Raxm component.
 		return $raxm::initializeComponent($component);
 	}
