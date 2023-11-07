@@ -77,13 +77,6 @@ if (!function_exists('raxmScripts')) {
 	 */
 	function raxmScripts()
 	{
-		// $raxm = app('raxm');
-		// dd(
-		// 	$raxm
-		// );
-		// Boot the Raxm instance if necessary.
-		// $raxm->boot();
-
 		// Set a flag in the View class to enable Raxm scripts and assets.
 		return View::$raxmAssets = true;
 	}
