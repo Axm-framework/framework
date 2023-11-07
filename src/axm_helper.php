@@ -61,9 +61,6 @@ if (!function_exists('raxm')) {
 		// Get the Raxm instance from the application.
 		$raxm = app('raxm');
 
-		// Boot the Raxm instance if necessary.
-		$raxm->boot();
-
 		// Initialize and use the specified Raxm component.
 		return $raxm::initializeComponent($component);
 	}
@@ -80,6 +77,13 @@ if (!function_exists('raxmScripts')) {
 	 */
 	function raxmScripts()
 	{
+		// $raxm = app('raxm');
+		// dd(
+		// 	$raxm
+		// );
+		// Boot the Raxm instance if necessary.
+		// $raxm->boot();
+
 		// Set a flag in the View class to enable Raxm scripts and assets.
 		return View::$raxmAssets = true;
 	}
