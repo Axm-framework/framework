@@ -35,7 +35,6 @@ if (!function_exists('memoize')) {
 	function memoize(callable $fn): callable
 	{
 		$cache = [];
-
 		// Return a new callable function that handles memoization.
 		return function (...$args) use ($fn, &$cache) {
 			// Generate a unique key based on the serialized arguments.
@@ -60,9 +59,6 @@ if (!function_exists('raxm')) {
 	{
 		// Get the Raxm instance from the application.
 		$raxm = app('raxm');
-
-		// Boot the Raxm instance if necessary.
-		$raxm->boot();
 
 		// Initialize and use the specified Raxm component.
 		return $raxm::initializeComponent($component);
