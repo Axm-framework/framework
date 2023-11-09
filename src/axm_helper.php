@@ -35,6 +35,7 @@ if (!function_exists('memoize')) {
 	function memoize(callable $fn): callable
 	{
 		$cache = [];
+
 		// Return a new callable function that handles memoization.
 		return function (...$args) use ($fn, &$cache) {
 			// Generate a unique key based on the serialized arguments.
@@ -456,7 +457,6 @@ if (!function_exists('old')) {
 	}
 }
 
-
 if (!function_exists('checkSession')) {
 
 	/**
@@ -784,7 +784,6 @@ if (!function_exists('to_object')) {
 	}
 }
 
-
 if (!function_exists('helpers')) {
 
 	/**
@@ -863,7 +862,6 @@ if (!function_exists('getRouteParams')) {
 	}
 }
 
-
 if (!function_exists('getUri')) {
 
 	/**
@@ -878,7 +876,6 @@ if (!function_exists('getUri')) {
 		return Axm::app()->request->getUri();
 	}
 }
-
 
 if (!function_exists('logger')) {
 
@@ -923,7 +920,7 @@ if (!function_exists('logger')) {
 	}
 }
 
-if (!function_exists('classBasename')) {
+if (!function_exists('class_basename')) {
 
 	/**
 	 * Class Basename
@@ -932,7 +929,7 @@ if (!function_exists('classBasename')) {
 	 * @param  mixed $class Either an object or a string with the class name.
 	 * @return string
 	 */
-	function classBasename($class)
+	function class_basename($class)
 	{
 		return is_object($class)
 			? basename(str_replace('\\', '/', get_class($class)))
