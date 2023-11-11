@@ -1,6 +1,6 @@
 <?php
 
-use Axm\I18n\I18n;
+use Axm\Lang\Lang;
 use Axm\Views\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -276,20 +276,30 @@ if (!function_exists('lang')) {
 	 * @param string $key The key representing the message to be translated.
 	 * @return string The translated message, with optional placeholders replaced.
 	 */
-	function lang(string $key)
+	function lang(string $key, array $args = [])
 	{
 		// Get the message translation using the provided key.
-		$message = I18n::gettext($key);
+		// $message = Lang::gettext($key);
 
-		// Check if multiple parameters are passed.
-		if (func_num_args() > 1) {
-			$args = func_get_args();
-			unset($args[0]);
-			// Replace placeholders in the message using vsprintf.
-			$message = vsprintf($message, $args);
+		// // Check if multiple parameters are passed.
+		// if (func_num_args() > 1) {
+		// 	$args = func_get_args();
+		// 	unset($args[0]);
+		// 	// Replace placeholders in the message using vsprintf.
+		// 	$message = vsprintf($message, $args);
+		// }
+
+		// return $message;
+
+		// Get an instance of Lang
+		$lang = Lang::make();
+
+		if (emty($args)) {	
+			return $lang->trans('file.message');
 		}
 
-		return $message;
+		// Translate a key
+		return $lang->trans('file.message', $args);
 	}
 }
 
