@@ -1,4 +1,5 @@
 <?php
+
 use Axm\Views\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -274,20 +275,17 @@ if (!function_exists('lang')) {
 	 * @param string $key The key representing the message to be translated.
 	 * @return string The translated message, with optional placeholders replaced.
 	 */
-	function lang(string $key)
+	function lang(string $key, array $args = [])
 	{
-		// Get the message translation using the provided key.
-		$message = I18n::gettext($key);
+		// Get an instance of Lang
+		$lang = Lang::make();
 
-		// Check if multiple parameters are passed.
-		if (func_num_args() > 1) {
-			$args = func_get_args();
-			unset($args[0]);
-			// Replace placeholders in the message using vsprintf.
-			$message = vsprintf($message, $args);
+		if (empty($args)) {
+			return $lang->trans('file.message');
 		}
 
-		return $message;
+		// Translate a key
+		return $lang->trans('file.message', $args);
 	}
 }
 
@@ -349,6 +347,17 @@ if (!function_exists('baseUrl')) {
 		$url = generateUrl(trim("$dir/"));
 
 		return $url;
+	}
+}
+
+if (!function_exists('asset')) {
+
+	function asset(string $dirFile): string
+	{
+		$pathAssets = 'resources/assets/';
+		$file = baseUrl($pathAssets.$dirFile);
+
+		return $file;
 	}
 }
 
