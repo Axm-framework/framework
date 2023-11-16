@@ -82,13 +82,20 @@ class Axm
 	 */
 	protected static function initSystemHandlers()
 	{
-		if (env('AXM_ENABLE_EXCEPTION_HANDLER', true)) {
-			set_exception_handler(fn ($e) => self::handleException($e));
+		if (self::is_cli()) {
+			return set_exception_handler(function (\Throwable $e) {
+				AxmCLIException::handleCLIException($e);
+			});
 		}
 
-		if (env('AXM_ENABLE_ERROR_HANDLER', true)) {
-			set_error_handler([self::class, 'handleError'], error_reporting());
-		}
+		\Axm\HandlerErrors::make(new \Whoops\Handler\PrettyPageHandler, new \Whoops\Run);
+		// if (env('AXM_ENABLE_EXCEPTION_HANDLER', true)) {
+		// 	set_exception_handler(fn ($e) => self::handleException($e));
+		// }
+
+		// if (env('AXM_ENABLE_ERROR_HANDLER', true)) {
+		// 	set_error_handler([self::class, 'handleError'], error_reporting());
+		// }
 	}
 
 	/**
@@ -101,7 +108,7 @@ class Axm
 		restore_exception_handler();
 
 		if (self::is_cli()) {
-			return self::throwCLIDisplay($e);
+			return AxmCLIException::handleCLIException($e);
 		}
 
 		return AxmException::handleException($e);
@@ -123,20 +130,13 @@ class Axm
 		if (self::is_cli()) {
 			// Create a custom error exception object.
 			$e = new \ErrorException($message, $code, 0, $file, $line);
-			return self::throwCLIDisplay($e);
+			return AxmCLIException::handleCLIException($e);
 		}
 
 		// Create a custom error exception object.
 		throw new \ErrorException($message, $code, 0, $file, $line);
 	}
 
-	/**
-	 * Displays CLI type exceptions.
-	 */
-	public static function throwCLIDisplay(\Throwable $e)
-	{
-		return AxmCLIException::handleCLIException($e);
-	}
 
 	/**
 	 * Checks if the application is running in a CLI environment.
@@ -192,7 +192,7 @@ class Axm
 
 	/**
 	 * Creates a console application instance.
-  	 *
+	 *
 	 * @param mixed $config application configuration.
 	 * If a string, it is treated as the path of the file that contains the configuration;
 	 * If an array, it is the actual configuration information.

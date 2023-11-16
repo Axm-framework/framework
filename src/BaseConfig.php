@@ -31,7 +31,7 @@ class BaseConfig
      *
      * @return BaseConfig
      */
-    public static function getInstance()
+    public static function make()
     {
         if (!self::$instance) {
             self::$instance = new self();
@@ -101,7 +101,6 @@ class BaseConfig
     public function recursiveLoadFiles(array $files, bool $merge = true): array
     {
         $config = [];
-
         foreach ($files as $file) {
             $data = $this->load($file, $merge);
             $config = array_merge($config, $data);

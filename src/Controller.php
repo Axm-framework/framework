@@ -42,7 +42,7 @@ abstract class Controller
         $app = Axm::app();
         $this->request  = $app->request;
         $this->response = $app->response;
-        $this->view     = $app->view;
+        $this->view     = View::make();
 
         $this->init();
     }

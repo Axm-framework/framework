@@ -57,13 +57,13 @@ abstract class Application
 	}
 
 	/**
-	 * Initialize the application by loading services, including internal functions, configuration files,
-	 * routes, and generating security tokens.
+	 * Initialize the application by loading services, including internal functions,
+	 * configuration files,routes, and generating security tokens.
 	 */
 	private function init(): void
 	{
 		$this->getContainer()
-			->loadFromDirectory(ROOT_PATH . '/services');
+			->loadFromDirectory(APP_PATH . DIRECTORY_SEPARATOR . 'Providers');
 
 		$this->openDefaultSystemConfigurationFiles();
 		$this->openRoutesUser();
@@ -75,23 +75,28 @@ abstract class Application
 	 */
 	private function openDefaultSystemConfigurationFiles(): void
 	{
-		$path = APP_PATH . '/Config';
-		$this->config->load($path . '/App.php');
-		$this->config->load($path . '/Paths.php');
+		$path = APP_PATH . DIRECTORY_SEPARATOR . 'Config';
+		$this->config->load($path . DIRECTORY_SEPARATOR . 'App.php');
+		$this->config->load($path . DIRECTORY_SEPARATOR . 'Paths.php');
 	}
 
 	/**
 	 * Get the application configuration.
 	 *
 	 * @param string $key An optional configuration key.
-	 * @return mixed The configuration value for the specified key, or the entire configuration if no key is provided.
+	 * @return mixed The configuration value for the specified key, or the entire 
+	 * configuration if no key is provided.
 	 */
 	public function config(string $key = '')
 	{
 		$key = strtolower($key);
 		$config = $this->config;
 
-		return empty($key) ? $config : (strpos($key, '/') ? $config->load($key) : $config->get($key));
+		return empty($key)
+			? $config
+			: (strpos($key, '/')
+				? $config->load($key)
+				: $config->get($key));
 	}
 
 	/**
@@ -100,7 +105,8 @@ abstract class Application
 	public function openRoutesUser(): void
 	{
 		$ext = '.php';
-		$files = glob(ROOT_PATH . "/routes/*$ext");
+		$files = glob(ROOT_PATH . DIRECTORY_SEPARATOR .
+			'routes' . DIRECTORY_SEPARATOR . "*$ext");
 
 		foreach ($files as $file) {
 			include_once($file);
@@ -124,14 +130,13 @@ abstract class Application
 	public function load(string $path, string $root = APP_PATH): void
 	{
 		$path = $root . $path;
-		$path = str_replace('.', '/', $path);
+		$path = str_replace('.', DIRECTORY_SEPARATOR, $path);
 
 		$this->container->load($path);
 	}
 
 	/**
 	 * Check if the application is in production mode.
-	 *
 	 * @return bool True if the application is in production mode, false otherwise.
 	 */
 	public function isProduction(): bool
@@ -324,7 +329,9 @@ abstract class Application
 			return $this->container->get('user');
 		}
 
-		return $this->container->get('user')->{$value} ?? null;
+		return $this->container
+			->get('user')
+			->{$value} ?? null;
 	}
 
 	/**
@@ -342,7 +349,8 @@ abstract class Application
 	/**
 	 * Add a service to the container and return it.
 	 *
-	 * This method adds a service identified by its alias to the container and returns the service instance.
+	 * This method adds a service identified by its alias to the container and returns 
+	 * the service instance.
 	 * @param string $alias The alias of the service.
 	 * @param mixed $args The arguments or configuration for creating the service.
 	 * @return object The added service instance.
@@ -467,7 +475,8 @@ abstract class Application
 	/**
 	 * Run the application.
 	 *
-	 * This method triggers events before and after handling the request and dispatches the router.
+	 * This method triggers events before and after handling the request 
+	 * and dispatches the router.
 	 */
 	public function run(): void
 	{

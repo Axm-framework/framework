@@ -1,5 +1,6 @@
 <?php
 
+use Axm\Lang\Lang;
 use Axm\Views\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
@@ -281,11 +282,11 @@ if (!function_exists('lang')) {
 		$lang = Lang::make();
 
 		if (empty($args)) {
-			return $lang->trans('file.message');
+			return $lang->trans($key);
 		}
 
 		// Translate a key
-		return $lang->trans('file.message', $args);
+		return $lang->trans($key, $args);
 	}
 }
 
@@ -355,7 +356,7 @@ if (!function_exists('asset')) {
 	function asset(string $dirFile): string
 	{
 		$pathAssets = 'resources/assets/';
-		$file = baseUrl($pathAssets.$dirFile);
+		$file = baseUrl($pathAssets . $dirFile);
 
 		return $file;
 	}
@@ -400,7 +401,9 @@ if (!function_exists('redirect')) {
 	 **/
 	function redirect($url)
 	{
-		return Axm::app()->response->redirect($url);
+		return Axm::app()
+			->response
+			->redirect($url);
 	}
 }
 
@@ -411,7 +414,9 @@ if (!function_exists('refresh')) {
 	 **/
 	function refresh()
 	{
-		return Axm::app()->request->getUri();
+		return Axm::app()
+			->request
+			->getUri();
 	}
 }
 
@@ -811,8 +816,8 @@ if (!function_exists('helpers')) {
 		}
 
 		// Define paths for helper files
-		$appPath = APP_PATH . '/Helpers'; // Default application path
-		$axmHelpersPath = AXM_PATH . '/helpers/src'; // Axm system path
+		$appPath = APP_PATH . DIRECTORY_SEPARATOR . 'Helpers'; // Default application path
+		$axmHelpersPath = AXM_PATH . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'src'; // Axm system path
 
 		// Load custom helpers from the provided path
 		if ($customPath) {
@@ -832,14 +837,14 @@ if (!function_exists('helpers')) {
 			}
 
 			// Try to load the helper from the default application path
-			$appHelperFile = "$appPath/$helper";
+			$appHelperFile = $appPath . DIRECTORY_SEPARATOR . $helper;
 			if (is_file($appHelperFile)) {
 				require_once($appHelperFile);
 				continue;
 			}
 
 			// Try to load the helper from the Axm system path
-			$axmHelperFile = "$axmHelpersPath/$helper";
+			$axmHelperFile = $axmHelpersPath . DIRECTORY_SEPARATOR . $helper;
 			if (is_file($axmHelperFile)) {
 				require_once($axmHelperFile);
 				continue;
@@ -865,7 +870,9 @@ if (!function_exists('getRouteParams')) {
 	 */
 	function getRouteParams()
 	{
-		return Axm::app()->request->getRouteParams();
+		return Axm::app()
+			->request
+			->getRouteParams();
 	}
 }
 
@@ -880,7 +887,9 @@ if (!function_exists('getUri')) {
 	 */
 	function getUri()
 	{
-		return Axm::app()->request->getUri();
+		return Axm::app()
+			->request
+			->getUri();
 	}
 }
 
@@ -902,7 +911,7 @@ if (!function_exists('logger')) {
 		$dateTime         = date('d-m-Y H:i:s');
 		$level            = in_array($level, $levels) ? $level : 'debug';
 		$formattedMessage = '[' . strtoupper($level) . "] $dateTime - $message";
-		$logFilePath      = STORAGE_PATH . '/logs/axm_log.log';
+		$logFilePath      = STORAGE_PATH . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'axm_log.log';
 
 		if (!file_exists($logFilePath)) {
 			setFlash('error', sprintf('The log file does not exist at %s', $logFilePath));
