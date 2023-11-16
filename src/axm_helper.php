@@ -1,6 +1,4 @@
 <?php
-
-use Axm\I18n\I18n;
 use Axm\Views\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
