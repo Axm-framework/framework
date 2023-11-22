@@ -33,7 +33,6 @@ abstract class Application
 	 */
 	private string $socketToken;
 
-
 	/**
 	 * Constructor for the Application class.
 	 * Initializes the application.
@@ -48,7 +47,6 @@ abstract class Application
 
 	/**
 	 * Get the container instance.
-	 *
 	 * @return Container The container instance.
 	 */
 	public function getContainer(): Container
@@ -87,16 +85,18 @@ abstract class Application
 	 * @return mixed The configuration value for the specified key, or the entire 
 	 * configuration if no key is provided.
 	 */
-	public function config(string $key = '')
+	public function config(string $key = null, $rootBaseConfig = null)
 	{
-		$key = strtolower($key);
-		$config = $this->config;
+		if (is_null($key))
+			return $this->config;
 
-		return empty($key)
-			? $config
-			: (strpos($key, '/')
-				? $config->load($key)
-				: $config->get($key));
+		if (str_contains($key, '/')) {
+			$path = is_null($rootBaseConfig) ? $this->config::ROOT_PATH_CONFIG .
+				$key : $rootBaseConfig;
+			return $this->config->load($path);
+		}
+
+		return $this->config->get($key);
 	}
 
 	/**
@@ -114,25 +114,30 @@ abstract class Application
 	}
 
 	/**
+	 * Load a configuration file.
+	 *
+	 * @param string $path The path to the configuration file.
+	 * @param string $root An optional root directory for the path.
+	 *
+	 * @return mixed The result of the configuration file load operation.
+	 */
+	public function load(string $path, string $root = APP_PATH)
+	{
+		$filePath = $root . DIRECTORY_SEPARATOR . str_replace(
+			'.',
+			DIRECTORY_SEPARATOR,
+			pathinfo($path, PATHINFO_FILENAME)
+		) . '.' . pathinfo($path, PATHINFO_EXTENSION);
+
+		return $this->container->load($filePath);
+	}
+
+	/**
 	 * Generate security tokens, including CSRF tokens.
 	 */
 	private function generateTokens(): void
 	{
 		$this->generateCsrfToken();
-	}
-
-	/**
-	 * Load a configuration file into the container.
-	 *
-	 * @param string $path The path to the configuration file.
-	 * @param string $root An optional root directory for the path.
-	 */
-	public function load(string $path, string $root = APP_PATH): void
-	{
-		$path = $root . $path;
-		$path = str_replace('.', DIRECTORY_SEPARATOR, $path);
-
-		$this->container->load($path);
 	}
 
 	/**
@@ -146,7 +151,6 @@ abstract class Application
 
 	/**
 	 * Check if the user is logged in.
-	 *
 	 * @return bool True if the user is logged in, false otherwise.
 	 */
 	public function isLogged(): bool
@@ -157,7 +161,7 @@ abstract class Application
 	/**
 	 * Set the user from the session variable.
 	 */
-	private function setUser(): void
+	private function getUser(): void
 	{
 		$this->user = function () {
 			return $this->session->get('user', true);
@@ -165,8 +169,17 @@ abstract class Application
 	}
 
 	/**
+	 * Set the user from the session variable.
+	 */
+	private function setUser(): void
+	{
+		$this->user = function () {
+			return $this->session->set('user', true);
+		};
+	}
+
+	/**
 	 * Log out the user.
-	 *
 	 * @param string $path The optional path to redirect after logout.
 	 */
 	public function logout(string $path = '/'): void
@@ -177,7 +190,6 @@ abstract class Application
 
 	/**
 	 * Get the event handler intent.
-	 *
 	 * @return mixed The event handler intent.
 	 */
 	public function event()
@@ -257,8 +269,8 @@ abstract class Application
 	/**
 	 * Generate a CSRF token.
 	 *
-	 * This method generates a CSRF token and stores it in a cookie. If a token already exists in the cookie,
-	 * it is reused.
+	 * This method generates a CSRF token and stores it in a cookie. 
+	 * If a token already exists in the cookie, it is reused.
 	 * @return string The generated CSRF token.
 	 */
 	public function generateCsrfToken(): string
@@ -279,7 +291,7 @@ abstract class Application
 	 */
 	public function hasCsrfToken(string $token): bool
 	{
-		return ($_COOKIE['csrfToken'] === $token);
+		return $_COOKIE['csrfToken'] === $token;
 	}
 
 	/**
@@ -325,9 +337,8 @@ abstract class Application
 	 */
 	public function user(string $value = null)
 	{
-		if (is_null($value)) {
+		if (is_null($value))
 			return $this->container->get('user');
-		}
 
 		return $this->container
 			->get('user')

@@ -19,25 +19,9 @@ use Axm\Exception\AxmCLIException;
  */
 class Axm
 {
-	public static $framework = 'Axm Framework';
-
+	public  static $framework = 'Axm Framework';
 	private static $version;
-
-	/**
-	 * @var array Class map used by the AXM autoloading mechanism.
-	 * The array keys are the class names, and the values are the corresponding class file paths.
-	 * @since 1.1.5
-	 */
-	public static $classMap = [];
-
-	/**
-	 * Request path to use.
-	 *
-	 * @var string
-	 */
-	protected $path;
-
-	public static $_environment;
+	public  static $_environment;
 	private static $_app;
 	private static $initialized = false;
 
@@ -88,55 +72,9 @@ class Axm
 			});
 		}
 
-		\Axm\HandlerErrors::make(new \Whoops\Handler\PrettyPageHandler, new \Whoops\Run);
-		// if (env('AXM_ENABLE_EXCEPTION_HANDLER', true)) {
-		// 	set_exception_handler(fn ($e) => self::handleException($e));
-		// }
-
-		// if (env('AXM_ENABLE_ERROR_HANDLER', true)) {
-		// 	set_error_handler([self::class, 'handleError'], error_reporting());
-		// }
+		if (self::$_environment !== 'production')
+			\Axm\HandlerErrors::make(new \Whoops\Handler\PrettyPageHandler, new \Whoops\Run);
 	}
-
-	/**
-	 * Manages and displays application features.
-	 */
-	private static function handleException(\Throwable $e)
-	{
-		// Disable error capturing to avoid recursive errors
-		restore_error_handler();
-		restore_exception_handler();
-
-		if (self::is_cli()) {
-			return AxmCLIException::handleCLIException($e);
-		}
-
-		return AxmException::handleException($e);
-	}
-
-	/**
-	 * Handles and displays the captured PHP error.
-	 *
-	 * This method displays the error in HTML when there is
-	 * no active error handler.
-	 * @param int    $code   Error code.
-	 * @param string $msg    Error message (optional).
-	 * @param string $file   Error file.
-	 * @param int    $line   Error line.
-	 * @return \AxmException Custom error exception object.
-	 */
-	public static function handleError($code, $message, $file, $line)
-	{
-		if (self::is_cli()) {
-			// Create a custom error exception object.
-			$e = new \ErrorException($message, $code, 0, $file, $line);
-			return AxmCLIException::handleCLIException($e);
-		}
-
-		// Create a custom error exception object.
-		throw new \ErrorException($message, $code, 0, $file, $line);
-	}
-
 
 	/**
 	 * Checks if the application is running in a CLI environment.
@@ -156,14 +94,15 @@ class Axm
 	private static function initializeEnvironment()
 	{
 		// Obtain the value of AXM_ENVIRONMENT or use a default value
-		static::$_environment = $environment = env('AXM_ENVIRONMENT', 'production');
+		static::$_environment = $env = env('AXM_ENVIRONMENT', 'production');
 
 		// Configuring environment-based error handling.
-		if ($environment === 'debug') {
+		if ($env === 'debug') {
 			error_reporting(E_ALL);
 			ini_set('display_errors', '1');
 		} else {
-			error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+			error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED
+				& ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
 			ini_set('display_errors', '0');
 		}
 	}
@@ -173,9 +112,9 @@ class Axm
 	 *
 	 * @return mixed The application instance.
 	 */
-	public static function startApplication()
+	public static function startApplication(array $config = null)
 	{
-		return self::createApplication('Axm\\initApplication');
+		return self::createApplication('Axm\\initApplication', $config);
 	}
 
 	/**
@@ -184,7 +123,7 @@ class Axm
 	 * @param string $class   The application class name.
 	 * @param mixed  $config  Application configuration.
 	 */
-	private static function createApplication(string $class, $config = null)
+	private static function createApplication(string $class, array $config = null)
 	{
 		self::ensureInitialized();
 		return new $class($config);
@@ -309,30 +248,10 @@ class Axm
 	public static function setApplication(Application $app): void
 	{
 		if (self::$_app !== null) {
-			throw new AxmException(self::t('axm', 'Axm application can only be created once.'));
+			throw new AxmException('Axm application can only be created once.');
 		}
 
 		self::$_app = $app;
-	}
-
-	/**
-	 * Translation method that allows translating messages in the system.
-	 *
-	 * @param string $category The translation category.
-	 * @param string $message  The original message.
-	 * @param array $params    Parameters to replace in the original message.
-	 * @param bool $isHtml     Whether the message should be treated as HTML.
-	 * @return string The translated message.
-	 */
-	public static function t($category, $message, $params = [], $language = null, bool $isHtml = true)
-	{
-		$source = ($category === 'axm') ? 'coreMessages' : 'messages';
-
-		$message = vsprintf($message, array_map(function ($value) use ($isHtml) {
-			return !$isHtml ? $value : '<b>' . $value . '</b>';
-		}, $params));
-
-		return $message;
 	}
 
 	/**

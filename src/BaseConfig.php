@@ -20,7 +20,7 @@ class BaseConfig
     private array $config = [];
     private array $cache  = [];
     private array $loadedFiles = [];
-
+    const ROOT_PATH_CONFIG = APP_PATH . DIRECTORY_SEPARATOR . 'Config';
 
     private function __construct()
     {
@@ -55,6 +55,8 @@ class BaseConfig
             return $this->config;
         }
 
+        $file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
+
         if (!file_exists($file)) {
             throw new AxmException('Configuration file not found: ' . $file);
         }
@@ -88,7 +90,6 @@ class BaseConfig
         $this->loadedFiles[] = $file;
         return (array) $this->config;
     }
-
 
     /**
      * Recursive load a configuration file.

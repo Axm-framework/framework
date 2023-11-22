@@ -16,23 +16,26 @@ defined('AXM_BEGIN_TIME') or define('AXM_BEGIN_TIME', time());
 // Defines the application charset
 const APP_CHARSET = 'UTF-8';
 
-// Define the root path
 defined('ROOT_PATH') or define('ROOT_PATH', getcwd());
 
+// Define the public path
+// const PUBLIC_PATH = '/';
+const PUBLIC_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'public';
+
 // Defines the path of the dependencies
-const VENDOR_PATH = ROOT_PATH . '/vendor';
+const VENDOR_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor';
 
 // Define AXM framework installation path
-const AXM_PATH = VENDOR_PATH . '/axm';
+const AXM_PATH = VENDOR_PATH . DIRECTORY_SEPARATOR . 'axm';
 
 // Define the application path
-const APP_PATH = ROOT_PATH . '/app';
+const APP_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'app';
 
 // Defines the path for writing files
-const STORAGE_PATH = ROOT_PATH . '/storage';
+const STORAGE_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'storage';
 
 // Defines the clean path of the request URI
-defined('PATH_CLEAR_URI') or define('PATH_CLEAR_URI', substr($_SERVER['SCRIPT_NAME'], 0, -9));
+defined('CLEAN_URI_PATH') or define('CLEAN_URI_PATH', substr($_SERVER['SCRIPT_NAME'], 0, -9));
 
 // Defines the development environment
 const ENV_PRODUCTION = 'production';
@@ -43,7 +46,9 @@ const AXM_NAMESPACE = 'Axm\\';
 
 require_once('axm_helper.php');
 
-require_once(VENDOR_PATH . '/vlucas/phpdotenv/src/Dotenv.php');
+require_once(VENDOR_PATH . DIRECTORY_SEPARATOR . 'vlucas' . DIRECTORY_SEPARATOR .
+    'phpdotenv' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Dotenv.php');
+
 try {
     \Dotenv\Dotenv::createImmutable(ROOT_PATH)->load();
 } catch (\Throwable $th) {

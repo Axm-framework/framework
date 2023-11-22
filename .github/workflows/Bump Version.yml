@@ -27,11 +27,11 @@ jobs:
         run: |
           if git describe --tags --abbrev=0 > /dev/null 2>&1; then
             VERSION=$(git describe --tags --abbrev=0)
-            echo "current_version=$VERSION" >> $GITHUB_ENV
           else
-            echo "No version tags found in the repository"
-            exit 1
+            VERSION="v1.0.0"
+            echo "Setting version to $VERSION as no tags were found."
           fi
+          echo "current_version=$VERSION" >> $GITHUB_ENV
         shell: bash
 
       - name: Bump release version

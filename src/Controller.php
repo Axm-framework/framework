@@ -107,14 +107,18 @@ abstract class Controller
      * @param string $view
      * @param array $param
      */
-    public function renderView(string $view, ?array $params = [], bool $buffer = true, string $ext = '.php'): ?string
-    {
+    public function renderView(
+        string $view,
+        ?array $params = [],
+        bool $buffer = true,
+        string $ext = '.php'
+    ): ?string {
+
         return $this->view::render($view, $params, $buffer, $ext);
     }
 
     /**
      * Register a Middleware in the Controller
-     *
      * @param BaseMiddleware $middleware
      */
     public function registerMiddleware(BaseMiddleware $middleware): void

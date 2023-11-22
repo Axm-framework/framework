@@ -6,7 +6,6 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 
-
 /**
  *  Class Database 
  * 
@@ -21,13 +20,14 @@ class Database
 
     /**
      * Create a new database connection for models
+     *
+     * @param string|null $driver
      */
-    public static function connect(string $n_driver = null)
+    public static function connect(string $driver = null)
     {
-        #open config DataBase
-        $config = app()->config(APP_PATH . '/Config/DataBase.php');
+        $config = config('/DataBase.php');
 
-        $driver = $n_driver ?? $config['db']['default'] ?? 'mysql';
+        $driver = $driver ?? $config['db']['default'] ?? 'mysql';
 
         $capsule = static::$conection = new Capsule;
         $capsule->addConnection(
@@ -42,10 +42,18 @@ class Database
     }
 
     /**
-     * get database connection
+     * Get database connection
      */
     public static function get()
     {
         return static::$conection;
+    }
+
+    /**
+     * Database disconnect
+     */
+    public static function disconnect(string $driver)
+    {
+        return static::$conection->getConnection()->disconnect($driver);
     }
 }

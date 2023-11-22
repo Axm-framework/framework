@@ -27,8 +27,9 @@ if (!function_exists('memoize')) {
 	/**
 	 * Memoize the result of a callable function.
 	 *
-	 * This function is used to cache and reuse the results of a callable function for the same set of arguments.
-	 * It returns a new callable function that stores and retrieves results from a cache based on argument values.
+	 * This function is used to cache and reuse the results of a callable function for the same 
+	 * set of arguments. It returns a new callable function that stores and retrieves results from 
+	 * a cache based on argument values.
 	 * @param callable $fn The callable function to memoize.
 	 * @return callable A memoized version of the original callable function.
 	 */
@@ -90,7 +91,8 @@ if (!function_exists('view')) {
 	 * This function is used to render and display a View template within the application.
 	 * @param string $view    The name of the View template to render.
 	 * @param mixed  $params  Optional data to pass to the View template (default is null).
-	 * @param bool   $buffer  If true, the output is buffered; if false, it's immediately displayed (default is true).
+	 * @param bool   $buffer  If true, the output is buffered; if false, 
+	 * it's immediately displayed (default is true).
 	 * @param string $ext     The file extension of the View template (default is '.php').
 	 * @return void
 	 */
@@ -208,7 +210,8 @@ if (!function_exists('show')) {
 	/**
 	 * Display or return data.
 	 *
-	 * This function is used to either display data or return it as a string based on the provided parameters.
+	 * This function is used to either display data or return it as a string
+	 * based on the provided parameters.
 	 * @param mixed  $data   The data to be displayed or returned (default is null).
 	 * @param bool   $return If true, the data is returned as a string; if false, it's echoed (default is false).
 	 * @return mixed If $return is true, the data is returned as a string; otherwise, it's echoed.
@@ -232,9 +235,11 @@ if (!function_exists('show')) {
 if (!function_exists('cVar')) {
 
 	/**
-	 * Copies the value of an original variable, removes the original variable, and returns the copied value.
+	 * Copies the value of an original variable, removes the original variable, 
+	 * and returns the copied value.
 	 *
-	 * This function is primarily used for duplicating and removing variables of types like $_COOKIE or $_SESSION.
+	 * This function is primarily used for duplicating and removing variables 
+	 * of types like $_COOKIE or $_SESSION.
 	 * @param mixed $var The variable whose value you want to copy and remove.
 	 * @return mixed The copied value of the original variable.
 	 */
@@ -303,7 +308,9 @@ if (!function_exists('setFlash')) {
 	function setFlash(string $type, string $message)
 	{
 		// Calls the 'setFlash' method from the 'session' component of the Axm application.
-		return Axm::app()->session->setFlash($type, $message);
+		return Axm::app()
+			->session
+			->setFlash($type, $message);
 	}
 }
 
@@ -312,15 +319,18 @@ if (!function_exists('generateUrl')) {
 	/**
 	 * This code checks if a function called "urlSite" exists. 
 	 * 
-	 * If it does not exist, the code creates a function called "urlSite" that takes in one parameter, a string called $dir. 
-	 * The function then sets the scheme and host variables to the request scheme and http host from the server respectively.
-	 * It then sets the path variable to the value of $dir after trimming off any slashes at the end. 
-	 * It then creates an url variable by concatenating the scheme, host and path variables.
-	 * If this url is not valid, it throws an exception. Otherwise, it returns the url.
+	 * If it does not exist, the code creates a function called "urlSite" that takes in one parameter, 
+	 * a string called $dir. The function then sets the scheme and host variables to the request scheme 
+	 * and http host from the server respectively. It then sets the path variable to the value of $dir 
+	 * after trimming off any slashes at the end. It then creates an url variable by concatenating the 
+	 * scheme, host and path variables. If this url is not valid, it throws an exception. Otherwise,
+	 * it returns the url.
 	 **/
 	function generateUrl(string $dir = ''): string
 	{
-		$url = Axm::app()->request->createNewUrl($dir);
+		$url = Axm::app()
+			->request
+			->createNewUrl($dir);
 
 		// If the URL is not valid, throw an exception
 		if (!filter_var($url, FILTER_VALIDATE_URL)) {
@@ -341,10 +351,12 @@ if (!function_exists('baseUrl')) {
 	 **/
 	function baseUrl(string $dir = ''): string
 	{
-		// If $dir is not empty, remove any forward-slashes or back-slashes from the beginning or end of the string, add a forward-slash to the end and assign it to $dir
+		// If $dir is not empty, remove any forward-slashes or back-slashes from the beginning 
+		// or end of the string, add a forward-slash to the end and assign it to $dir
 		$dir = (!empty($dir)) ? rtrim($dir, '\/') . '/' : '';
 
-		// Concatenate PUBLIC_PATH and $dir to form the full URL of the current site with the directory appended
+		// Concatenate PUBLIC_PATH and $dir to form the full URL of the current site 
+		// with the directory appended
 		$url = generateUrl(trim("$dir/"));
 
 		return $url;
@@ -480,7 +492,6 @@ if (!function_exists('checkSession')) {
 	}
 }
 
-
 if (!function_exists('getInfoUser')) {
 
 	/**
@@ -495,7 +506,6 @@ if (!function_exists('getInfoUser')) {
 		return $userClass::getInfoUser($user, $value);
 	}
 }
-
 
 if (!function_exists('getUser')) {
 
@@ -515,7 +525,7 @@ if (!function_exists('app')) {
 	 * Resolve or retrieve an instance of the Axm class.
 	 *
 	 * @param string|null $alias  (Optional) An alias for the instance to be retrieved.
-	 * @param Closure|null $callback  (Optional) A closure (anonymous function) to construct the instance if it doesn't exist.
+	 * @param Closure|null $callback  (Optional) A closure (anonymous function) to construct
 	 * @param bool $shared  (Optional) Indicates whether the instance should be shared (singleton) or not.
 	 * @return mixed If an alias is provided, it returns the instance associated with that alias.
 	 *               If no alias is provided, it returns an instance of the Axm class.
@@ -531,7 +541,6 @@ if (!function_exists('now')) {
 
 	/**
 	 * Get the current date and time using the Carbon library.
-	 *
 	 * @return \Carbon\Carbon A Carbon instance representing the current date and time.
 	 */
 	function now()
@@ -722,18 +731,10 @@ if (!function_exists('config')) {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	function config(string $key = null, $default = null)
+	function config(string $key = null, $rootBaseConfig = null)
 	{
 		// Get the application's configuration
-		$config = Axm::app()->config();
-
-		// If no key is provided, return the entire configuration array
-		if (is_null($key)) {
-			return $config;
-		}
-
-		// Use null coalescing operator to return the value or default if not found
-		return $config->$key ?? $default;
+		return Axm::app()->config($key, $rootBaseConfig);
 	}
 }
 
@@ -801,8 +802,10 @@ if (!function_exists('helpers')) {
 	/**
 	 * Load one or multiple helpers.
 	 *
-	 * @param string|array $helpers Names of the helpers to load, separated by spaces, commas, dots, or an array.
-	 * @param string|null $customPath The path to custom helper files. If not provided, custom helpers are not loaded.
+	 * @param string|array $helpers Names of the helpers to load, separated by spaces, 
+	 * commas, dots or an array.
+	 * @param string|null $customPath The path to custom helper files. If not provided, 
+	 * custom helpers are not loaded.
 	 * @return bool True if all helpers were loaded successfully, false otherwise.
 	 * @throws HelperNotFoundException If a specified helper file does not exist in the given paths.
 	 */
@@ -863,8 +866,10 @@ if (!function_exists('getRouteParams')) {
 	/**
 	 * Get the route parameters from the current request.
 	 *
-	 * This function retrieves the route parameters from the current HTTP request. Route parameters are typically used to
-	 * capture values from the URL in a structured way and are commonly used in routing systems to determine the action to
+	 * This function retrieves the route parameters from the current HTTP request. 
+	 * Route parameters are typically used to
+	 * capture values from the URL in a structured way and are commonly used in routing 
+	 * systems to determine the action to
 	 * be taken based on the requested URL.
 	 * @return array An associative array containing the route parameters.
 	 */
@@ -881,8 +886,10 @@ if (!function_exists('getUri')) {
 	/**
 	 * Get the URI (Uniform Resource Identifier) of the current request.
 	 *
-	 * This function retrieves the URI of the current HTTP request. The URI represents the unique identifier for the requested
-	 * resource and typically includes the scheme, host, path, query parameters, and fragment identifier.
+	 * This function retrieves the URI of the current HTTP request. 
+	 * The URI represents the unique identifier for the requested
+	 * resource and typically includes the scheme, host, path, query parameters,
+	 * and fragment identifier.
 	 * @return string The URI of the current request as a string.
 	 */
 	function getUri()
@@ -898,11 +905,13 @@ if (!function_exists('logger')) {
 	/**
 	 * Log a message with a specified log level and optionally output it.
 	 *
-	 * This function is used to log messages with various log levels, such as 'debug', 'info', 'warning', 'error', etc.
-	 * It can also optionally output the log message. The log messages are formatted with a timestamp and written to a log file.
+	 * This function is used to log messages with various log levels, 
+	 * such as 'debug', 'info', 'warning', 'error', etc.
+	 * It can also optionally output the log message. 
+	 * The log messages are formatted with a timestamp and written to a log file.
 	 * @param string $message The message to be logged.
-	 * @param string $level (Optional) The log level (e.g., 'debug', 'info', 'warning'). Defaults to 'debug' if not provided.
-	 * @param bool $output (Optional) Whether to output the log message to the console. Defaults to false.
+	 * @param string $level (Optional) The log level (e.g., 'debug', 'info', 'warning').
+	 * @param bool $output (Optional) Whether to output the log message to the console.
 	 * @return bool True if the message was logged successfully, false otherwise.
 	 */
 	function logger(string $message, string $level = 'debug', bool $output = false)
