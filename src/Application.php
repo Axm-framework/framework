@@ -87,16 +87,17 @@ abstract class Application
 	 */
 	public function config(string $key = null, $rootBaseConfig = null)
 	{
+		$config = Axm\BaseConfig::make();
 		if (is_null($key))
-			return $this->config;
+			return $config;
 
 		if (str_contains($key, '/')) {
-			$path = is_null($rootBaseConfig) ? $this->config::ROOT_PATH_CONFIG .
+			$path = is_null($rootBaseConfig) ? $config::ROOT_PATH_CONFIG .
 				$key : $rootBaseConfig;
-			return $this->config->load($path);
+			return $config->load($path);
 		}
 
-		return $this->config->get($key);
+		return $config->get($key);
 	}
 
 	/**
