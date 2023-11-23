@@ -96,7 +96,7 @@ if (!function_exists('view')) {
 	 * @param string $ext     The file extension of the View template (default is '.php').
 	 * @return void
 	 */
-	function view(string $view, $params = null, bool $buffer = true, string $ext = '.php')
+	function view(string $view, array $params = [], bool $buffer = true, string $ext = '.php')
 	{
 		// Render the View template using the provided parameters.
 		$renderedView = Axm::app()->controller->renderView($view, $params, $buffer, $ext);
