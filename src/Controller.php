@@ -158,6 +158,6 @@ abstract class Controller
      */
     public function __call($name, $arguments)
     {
-        throw new AxmException(Axm::t('axm', 'El método "%s" no existe', [$name]), 'no_action');
+        throw new AxmException("Method [ $name ] does not exist");
     }
 }
