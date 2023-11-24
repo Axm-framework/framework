@@ -1008,6 +1008,22 @@ if (!function_exists('camelCase')) {
 	}
 }
 
+if (!function_exists('esc')) {
+	/**
+	 * Escapes and formats a text string for safe display in HTML.
+	 *
+	 * This function combines HTML encoding and newline-to-break conversion.
+	 * @param string $text The input text to be escaped and formatted.
+	 * @return string The escaped and formatted text.
+	 */
+	function esc(string $text): string
+	{
+		$encodedText = htmlspecialchars($text, ENT_QUOTES, config('app.charset') ?? 'UTF-8');
+		$brText = nl2br($encodedText);
+		return $brText;
+	}
+}
+
 if (!function_exists('getLatestPackageVersion')) {
 
 	/**
