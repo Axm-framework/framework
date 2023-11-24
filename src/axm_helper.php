@@ -819,8 +819,8 @@ if (!function_exists('helpers')) {
 		}
 
 		// Define paths for helper files
-		$appPath = APP_PATH . DIRECTORY_SEPARATOR . 'Helpers'; // Default application path
-		$axmHelpersPath = AXM_PATH . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'src'; // Axm system path
+		$appPath = config('paths.helpersPath'); // Default application path
+		$axmHelpersPath = config('paths.helpersAxmPath'); // Axm system path
 
 		// Load custom helpers from the provided path
 		if ($customPath) {
@@ -920,7 +920,7 @@ if (!function_exists('logger')) {
 		$dateTime         = date('d-m-Y H:i:s');
 		$level            = in_array($level, $levels) ? $level : 'debug';
 		$formattedMessage = '[' . strtoupper($level) . "] $dateTime - $message";
-		$logFilePath      = STORAGE_PATH . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'axm_log.log';
+		$logFilePath      = config('paths.logsPath') . DIRECTORY_SEPARATOR . 'axm_log.log';
 
 		if (!file_exists($logFilePath)) {
 			setFlash('error', sprintf('The log file does not exist at %s', $logFilePath));
