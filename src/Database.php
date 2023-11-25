@@ -16,20 +16,25 @@ use Illuminate\Container\Container;
  */
 class Database
 {
-    private static $conection;
+    /**
+     * @var Illuminate\Database\Capsule\Manager
+     */
+    private static $connection;
 
     /**
      * Create a new database connection for models
-     *
      * @param string|null $driver
      */
     public static function connect(string $driver = null)
     {
+        // If there is already a connection, do nothing
+        if (isset(static::$connection)) return;
+
         $config = config('/DataBase.php');
 
         $driver = $driver ?? $config['db']['default'] ?? 'mysql';
 
-        $capsule = static::$conection = new Capsule;
+        $capsule = static::$connection = new Capsule;
         $capsule->addConnection(
             $config['db']['connections'][$driver]
         );
@@ -39,14 +44,25 @@ class Database
 
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
+
+        // if (php_sapi_name() === 'cli') {
+        //     Schema::$capsule = $capsule;
+        // }
     }
 
     /**
      * Get database connection
+     * @return Illuminate\Database\Capsule\Manager
      */
-    public static function get()
+    public static function db()
     {
-        return static::$conection;
+        if (static::$connection) {
+            return static::$connection;
+        }
+
+        static::connect();
+
+        return static::$connection;
     }
 
     /**
@@ -54,6 +70,8 @@ class Database
      */
     public static function disconnect(string $driver)
     {
-        return static::$conection->getConnection()->disconnect($driver);
+        return static::$connection
+            ->getConnection()
+            ->disconnect($driver);
     }
 }
