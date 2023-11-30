@@ -96,7 +96,7 @@ if (!function_exists('view')) {
 	 * @param string $ext     The file extension of the View template (default is '.php').
 	 * @return void
 	 */
-	function view(string $view, $params = null, bool $buffer = true, string $ext = '.php')
+	function view(string $view, array $params = [], bool $buffer = true, string $ext = '.php')
 	{
 		// Render the View template using the provided parameters.
 		$renderedView = Axm::app()->controller->renderView($view, $params, $buffer, $ext);
@@ -819,8 +819,8 @@ if (!function_exists('helpers')) {
 		}
 
 		// Define paths for helper files
-		$appPath = APP_PATH . DIRECTORY_SEPARATOR . 'Helpers'; // Default application path
-		$axmHelpersPath = AXM_PATH . DIRECTORY_SEPARATOR . 'helpers' . DIRECTORY_SEPARATOR . 'src'; // Axm system path
+		$appPath = config('paths.helpersPath'); // Default application path
+		$axmHelpersPath = config('paths.helpersAxmPath'); // Axm system path
 
 		// Load custom helpers from the provided path
 		if ($customPath) {
@@ -920,7 +920,7 @@ if (!function_exists('logger')) {
 		$dateTime         = date('d-m-Y H:i:s');
 		$level            = in_array($level, $levels) ? $level : 'debug';
 		$formattedMessage = '[' . strtoupper($level) . "] $dateTime - $message";
-		$logFilePath      = STORAGE_PATH . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'axm_log.log';
+		$logFilePath      = config('paths.logsPath') . DIRECTORY_SEPARATOR . 'axm_log.log';
 
 		if (!file_exists($logFilePath)) {
 			setFlash('error', sprintf('The log file does not exist at %s', $logFilePath));
@@ -1005,6 +1005,22 @@ if (!function_exists('camelCase')) {
 		$camelCaseStr = implode('', $words);
 
 		return $camelCaseStr;
+	}
+}
+
+if (!function_exists('esc')) {
+	/**
+	 * Escapes and formats a text string for safe display in HTML.
+	 *
+	 * This function combines HTML encoding and newline-to-break conversion.
+	 * @param string $text The input text to be escaped and formatted.
+	 * @return string The escaped and formatted text.
+	 */
+	function esc(string $text): string
+	{
+		$encodedText = htmlspecialchars($text, ENT_QUOTES, config('app.charset') ?? 'UTF-8');
+		$brText = nl2br($encodedText);
+		return $brText;
 	}
 }
 

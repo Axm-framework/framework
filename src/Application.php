@@ -8,6 +8,7 @@ use Axm;
 use Locale;
 use Axm\Container;
 use Axm\Exception\AxmException;
+use Exception;
 
 /**
  * Class Application
@@ -177,6 +178,134 @@ abstract class Application
 		$this->user = function () {
 			return $this->session->set('user', true);
 		};
+	}
+
+	/**
+	 * Attempts to log in a user based on provided data.
+	 *
+	 * @param array $data An associative array containing user login data.
+	 * @return bool Returns true if the login is successful, false otherwise.
+	 * @throws \Exception Throws an exception in case of an error during the login process.
+	 */
+	public function simpleKeyLogin(array $data): bool
+	{
+		try {
+			// Retrieve configuration values
+			$userId = $this->config('app.userId');
+			$userClass = $this->config('app.userClass');
+
+			// Extract field and value from the input data
+			[$field, $value] = $data;
+
+			// Retrieve user from the database
+			$result = $this->getUserFromDatabase($userClass, $field, $value);
+
+			// If a user is found, set the user session and return true
+			if ($result) {
+				$this->setUserSession($userId, $result);
+				return true;
+			}
+
+			// If no user is found, return false
+			return false;
+		} catch (\Throwable $th) {
+			// Handle errors and throw a more descriptive exception
+			throw new Exception("Error during login: " . $th->getMessage());
+		}
+	}
+
+	/**
+	 * @param array $keys
+	 * @param array $values
+	 * 
+	 * @return bool
+	 */
+	public function multipleKeyLogin(array $keys, array $values): bool
+	{
+		try {
+			// Retrieve configuration values
+			$userId = $this->config('app.userId');
+			$userClass = $this->config('app.userClass');
+
+			// Make sure the number of keys and values match
+			if (count($keys) !== count($values)) {
+				throw new \InvalidArgumentException("Number of keys and values must match.");
+			}
+
+			// Combine keys and values into an associative array
+			$userData = array_combine($keys, $values);
+
+			foreach ($userData as $field => $value) {
+				// Retrieve user from the database
+				$result = $this->getUserFromDatabase($userClass, $field, $value);
+
+				// If a user is found, set the user session and return true
+				if ($result) {
+					$this->setUserSession($userId, $result);
+					return true;
+				}
+			}
+
+			// If no user is found, return false
+			return false;
+		} catch (\Throwable $th) {
+			// Handle errors and throw a more descriptive exception
+			throw new Exception("Error during login: " . $th->getMessage());
+		}
+	}
+
+	/**
+	 * Attempts to log in a user based on provided data.
+	 *
+	 * @param array|array[] $fields An array or nested arrays containing the fields to use for the database query.
+	 * @param array|array[] $values An array or nested arrays containing the corresponding values to match in the database query.
+	 * @param callable|null $callback A callback function to execute upon successful login.
+	 *
+	 * @return bool Returns true if the login is successful, false otherwise.
+	 * @throws \Exception Throws an exception in case of an error during the login process.
+	 */
+	public function login(array $fields, array $values = []): bool
+	{
+		try {
+
+			$check = match (func_num_args()) {
+				1 => $this->simpleKeyLogin($fields),
+				2 => $this->multipleKeyLogin($fields, $values),
+				default => false,
+			};
+
+			return $check;
+		} catch (\Throwable $th) {
+			// Handle errors and throw a more descriptive exception
+			throw new \Exception("Error during login: " . $th->getMessage());
+		}
+	}
+
+	/**
+	 * Retrieves a user from the database based on provided field and value.
+	 *
+	 * @param string $userClass The class representing the user model.
+	 * @param string $field The field to use for the database query.
+	 * @param mixed $value The value to match in the database query.
+	 *
+	 * @return mixed|null Returns the user object if found, or null if no user is found.
+	 */
+	private function getUserFromDatabase(string $userClass, string $field, $value)
+	{
+		// Use prepared statements or an ORM to prevent SQL injection
+		return $userClass::where($field, $value)->first();
+	}
+
+	/**
+	 * Sets the user session based on the provided user ID and data.
+	 *
+	 * @param string $userId The key to use for storing user data in the session.
+	 * @param mixed $result The user data to store in the session.
+	 * @return void
+	 */
+	private function setUserSession($userId, $result)
+	{
+		app()->session->set($userId, $result);
 	}
 
 	/**

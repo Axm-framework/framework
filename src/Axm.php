@@ -93,8 +93,8 @@ class Axm
 	 */
 	private static function initializeEnvironment()
 	{
-		// Obtain the value of AXM_ENVIRONMENT or use a default value
-		static::$_environment = $env = env('AXM_ENVIRONMENT', 'production');
+		// Obtain the value of APP_ENVIRONMENT or use a default value
+		static::$_environment = $env = env('APP_ENVIRONMENT', 'production');
 
 		// Configuring environment-based error handling.
 		if ($env === 'debug') {
