@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use Exception;
 use Axm\Application;
-use Axm\Exception\AxmException;
 use Axm\Exception\AxmCLIException;
 
 /**
@@ -72,8 +72,9 @@ class Axm
 			});
 		}
 
-		if (self::$_environment !== 'production')
+		if (self::$_environment !== 'production'){
 			\Axm\HandlerErrors::make(new \Whoops\Handler\PrettyPageHandler, new \Whoops\Run);
+		}
 	}
 
 	/**
@@ -243,12 +244,12 @@ class Axm
 	 * will cause an exception to be thrown.
 	 * To retrieve the application instance, use app().
 	 * @param Application $app The application instance.
-	 * @throws AxmException if multiple application instances are registered.
+	 * @throws Exception if multiple application instances are registered.
 	 */
 	public static function setApplication(Application $app): void
 	{
 		if (self::$_app !== null) {
-			throw new AxmException('Axm application can only be created once.');
+			throw new Exception('Axm application can only be created once.');
 		}
 
 		self::$_app = $app;
