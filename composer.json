@@ -28,14 +28,13 @@
         "vlucas/phpdotenv": "^5.5",
         "illuminate/database": "*",
 
-        "axm/http": "*",
-        "axm/views": "*",
-        "axm/exception": "*",
-        "axm/middlewares": "*",
-        "axm/session": "*",
-        "axm/console": "*",
-        "axm/helpers": "*",
-        "axm/fluent": "*"
+        "axm/http": "^1.0.18",
+        "axm/views": "^1.0.14",
+        "axm/middlewares": "^1.0.4",
+        "axm/session": "^1.0.5",
+        "axm/console": "^1.0.41",
+        "axm/helpers": "^1.0.6",
+        "axm/fluent": "^1.0.7"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6"
@@ -64,7 +63,7 @@
     },
     "support": {
         "forum":  "http://forum.Axmphp.com/",
-        "source": "https://github.com/Axmphp/Axmv1",
-        "slack":  "https://Axmchat.slack.com"
+        "source": "https://github.com/Axm-framework/framework",
+        "slack":  "https://axm.slack.com"
     }
 }

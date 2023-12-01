@@ -7,7 +7,6 @@ namespace Axm;
 use Axm;
 use Locale;
 use Axm\Container;
-use Axm\Exception\AxmException;
 use Exception;
 
 /**
@@ -120,7 +119,6 @@ abstract class Application
 	 *
 	 * @param string $path The path to the configuration file.
 	 * @param string $root An optional root directory for the path.
-	 *
 	 * @return mixed The result of the configuration file load operation.
 	 */
 	public function load(string $path, string $root = APP_PATH)
@@ -210,7 +208,7 @@ abstract class Application
 			return false;
 		} catch (\Throwable $th) {
 			// Handle errors and throw a more descriptive exception
-			throw new Exception("Error during login: " . $th->getMessage());
+			throw new Exception('Error during login: ' . $th->getMessage());
 		}
 	}
 
@@ -229,7 +227,7 @@ abstract class Application
 
 			// Make sure the number of keys and values match
 			if (count($keys) !== count($values)) {
-				throw new \InvalidArgumentException("Number of keys and values must match.");
+				throw new \InvalidArgumentException('Number of keys and values must match.');
 			}
 
 			// Combine keys and values into an associative array
@@ -381,7 +379,7 @@ abstract class Application
 	 *
 	 * This method retrieves the user's preferred locale from the HTTP Accept-Language header.
 	 * @return string The user's preferred locale or an empty string if not available.
-	 * @throws AxmException If the "intl" extension is not enabled on the server.
+	 * @throws Exception If the "intl" extension is not enabled on the server.
 	 */
 	public function getLocale()
 	{
@@ -390,7 +388,7 @@ abstract class Application
 		}
 
 		if (!extension_loaded('intl')) {
-			throw new AxmException('The "intl" extension is not enabled on this server');
+			throw new Exception('The "intl" extension is not enabled on this server');
 		}
 
 		return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
