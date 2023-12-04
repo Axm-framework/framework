@@ -62,7 +62,7 @@
         "test": "phpunit"
     },
     "support": {
-        "forum":  "http://forum.Axmphp.com/",
+        "forum":  "http://forum.axmphp.com/",
         "source": "https://github.com/Axm-framework/framework",
         "slack":  "https://axm.slack.com"
     }

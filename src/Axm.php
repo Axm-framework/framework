@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Axm\Application;
-use Axm\Exception\AxmCLIException;
+use Axm\Console\CLIException;
 
 /**
  * AXM Framework PHP.
@@ -67,7 +67,7 @@ class Axm
 	{
 		if (self::is_cli()) {
 			return set_exception_handler(function (\Throwable $e) {
-				AxmCLIException::handleCLIException($e);
+				CLIException::handleCLIException($e);
 			});
 		}
 
