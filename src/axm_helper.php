@@ -365,11 +365,20 @@ if (!function_exists('baseUrl')) {
 
 if (!function_exists('asset')) {
 
+	/**
+	 * @param string $dirFile
+	 * @return string
+	 */
 	function asset(string $dirFile): string
 	{
 		$pathAssets = 'resources/assets/';
-		$file = baseUrl($pathAssets . $dirFile);
+		$fullPath = trim($pathAssets, '/') . '/' . trim($dirFile, '/');
 
+		if (!file_exists($fullPath)) {
+			throw new Exception("File not found: $fullPath");
+		}
+
+		$file = baseUrl($fullPath);
 		return $file;
 	}
 }
@@ -390,7 +399,7 @@ if (!function_exists('go')) {
 if (!function_exists('back')) {
 
 	/**
-	 *  is used to go backwards, 
+	 *  Is used to go backwards, 
 	 *  if $_SERVER['HTTP_REFERER'] is defined it goes backwards, 
 	 *  otherwise it does a refresh 
 	 *  e.g.: back('login'); **/
@@ -496,6 +505,7 @@ if (!function_exists('getInfoUser')) {
 
 	/**
 	 * Returns any user specific info, the name of the class from the ConfigApp 
+	 * 
 	 * var public userClass   
 	 * @param string $user
 	 * @param string $value
@@ -919,18 +929,16 @@ if (!function_exists('logger')) {
 		$levels           = ['debug', 'import', 'info', 'success', 'warning', 'error'];
 		$dateTime         = date('d-m-Y H:i:s');
 		$level            = in_array($level, $levels) ? $level : 'debug';
-		$formattedMessage = '[' . strtoupper($level) . "] $dateTime - $message";
+		$formattedMessage = '[' . strtoupper($level) . ']' . $dateTime - $message;
 		$logFilePath      = config('paths.logsPath') . DIRECTORY_SEPARATOR . 'axm_log.log';
 
 		if (!file_exists($logFilePath)) {
 			setFlash('error', sprintf('The log file does not exist at %s', $logFilePath));
-
 			return false;
 		}
 
 		if (!$fileHandle = fopen($logFilePath, 'a')) {
 			setFlash('error', sprintf('Cannot open file at %s', $logFilePath));
-
 			return false;
 		}
 
@@ -1024,7 +1032,7 @@ if (!function_exists('esc')) {
 	}
 }
 
-if (!function_exists('getLatestPackageVersion')) {
+if (!function_exists('getVersion')) {
 
 	/**
 	 * Get the latest version of a Composer package from Packagist.org.
@@ -1032,7 +1040,7 @@ if (!function_exists('getLatestPackageVersion')) {
 	 * @param string $packageName The name of the Composer package.
 	 * @return string|null The latest version of the package, or null if not found.
 	 */
-	function getLatestPackageVersion($packageName)
+	function getVersion($packageName)
 	{
 		$url = "https://packagist.org/packages/{$packageName}.json";
 

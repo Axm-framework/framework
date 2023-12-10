@@ -3,10 +3,9 @@
 declare(strict_types=1);
 
 use Axm\Application;
-use Axm\Console\CLIException;
 
 /**
- * AXM Framework PHP.
+ * Axm Framework PHP.
  *
  * The Axm class serves as the entry point for the AXM Framework. It provides methods for
  * initializing the application, handling exceptions and errors, and managing services.
@@ -25,6 +24,15 @@ class Axm
 	private static $initialized = false;
 
 
+	/**
+	 * Ensures that the class is initialized.
+	 *
+	 * This method checks if the class has already been initialized. If not,
+	 * it sets the initialization flag to true and calls the initialize method.
+	 * This helps to ensure that the necessary setup or initialization is performed
+	 * only once.
+	 * @return void
+	 */
 	private static function ensureInitialized()
 	{
 		if (!self::$initialized) {
@@ -34,7 +42,12 @@ class Axm
 	}
 
 	/**
-	 * Initializes the AXM Framework.
+	 * Initializes the application.
+	 *
+	 * This method performs the initial setup for the application. It includes
+	 * bootstrapping, initializing system handlers, and detecting the environment.
+	 * It is typically called after ensuring that the class is initialized.
+	 * @return void
 	 */
 	private static function initialize()
 	{
@@ -49,10 +62,14 @@ class Axm
 	}
 
 	/**
-	 * Starts the application by loading the specified bootstrap file.
+	 * Bootstraps the application.
 	 *
-	 * @param string $bootstrapFileName The name of the bootstrap file.
-	 * @throws Exception If the bootstrap file cannot be loaded or is unreadable.
+	 * This method is responsible for including the specified bootstrap file,
+	 * typically used for initializing configurations, autoloading, and other
+	 * necessary setup for the application.
+	 * @param string $bootstrapFileName The name of the bootstrap file to include.
+	 *                                  Defaults to 'bootstrap.php'.
+	 * @return void
 	 */
 	public static function boot(string $bootstrapFileName = 'bootstrap.php'): void
 	{
@@ -61,23 +78,26 @@ class Axm
 	}
 
 	/**
-	 * Initializes the error handlers.
+	 * Initializes system-specific error handlers.
+	 *
+	 * This method is responsible for setting up system-specific error handlers,
+	 * such as those defined in the `Axm\HandlerErrors` class. It ensures that the
+	 * necessary error handling configurations are applied.
+	 *
+	 * @return void
 	 */
 	protected static function initSystemHandlers()
 	{
-		if (self::is_cli()) {
-			return set_exception_handler(function (\Throwable $e) {
-				CLIException::handleCLIException($e);
-			});
-		}
-
-		if (self::$_environment !== 'production'){
-			\Axm\HandlerErrors::make(new \Whoops\Handler\PrettyPageHandler, new \Whoops\Run);
-		}
+		Axm\HandlerErrors::get()->run();
 	}
 
 	/**
-	 * Checks if the application is running in a CLI environment.
+	 * Checks if the script is running in a command-line environment.
+	 *
+	 * This method determines whether the script is being executed in a command-line
+	 * interface (CLI) environment based on the PHP_SAPI value or the absence of
+	 * specific server variables commonly present in web requests.
+	 * @return bool True if the script is running in a CLI environment, false otherwise.
 	 */
 	public static function is_cli(): bool
 	{
@@ -89,32 +109,40 @@ class Axm
 	}
 
 	/**
-	 * Starts the environment and configures error handling.
+	 * Initializes the application environment.
+	 *
+	 * This method sets up the application environment based on the value of
+	 * APP_ENVIRONMENT. It configures error reporting and display settings
+	 * according to the specified environment.
+	 * @return void
 	 */
 	private static function initializeEnvironment()
 	{
 		// Obtain the value of APP_ENVIRONMENT or use a default value
 		static::$_environment = $env = env('APP_ENVIRONMENT', 'production');
 
-		// Configuring environment-based error handling.
 		if ($env === 'debug') {
+			ini_set('display_errors', 1);
 			error_reporting(E_ALL);
-			ini_set('display_errors', '1');
 		} else {
 			error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED
 				& ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-			ini_set('display_errors', '0');
+			ini_set('display_errors', 0);
 		}
 	}
 
 	/**
-	 * Creates an application instance of the specified class.
+	 * Starts the application.
 	 *
-	 * @return mixed The application instance.
+	 * This method initiates the application by calling the specified initialization
+	 * function and passing the provided configuration. It returns the initialized
+	 * application instance.
+	 * @param array|null $config An optional array of configuration parameters.
+	 * @return object The initialized application instance.
 	 */
 	public static function startApplication(array $config = null)
 	{
-		return self::createApplication('Axm\\initApplication', $config);
+		return self::buildApplication('Axm\\initApplication', $config);
 	}
 
 	/**
@@ -123,7 +151,7 @@ class Axm
 	 * @param string $class   The application class name.
 	 * @param mixed  $config  Application configuration.
 	 */
-	private static function createApplication(string $class, array $config = null)
+	private static function buildApplication(string $class, array $config = null)
 	{
 		self::ensureInitialized();
 		return new $class($config);
@@ -139,18 +167,22 @@ class Axm
 	 */
 	public static function createConsoleApplication($config = null)
 	{
-		return self::createApplication('Axm\\Console\\ConsoleApplication', $config);
+		return self::buildApplication('Axm\\Console\\ConsoleApplication', $config);
 	}
 
 	/**
-	 * Gets the application singleton or a registered service instance.
+	 * Gets or registers a service in the application container.
 	 *
-	 * @param string|null $alias    The service alias to get or register.
-	 * @param Closure|null $callback The callback function to create the service.
-	 * @param bool $shared           Whether the service instance should be shared across requests.
-	 * @return mixed|null The application singleton, the requested service instance, or null if not found.
-	 * @throws InvalidArgumentException if attempting to register a service with an existing alias.
-	 * @throws RuntimeException if attempting to get a non-existent service.
+	 * This method allows getting or registering a service in the application container.
+	 * If no arguments are provided, it returns the singleton instance of the application.
+	 * If an alias is provided, it checks if the service is registered and returns it.
+	 * If a callback is provided, it registers the service with the specified alias and callback.
+	 * @param string|object|null $alias    The alias or object of the service.
+	 * @param Closure|null       $callback The callback function to create the service.
+	 * @param bool               $shared   Whether the service should be shared (singleton) or not.
+	 * @return object The registered or retrieved service instance.
+	 * @throws InvalidArgumentException If the provided alias or callback is not valid.
+	 * @throws RuntimeException         If the requested service is not found.
 	 */
 	public static function app($alias = null, Closure $callback = null, bool $shared = false)
 	{
@@ -201,7 +233,10 @@ class Axm
 	}
 
 	/**
-	 * Returns the app instance.
+	 * Gets the singleton instance of the application.
+	 *
+	 * This method returns the singleton instance of the application container.
+	 * @return Application|null The singleton instance of the application, or null if not set.
 	 */
 	private static function getSingleton(): ?Application
 	{
@@ -209,7 +244,11 @@ class Axm
 	}
 
 	/**
-	 * Returns the environment variable.
+	 * Gets the current application environment.
+	 *
+	 * This method returns the current application environment, which is typically
+	 * determined based on the value of the `APP_ENVIRONMENT` variable or a default value.
+	 * @return string The current application environment.
 	 */
 	public static function getEnvironment()
 	{
@@ -217,7 +256,11 @@ class Axm
 	}
 
 	/**
-	 * Checks if the application is running in production mode.
+	 * Checks if the application is in production environment.
+	 *
+	 * This method returns true if the current application environment is set to
+	 * production, as determined by the value of the `APP_ENVIRONMENT` variable.
+	 * @return bool True if the application is in production environment, false otherwise.
 	 */
 	public static function isProduction(): bool
 	{
@@ -225,7 +268,13 @@ class Axm
 	}
 
 	/**
-	 * Returns an array with basic performance statistics.
+	 * Gets performance statistics for the script execution.
+	 *
+	 * This method returns an array containing performance statistics for the script execution.
+	 * It includes the start time and the total time elapsed since the script began executing.
+	 * @return array An associative array containing performance statistics.
+	 *               - 'startTime': The timestamp when the script started executing.
+	 *               - 'totalTime': The total time elapsed since the script began executing.
 	 */
 	public static function getPerformanceStats(): array
 	{
@@ -236,14 +285,13 @@ class Axm
 	}
 
 	/**
-	 * Stores the application instance in the class static member.
-	 * 
-	 * This method helps implement a singleton pattern for Application.
-	 * Repeated invocation of this method or the Application constructor
-	 * will cause an exception to be thrown.
-	 * To retrieve the application instance, use app().
-	 * @param Application $app The application instance.
-	 * @throws Exception if multiple application instances are registered.
+	 * Sets the application instance.
+	 *
+	 * This method sets the application instance, ensuring that it can only be set once.
+	 * If the application instance is already set, an exception is thrown.
+	 * @param Application $app The instance of the application to set.
+	 * @return void
+	 * @throws Exception If the application instance is already set.
 	 */
 	public static function setApplication(Application $app): void
 	{
@@ -256,16 +304,13 @@ class Axm
 
 	/**
 	 * Get the installed version of the Axm Framework from composer.json.
-	 *
 	 * @return string|null The version of the Axm Framework or null if not found.
 	 */
-	public static function getVersion()
+	public static function version()
 	{
-		if (isset($version)) {
-			return self::$version;
-		}
+		if (isset($version)) return self::$version;
 
-		self::$version = getLatestPackageVersion('axm/framework');
+		self::$version = \Composer\InstalledVersions::getVersion('axm/framework');
 		return self::$version;
 	}
 }
