@@ -2,7 +2,7 @@
 
 namespace Axm;
 
-use Axm\Exception\AxmException;
+use RuntimeException;
 
 /**
  * Class EventManager
@@ -56,9 +56,7 @@ class EventManager
      */
     public function offEvent(string $name, callable $callback = null): void
     {
-        if (!isset($this->events[$name])) {
-            return;
-        }
+        if (!isset($this->events[$name])) return;
 
         if ($callback === null) {
             unset($this->events[$name]);
@@ -78,9 +76,7 @@ class EventManager
      */
     public function triggerEvent(string $name): void
     {
-        if (!isset($this->events[$name])) {
-            return;
-        }
+        if (!isset($this->events[$name])) return;
 
         $callbacks = $this->events[$name] ?? [];
         foreach ($callbacks as $callback) {
@@ -93,12 +89,12 @@ class EventManager
      *
      * @param string $name The name of the event.
      * @return array|false An array of callbacks if the event is registered, false otherwise.
-     * @throws AxmException If the name of the event is null or empty.
+     * @throws RuntimeException If the name of the event is null or empty.
      */
     public function getEvent(string $name): array|false
     {
         if (empty($name)) {
-            throw new AxmException('The name of the event cannot be null or empty.');
+            throw new RuntimeException('The name of the event cannot be null or empty.');
         }
 
         if (array_key_exists($name, $this->events)) {

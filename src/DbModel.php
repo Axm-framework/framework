@@ -5,7 +5,7 @@ namespace Axm;
 use Axm;
 use PDO;
 use PDOException;
-use Axm\Exception\AxmException;
+use RuntimeException;
 
 
 /**
@@ -101,7 +101,7 @@ abstract class DbModel
 	public static function createConnection(array $conn): PDO
 	{
 		if (empty($conn['database']) || empty($conn['hostname']) || empty($conn['port']) || empty($conn['username']) || empty($conn['password']) || empty($conn['charset'])) {
-			throw new AxmException('Connection parameters are mandatory');
+			throw new RuntimeException('Connection parameters are mandatory');
 		}
 
 		if (self::$db === null) {
@@ -114,7 +114,7 @@ abstract class DbModel
 				self::$db = $pdo;
 			} catch (PDOException $e) {
 				error_log('Database connection error: ' . $e->getMessage(), 0);
-				throw new AxmException('Falló la conexión a la base de datos: ' . $e->getMessage());
+				throw new RuntimeException('Falló la conexión a la base de datos: ' . $e->getMessage());
 			}
 		}
 
@@ -206,7 +206,7 @@ abstract class DbModel
 		endforeach;
 
 		if (!$stmt || !$stmt->execute())
-			throw new AxmException('Unable to execute SQL statement: ' . static::getConnection()->errorCode());
+			throw new RuntimeException('Unable to execute SQL statement: ' . static::getConnection()->errorCode());
 
 		return $stmt->fetch(PDO::FETCH_OBJ);
 	}
@@ -278,7 +278,7 @@ abstract class DbModel
 	public static function _insert(string $colums, $values, string $params = null)
 	{
 		if (static::$readOnly)
-			throw new AxmException("Cannot write to READ ONLY tables.");
+			throw new RuntimeException("Cannot write to READ ONLY tables.");
 
 		//preInsert
 		if (self::preInsert() === false) return;
@@ -316,7 +316,6 @@ abstract class DbModel
 	{
 	}
 
-
 	/**
 	 * Executed just after any new records are created.
 	 * Place holder for sub-classes.
@@ -327,8 +326,6 @@ abstract class DbModel
 	public static function postInsert()
 	{
 	}
-
-
 
 	/**
 	 * Update SQL.
@@ -345,7 +342,7 @@ abstract class DbModel
 	public static function _update(string $colums, $values, string $params = null)
 	{
 		if (static::$readOnly)
-			throw new AxmException("Cannot write to READ ONLY tables.");
+			throw new RuntimeException("Cannot write to READ ONLY tables.");
 
 		if (self::preUpdate() === false) return;      //run preUpdate
 
@@ -379,7 +376,6 @@ abstract class DbModel
 	{
 	}
 
-
 	/**
 	 * Executed just after any new records are created.
 	 * Place holder for sub-classes.
@@ -390,35 +386,6 @@ abstract class DbModel
 	public static function postUpdate()
 	{
 	}
-
-
-	/**
-	 * 
-	 */
-	// public static function _exec(string $sql, bool $fetchAll = true, array $values = null)
-	// {
-	//   $stmt = static::getConnection()->prepare($sql);   //preparamos la sentencia.
-
-	//   /**
-	//    * Si los valores pasados a $values son array||object, estonces se pasan por la funcion bindParam
-	//    * para que Vincule los parámetros a los nombres de variable especificados. */
-	//   if (is_array($values) || is_object($values)) :
-	//     $key = 0;
-	//     foreach ($values as $key => &$item) :
-	//       $key++;
-	//       $stmt->bindParam($key, $item);
-	//     endforeach;
-	//   endif;
-
-	//   /**execute sql sino mostrar error*/
-	//   if (!$stmt || !$stmt->execute())
-	//     throw new AxmException('Unable to execute SQL statement: ' . static::getConnection()->errorCode());
-
-	//   if (!$fetchAll)
-	//     return ($stmt->rowCount() > 0) ? true : false;
-	//   else
-	//     return $stmt;
-	// }
 
 	public static function _exec(string $sql, bool $fetchAll = true, array $values = null)
 	{
@@ -435,11 +402,10 @@ abstract class DbModel
 
 		/**execute sql sino mostrar error*/
 		if (!$stmt || !$stmt->execute())
-			throw new AxmException('Unable to execute SQL statement: ' . static::getConnection()->errorCode());
+			throw new RuntimeException('Unable to execute SQL statement: ' . static::getConnection()->errorCode());
 
 		return ($fetchAll) ? $stmt : ($stmt->rowCount() > 0);  //return statement or boolean value based on fetchAll flag 
 	}
-
 
 	/**
 	 * convertir un array multinivel en uno simple
@@ -458,47 +424,6 @@ abstract class DbModel
 		return $res;
 	}
 
-
-	// /**
-	//  * 
-	//  */
-	// public static function _exec(string $sql, bool $fetchAll = true, array $values = null)
-	// {
-	//   // $values = protect($values);
-	//   // $values = self::sqlSanitize($values);
-	//   $stmt = static::getConnection()->prepare($sql);   //preparamos la sentencia.
-
-	//   /**
-	//    * Si los valores pasados a $values son array||object, estonces se pasan por la funcion bindParam
-	//    * para que Vincule los parámetros a los nombres de variable especificados. */
-	//   if(is_array($values) || is_object($values)):
-	//     $key = 0;
-	//     foreach ($values as $key => &$item):
-	//       $key++; 
-	//       $stmt->bindParam($key, $item);
-	//     endforeach;
-	//   endif;
-
-	//   /**execute sql sino mostrar error*/
-	//   if(!$stmt || !$stmt->execute())
-	//     throw new AxmException('Unable to execute SQL statement: ' .static::getConnection()->errorCode());
-
-	//   if(!$fetchAll):
-	//       $ret = ($stmt->rowCount() > 0) ? true : false;
-	//   else:
-	//       $ret = [];
-	//       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
-	//         $ret[] = $row;
-	//       }
-	//       $ret = isset($ret) ? $ret : false;
-	//   endif;
-
-	//   $stmt->closeCursor();        //liberar conexion del servidor
-	//   return $ret;
-	// } 
-
-
-
 	/**
 	 *  Select SQL
 	 *  user::_delete();    //elimina todos los fields de una tablas
@@ -507,7 +432,7 @@ abstract class DbModel
 	public static function _delete(string $params = null)
 	{
 		if (static::$readOnly)
-			throw new AxmException("Cannot write to READ ONLY tables.");
+			throw new RuntimeException("Cannot write to READ ONLY tables.");
 
 		if (self::preDelete() === false) return;  //run preDelete
 
@@ -521,7 +446,6 @@ abstract class DbModel
 
 	}
 
-
 	/**
 	 * Executed just before any new records are created.
 	 * Place holder for sub-classes.
@@ -532,7 +456,6 @@ abstract class DbModel
 	public static function preDelete()
 	{
 	}
-
 
 	/**
 	 * Executed just after any new records are created.
@@ -545,7 +468,6 @@ abstract class DbModel
 	{
 	}
 
-
 	public static function _sum(string $field, string $params = null)
 	{
 
@@ -556,13 +478,12 @@ abstract class DbModel
 			$sql = "SELECT SUM({$field}) as {$field} FROM {$table} WHERE {$params}";
 		$result = static::getConnection()->query("$sql");
 		if (!$result)
-			throw new AxmException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
+			throw new RuntimeException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
 
 		$row = $result->fetch(PDO::FETCH_NUM);
 		unset($result);
 		return ($row > 0) ? $row[0] : 0.00;
 	}
-
 
 	/**
 	 * Execute a Count SQL statement & return the number.
@@ -581,14 +502,16 @@ abstract class DbModel
 			$sql = "SELECT COUNT(*) FROM {$table} WHERE {$params}";
 		$result = static::getConnection()->query("$sql");
 		if (!$result)
-			throw new AxmException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
+			throw new RuntimeException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
 
 		$count = $result->fetch(PDO::FETCH_NUM);
 		return (int) $count[0] > 0 ? $count[0] : 0;
 	}
 
-
-
+	/**
+	 * @param array $colums
+	 * @return [type]
+	 */
 	protected static function Sqlcomodin(array $colums)
 	{
 
@@ -615,7 +538,7 @@ abstract class DbModel
 	public static function _truncate()
 	{
 		if (static::$readOnly) {
-			throw new AxmException('Cannot write to READ ONLY tables.');
+			throw new RuntimeException('Cannot write to READ ONLY tables.');
 		}
 
 		$table = static::getTableName();
@@ -623,7 +546,7 @@ abstract class DbModel
 		$stmt = static::_exec($sql);
 
 		if (!$stmt)
-			throw new AxmException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
+			throw new RuntimeException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
 
 		return (bool) $stmt;
 	}
@@ -632,13 +555,13 @@ abstract class DbModel
 	public function _renameTable($newName)
 	{
 		if (static::$readOnly)
-			throw new AxmException("Cannot write to READ ONLY tables.");
+			throw new RuntimeException("Cannot write to READ ONLY tables.");
 
 		$table = static::getTableName();
 		$sql = "RENAME TABLE {$newName}";
 		$stmt = static::_exec($sql);
 		if (!$stmt)
-			throw new AxmException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
+			throw new RuntimeException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
 
 		if (!$stmt)
 			return false;
@@ -657,12 +580,12 @@ abstract class DbModel
 	public static function _createDatabase(string $dbname = null)
 	{
 		if (static::$readOnly)
-			throw new AxmException("Cannot write to READ ONLY tables.");
+			throw new RuntimeException("Cannot write to READ ONLY tables.");
 
 		$sql = "CREATE DATABASE {$dbname}";
 		$stmt = static::_exec($sql);
 		if (!$stmt)
-			throw new AxmException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
+			throw new RuntimeException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
 
 		if (!$stmt)
 			return false;
@@ -681,12 +604,12 @@ abstract class DbModel
 	public static function _dropDatabase(string $dbname)
 	{
 		if (static::$readOnly)
-			throw new AxmException("Cannot write to READ ONLY tables.");
+			throw new RuntimeException("Cannot write to READ ONLY tables.");
 
 		$sql = "DROP DATABASE {$dbname}";
 		$stmt = static::_exec($sql);
 		if (!$stmt)
-			throw new AxmException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
+			throw new RuntimeException(sprintf('Unable to execute SQL statement. %s', static::getConnection()->errorCode()));
 
 		if (!$stmt)
 			return false;
@@ -726,7 +649,7 @@ abstract class DbModel
 		$result = static::getConnection()->query("DESCRIBE {$table}");
 
 		if ($result === false) {
-			throw new AxmException(sprintf('Unable to fetch the column names. %s.', static::getConnection()->errorCode()));
+			throw new RuntimeException(sprintf('Unable to fetch the column names. %s.', static::getConnection()->errorCode()));
 		}
 
 		$ret = [];
@@ -738,8 +661,6 @@ abstract class DbModel
 		$result->closeCursor();
 		return $ret;
 	}
-
-
 
 	/**
 	 * Retrieve a record by a particular column name using the retrieveBy prefix.
@@ -756,15 +677,10 @@ abstract class DbModel
 	public static function __callStatic($name, $args)
 	{
 		$class = get_called_class();
-		throw new AxmException(Axm::t(
-			'axm',
-			'There is no static method named "%s" in the "%s".',
-			[
-				$name, $class
-			]
+		throw new RuntimeException(sprintf('There is no static method named "%s" in the "%s".',
+			$name, $class
 		));
 	}
-
 
 	/**
 	 * Obtiene la llave primaria de una tabla
@@ -776,7 +692,6 @@ abstract class DbModel
 	{
 		return @static::$primaryKey ? static::$primaryKey : 'id';
 	}
-
 
 	/**
 	 * Crea una migration
@@ -807,7 +722,6 @@ abstract class DbModel
 			$this->log("There are no migrations to apply");
 	}
 
-
 	public static function createMigrationsTable()
 	{
 		self::getConnection()->exec("CREATE TABLE IF NOT EXISTS migrations (
@@ -816,7 +730,6 @@ abstract class DbModel
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		) ENGINE=MyISAM;");
 	}
-
 
 	public static function saveMigrations(array $newMigrations)
 	{
@@ -827,8 +740,6 @@ abstract class DbModel
 		$statement->execute();
 	}
 
-
-
 	public static function getAppliedMigrations()
 	{
 		$statement = self::getConnection()->prepare("SELECT migration FROM migrations");
@@ -837,8 +748,6 @@ abstract class DbModel
 		return $statement->fetchAll(\PDO::FETCH_COLUMN);
 	}
 
-
-
 	/**
 	 * Muestra un mesage con la hora actual */
 	private function log($message)
@@ -846,11 +755,8 @@ abstract class DbModel
 		echo "[" . date("Y-m-d H:i:s") . "] - " . $message . PHP_EOL;
 	}
 
-
-
 	/**
 	 * Devuelve un JSON de este modelo.
-	 *
 	 * @return string JSON del modelo
 	 */
 	public static function toJson()
@@ -858,10 +764,8 @@ abstract class DbModel
 		return json_encode(new self());
 	}
 
-
 	/**
 	 * Devuelve un array de este modelo.
-	 *
 	 * @return array Array del modelo
 	 */
 	public static function toArray()
@@ -875,7 +779,6 @@ abstract class DbModel
 		$data = json_decode(json_encode($data));
 		return $data;
 	}
-
 
 	/**
 	 * Elimina caracteres que podrian ayudar a ejecutar
@@ -910,7 +813,7 @@ abstract class DbModel
 		if ($sql !== '' && $sql !== null) :
 			$sql_temp = preg_replace('/\s+/', '', $sql);
 		//     if (!preg_match('/^[a-zA-Z_0-9\,\(\)\.\*]+$/', $sql_temp))  //revisar
-		//         throw new AxmException('Se está tratando de ejecutar un SQL peligroso!'.$sql_temp);
+		//         throw new RuntimeException('Se está tratando de ejecutar un SQL peligroso!'.$sql_temp);
 		endif;
 
 		return $sql;

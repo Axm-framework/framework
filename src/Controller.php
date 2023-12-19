@@ -6,7 +6,7 @@ use Axm;
 use Axm\Views\View;
 use Axm\Http\Request;
 use Axm\Http\Response;
-use Axm\Exception\AxmException;
+use RuntimeException;
 use Axm\Middlewares\BaseMiddleware;
 use Axm\Middlewares\MaintenanceMiddleware;
 use Axm\Middlewares\AuthMiddleware;
@@ -22,14 +22,12 @@ use Axm\Middlewares\AuthMiddleware;
  */
 abstract class Controller
 {
-    protected ?object   $user     = null;
-    protected ?string   $layout   = null;
-    protected ?View     $view     = null;
-    protected string    $action   = '';
-    protected ?object   $model    = null;
-    protected ?Request  $request  = null;
+    protected ?object $user = null;
+    protected ?string $layout = null;
+    protected ?View $view = null;
+    protected string $action = '';
+    protected ?Request $request = null;
     protected ?Response $response = null;
-    protected string    $controllerName = '';
 
     /**
      * @var BaseMiddleware[]
@@ -153,11 +151,11 @@ abstract class Controller
      *
      * @param string $name      
      * @param array  $arguments
-     * @throws AxmException
+     * @throws RuntimeException
      * @return void
      */
     public function __call($name, $arguments)
     {
-        throw new AxmException("Method [ $name ] does not exist");
+        throw new RuntimeException("Method [ $name ] does not exist");
     }
 }

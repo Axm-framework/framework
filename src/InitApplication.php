@@ -12,6 +12,6 @@ use Axm\Application;
  * @license http://www.axm.com/license/
  * @package Axm
  */
-class InitApplication extends Application
+final class InitApplication extends Application
 {
 }
