@@ -24,6 +24,7 @@
         "ext-openssl": "*",
         "ext-zip": "*",
         "ext-mbstring": "*",
+        "ext-intl": "*",
         "symfony/var-dumper": "^6.3.5",
         "vlucas/phpdotenv": "^5.5",
         "illuminate/database": "*",
