@@ -63,9 +63,8 @@ abstract class Application
 		$this->getContainer()
 			->loadFromDirectory(APP_PATH . DIRECTORY_SEPARATOR . 'Providers');
 
-		$this->openDefaultSystemConfigurationFiles();
+		// $this->openDefaultSystemConfigurationFiles();
 		$this->openRoutesUser();
-		$this->generateTokens();
 	}
 
 	/**
@@ -130,14 +129,6 @@ abstract class Application
 		) . '.' . pathinfo($path, PATHINFO_EXTENSION);
 
 		return $this->container->load($filePath);
-	}
-
-	/**
-	 * Generate security tokens, including CSRF tokens.
-	 */
-	private function generateTokens(): void
-	{
-		$this->generateCsrfToken();
 	}
 
 	/**
@@ -392,6 +383,14 @@ abstract class Application
 		}
 
 		return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+	}
+
+	/**
+	 * Generate security tokens, including CSRF tokens.
+	 */
+	private function generateTokens(): void
+	{
+		$this->generateCsrfToken();
 	}
 
 	/**

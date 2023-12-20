@@ -45,6 +45,8 @@ const APP_NAMESPACE = 'App\\';
 const AXM_NAMESPACE = 'Axm\\';
 
 require_once('axm_helper.php');
+require_once(APP_PATH . DIRECTORY_SEPARATOR . 'Config'.DIRECTORY_SEPARATOR . 'App.php');
+require_once(APP_PATH . DIRECTORY_SEPARATOR . 'Config'.DIRECTORY_SEPARATOR . 'Paths.php');
 
 require_once(VENDOR_PATH . DIRECTORY_SEPARATOR . 'vlucas' . DIRECTORY_SEPARATOR .
     'phpdotenv' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Dotenv.php');
