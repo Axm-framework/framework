@@ -21,7 +21,7 @@ class Axm
 	private static $version;
 	public  static $_environment;
 	private static $_app;
-	private static $initialized = false;
+	private static $initialized;
 
 
 	/**
