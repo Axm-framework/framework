@@ -63,7 +63,7 @@ abstract class Application
 		$this->getContainer()
 			->loadFromDirectory(APP_PATH . DIRECTORY_SEPARATOR . 'Providers');
 
-		// $this->openDefaultSystemConfigurationFiles();
+		$this->openDefaultSystemConfigurationFiles();
 		$this->openRoutesUser();
 	}
 
