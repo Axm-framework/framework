@@ -3,7 +3,7 @@
 namespace Axm;
 
 use Axm\Cache\Cache;
-use Axm\Exception\AxmException;
+use RuntimeException;
 
 /**
  *  Class BaseConfig 
@@ -46,7 +46,7 @@ class BaseConfig
      * @param string $file
      * @param bool   $merge
      * @return array
-     * @throws AxmException
+     * @throws RuntimeException
      */
     public function load(string $file, bool $merge = true)
     {
@@ -58,7 +58,7 @@ class BaseConfig
         $file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
 
         if (!file_exists($file)) {
-            throw new AxmException('Configuration file not found: ' . $file);
+            throw new RuntimeException('Configuration file not found: ' . $file);
         }
 
         $ext = pathinfo($file, PATHINFO_EXTENSION);
@@ -73,11 +73,11 @@ class BaseConfig
                 $data = parse_ini_file($file, true);
                 break;
             default:
-                throw new AxmException('Invalid configuration file format: ' . $ext);
+                throw new RuntimeException('Invalid configuration file format: ' . $ext);
         }
 
         if (!is_array($data)) {
-            throw new AxmException('Invalid configuration file: ' . $file);
+            throw new RuntimeException('Invalid configuration file: ' . $file);
         }
 
         if ($merge) {
@@ -97,7 +97,7 @@ class BaseConfig
      * @param string $file
      * @param bool   $merge
      * @return array
-     * @throws AxmException
+     * @throws RuntimeException
      */
     public function recursiveLoadFiles(array $files, bool $merge = true): array
     {
