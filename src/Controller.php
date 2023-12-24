@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Axm;
 
 use Axm;
@@ -8,13 +10,11 @@ use Axm\Http\Request;
 use Axm\Http\Response;
 use RuntimeException;
 use Axm\Middlewares\BaseMiddleware;
-use Axm\Middlewares\MaintenanceMiddleware;
 use Axm\Middlewares\AuthMiddleware;
 
-
 /**
- *  Class Controller 
- * 
+ * Class Controller
+ *
  * @author Juan Cristobal <juancristobalgd1@gmail.com>
  * @link http://www.axm.com/
  * @license http://www.axm.com/license/
@@ -22,40 +22,73 @@ use Axm\Middlewares\AuthMiddleware;
  */
 abstract class Controller
 {
+    /**
+     * @var object|null The current user.
+     */
     protected ?object $user = null;
+
+    /**
+     * @var string|null The layout to be used.
+     */
     protected ?string $layout = null;
+
+    /**
+     * @var View|null The View instance.
+     */
     protected ?View $view = null;
+
+    /**
+     * @var string The current action.
+     */
     protected string $action = '';
+
+    /**
+     * @var Request|null The Request instance.
+     */
     protected ?Request $request = null;
+
+    /**
+     * @var Response|null The Response instance.
+     */
     protected ?Response $response = null;
 
     /**
-     * @var BaseMiddleware[]
+     * @var BaseMiddleware[]|null The array of middlewares.
      */
     protected ?array $middlewares = [];
 
-
+    /**
+     * Controller constructor.
+     */
     public function __construct()
     {
         $app = Axm::app();
-        $this->request  = $app->request;
+        $this->request = $app->request;
         $this->response = $app->response;
-        $this->view     = View::make();
+        $this->view = View::make();
 
-        $this->init();
+        $this->executeMiddleware();
     }
 
     /**
-     * 
+     * Execute the registered middlewares.
+     * @return void
      */
-    public function init()
+    private function executeMiddleware()
     {
-        $middleware = new MaintenanceMiddleware;
-        $this->registerMiddleware($middleware);
+        $middlewares = BaseMiddleware::$httpMiddlewares;
+        foreach ($middlewares as $key => $middleware) {
+            if ($middleware instanceof BaseMiddleware) {
+                $this->registerMiddleware(new $middleware);
+            }
+        }
     }
 
     /**
-     * Modifies the current layout
+     * Set the layout for the current controller.
+     *
+     * @param string $layout
+     * @return void
      */
     public function setLayout(string $layout): void
     {
@@ -63,7 +96,8 @@ abstract class Controller
     }
 
     /**
-     * Gets the current layout
+     * Get the current layout.
+     * @return string
      */
     public function getLayout(): string
     {
@@ -71,16 +105,19 @@ abstract class Controller
     }
 
     /**
-     * Specifies that the current view should extend an existing layout.
+     * Set the path for the current view.
+     *
+     * @param string $path
+     * @return void
      */
     public function setPathView(string $path)
     {
-        return $this->view::$viewPath = $path;
+        $this->view::$viewPath = $path;
     }
 
     /**
-     * Adds an action to the controller
-     * 
+     * Add an action to the controller.
+     *
      * @param string|null $action
      * @return void
      */
@@ -90,8 +127,7 @@ abstract class Controller
     }
 
     /**
-     * Gets the current controller action.
-     *
+     * Get the current controller action.
      * @return string
      */
     public function getAction(): string
@@ -100,10 +136,13 @@ abstract class Controller
     }
 
     /**
-     * Render the view
-     * 
+     * Render the view.
+     *
      * @param string $view
-     * @param array $param
+     * @param array|null $params
+     * @param bool $buffer
+     * @param string $ext
+     * @return string|null
      */
     public function renderView(
         string $view,
@@ -111,13 +150,14 @@ abstract class Controller
         bool $buffer = true,
         string $ext = '.php'
     ): ?string {
-
         return $this->view::render($view, $params, $buffer, $ext);
     }
 
     /**
-     * Register a Middleware in the Controller
+     * Register a middleware in the controller.
+     *
      * @param BaseMiddleware $middleware
+     * @return void
      */
     public function registerMiddleware(BaseMiddleware $middleware): void
     {
@@ -125,6 +165,7 @@ abstract class Controller
     }
 
     /**
+     * Get the registered middlewares.
      * @return Middlewares\BaseMiddleware[]
      */
     public function getMiddlewares(): array
@@ -133,13 +174,12 @@ abstract class Controller
     }
 
     /**
-     * Registers and executes the AuthMiddleware middleware in the controller 
-     * 
-     * for access control to the specified actions 
-     * @param array $actions Actions requiring authorization 
-     * @param bool $allowedAction Indicates whether access to other 
-     * actions than those specified is allowed.    
-     **/
+     * Register and execute the AuthMiddleware for access control to the specified actions.
+     *
+     * @param array $actions Actions requiring authorization.
+     * @param bool $allowedAction Indicates whether access to other actions than those specified is allowed.
+     * @return void
+     */
     public function accessControl(array $actions, bool $allowedAction = false)
     {
         $middleware = new AuthMiddleware($actions, $allowedAction);
@@ -147,15 +187,15 @@ abstract class Controller
     }
 
     /**
-     * Called when there is no method
+     * Handle calls to methods that do not exist.
      *
-     * @param string $name      
-     * @param array  $arguments
+     * @param string $name
+     * @param array $arguments
      * @throws RuntimeException
      * @return void
      */
     public function __call($name, $arguments)
     {
-        throw new RuntimeException("Method [ $name ] does not exist");
+        throw new RuntimeException(sprintf('Method [  %s ] does not exist', $name));
     }
 }

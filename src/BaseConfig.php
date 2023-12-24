@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Axm;
 
 use Axm\Cache\Cache;
@@ -28,7 +30,6 @@ class BaseConfig
 
     /**
      * Get the instance of the class.
-     *
      * @return BaseConfig
      */
     public static function make()
@@ -41,54 +42,84 @@ class BaseConfig
     }
 
     /**
-     * Load a configuration file.
+     * Loads a configuration file or multiple files.
      *
-     * @param string $file
-     * @param bool   $merge
-     * @return array
-     * @throws RuntimeException
+     * @param string|array $file      Configuration file name or an array of file names.
+     * @param bool          $merge     Whether to merge the loaded configuration.
+     * @return self Instance of the class.
      */
-    public function load(string $file, bool $merge = true)
+    public function load(string|array $file, bool $merge = true): self
+    {
+        is_string($file)
+            ? $this->openFileConfig($file, $merge)
+            : $this->recursiveLoadFiles($file, $merge);
+
+        return self::$instance;
+    }
+
+    /**
+     * Opens and loads a configuration file.
+     *
+     * @param string      $file        Configuration file name.
+     * @param bool        $merge       Whether to merge the loaded configuration.
+     * @param string|null $pathConfig  Optional path to the configuration directory.
+     * @return array Loaded configuration.
+     * @throws \RuntimeException When the file is not found or has an invalid format.
+     */
+    private function openFileConfig(string $file, bool $merge = true, ?string $pathConfig = null): array
     {
         // Check if the file has already been previously uploaded
-        if (in_array($file, $this->loadedFiles)) {
-            return $this->config;
-        }
+        if (in_array($file, $this->loadedFiles)) return $this->config;
 
-        $file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $file);
+        $filePath = $this->resolverDirPath($file, $pathConfig);
 
-        if (!file_exists($file)) {
-            throw new RuntimeException('Configuration file not found: ' . $file);
-        }
+        if (!is_file($filePath))
+            throw new RuntimeException(sprintf('Configuration file not found: %s', $filePath));
 
-        $ext = pathinfo($file, PATHINFO_EXTENSION);
-        switch ($ext) {
-            case 'php':
-                $data = require($file);
-                break;
-            case 'json':
-                $data = json_decode(file_get_contents($file), true);
-                break;
-            case 'ini':
-                $data = parse_ini_file($file, true);
-                break;
-            default:
-                throw new RuntimeException('Invalid configuration file format: ' . $ext);
-        }
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION);
+        $data = $this->getData($filePath, $ext);
 
-        if (!is_array($data)) {
-            throw new RuntimeException('Invalid configuration file: ' . $file);
-        }
+        if (!is_array($data))
+            throw new RuntimeException(sprintf('Invalid configuration file: %s', $filePath));
 
-        if ($merge) {
-            $this->config = array_merge($this->config, $data);
-        } else {
-            $this->config = $data;
-        }
+        $this->config = ($merge) ? array_merge($this->config, $data) : $data;
 
         // Register the file as uploaded
         $this->loadedFiles[] = $file;
-        return (array) $this->config;
+        return $this->config;
+    }
+
+    /**
+     * Resolves the full path of a configuration file.
+     *
+     * @param string      $file        Configuration file name.
+     * @param string|null $pathConfig  Optional path to the configuration directory.
+     * @return string Full path of the configuration file.
+     */
+    private function resolverDirPath(string $file, ?string $pathConfig = null)
+    {
+        $file = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, trim($file, '\/'));
+        $basePath = realpath($pathConfig ?? self::ROOT_PATH_CONFIG) . DIRECTORY_SEPARATOR . $file;
+
+        return $basePath;
+    }
+
+    /**
+     * Get parsed data from a configuration file.
+     *
+     * @param string $file The file path.
+     * @param string $ext  The format ('php', 'json', 'ini').
+     * @return mixed Parsed data.
+     * @throws RuntimeException If the format is invalid.
+     */
+    private function getData(string $file, string $ext)
+    {
+        return match ($ext) {
+            'php'   => require $file,
+            'json'  => json_decode(file_get_contents($file), true),
+            'ini'   => parse_ini_file($file, true),
+            default => throw new RuntimeException(sprintf('Invalid format: %s', $ext)),
+        };
     }
 
     /**
@@ -99,11 +130,11 @@ class BaseConfig
      * @return array
      * @throws RuntimeException
      */
-    public function recursiveLoadFiles(array $files, bool $merge = true): array
+    private function recursiveLoadFiles(array $files, bool $merge = true): array
     {
         $config = [];
         foreach ($files as $file) {
-            $data = $this->load($file, $merge);
+            $data = $this->openFileConfig($file, $merge);
             $config = array_merge($config, $data);
         }
 
@@ -111,14 +142,14 @@ class BaseConfig
     }
 
     /**
-     * Get the view cache.
+     * Get the file cache.
      *
-     * @param string $view
+     * @param string $file
      * @return bool
      */
-    protected function getCache(string $view)
+    protected function getCache(string $file)
     {
-        $cache = Cache::driver()->get($view);
+        $cache = Cache::driver()->get($file);
         return $cache;
     }
 
@@ -142,16 +173,20 @@ class BaseConfig
      * @param mixed  $default
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(string|null $key = null, $default = null)
     {
+        if (is_null($key)) return (array) $this->config;
+
         $value = $this->config;
         foreach (explode('.', $key) as $segment) {
             if (!is_array($value) || !array_key_exists($segment, $value)) {
                 $this->cache[$key] = $default;
                 return $default;
             }
+
             $value = $value[$segment];
         }
+
         $this->cache[$key] = $value;
         return $value;
     }
@@ -169,7 +204,6 @@ class BaseConfig
 
     /**
      * Get all configuration settings.
-     *
      * @return array
      */
     public function all()
@@ -179,7 +213,6 @@ class BaseConfig
 
     /**
      * Set default configuration values.
-     *
      * @param array $defaults
      */
     public function setDefaults(array $defaults)
@@ -195,6 +228,7 @@ class BaseConfig
         $this->cache = [];
     }
 
+
     /**
      * Magic method to retrieve configuration values.
      *
@@ -203,6 +237,7 @@ class BaseConfig
      */
     public function __get($key)
     {
-        return $this->get($key);
+        $config = ((object) $this->config[$key]) ?? null;
+        return $config;
     }
 }

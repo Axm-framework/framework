@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Axm\Lang\Lang;
 use Axm\Views\View;
 use Illuminate\Support\Str;
@@ -334,7 +336,7 @@ if (!function_exists('generateUrl')) {
 
 		// If the URL is not valid, throw an exception
 		if (!filter_var($url, FILTER_VALIDATE_URL)) {
-			throw new RuntimeException("Invalid URL: {$url}");
+			throw new RuntimeException(sprintf('Invalid URL: %s', $url));
 		}
 
 		// Return the generated URL
@@ -743,8 +745,16 @@ if (!function_exists('config')) {
 	 */
 	function config(string $key = null, $rootBaseConfig = null)
 	{
-		// Get the application's configuration
-		return Axm::app()->config($key, $rootBaseConfig);
+		$config = Axm\BaseConfig::make();
+
+		if (is_null($key)) return $config;
+
+		if (str_contains($key, '/')) {
+			$path = is_null($rootBaseConfig) ? $config::ROOT_PATH_CONFIG . $key : $rootBaseConfig;
+			return $config->load($path);
+		}
+
+		return $config->get($key);
 	}
 }
 

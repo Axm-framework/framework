@@ -63,18 +63,7 @@ abstract class Application
 		$this->getContainer()
 			->loadFromDirectory(APP_PATH . DIRECTORY_SEPARATOR . 'Providers');
 
-		$this->openDefaultSystemConfigurationFiles();
 		$this->openRoutesUser();
-	}
-
-	/**
-	 * Open the default system configuration files.
-	 */
-	private function openDefaultSystemConfigurationFiles(): void
-	{
-		$path = APP_PATH . DIRECTORY_SEPARATOR . 'Config';
-		$this->config->load($path . DIRECTORY_SEPARATOR . 'App.php');
-		$this->config->load($path . DIRECTORY_SEPARATOR . 'Paths.php');
 	}
 
 	/**
@@ -86,17 +75,8 @@ abstract class Application
 	 */
 	public function config(string $key = null, $rootBaseConfig = null)
 	{
-		$config = Axm\BaseConfig::make();
-		if (is_null($key))
-			return $config;
-
-		if (str_contains($key, '/')) {
-			$path = is_null($rootBaseConfig) ? $config::ROOT_PATH_CONFIG .
-				$key : $rootBaseConfig;
-			return $config->load($path);
-		}
-
-		return $config->get($key);
+		// return $config->get($key);
+		return config($key, $rootBaseConfig);
 	}
 
 	/**
@@ -108,9 +88,7 @@ abstract class Application
 		$files = glob(ROOT_PATH . DIRECTORY_SEPARATOR .
 			'routes' . DIRECTORY_SEPARATOR . "*$ext");
 
-		foreach ($files as $file) {
-			include_once($file);
-		}
+		foreach ($files as $file) include_once($file);
 	}
 
 	/**
@@ -204,9 +182,10 @@ abstract class Application
 	}
 
 	/**
-	 * @param array $keys
-	 * @param array $values
-	 * 
+	 * multipleKeyLogin
+	 *
+	 * @param  mixed $keys
+	 * @param  mixed $values
 	 * @return bool
 	 */
 	public function multipleKeyLogin(array $keys, array $values): bool
@@ -266,7 +245,7 @@ abstract class Application
 			return $check;
 		} catch (\Throwable $th) {
 			// Handle errors and throw a more descriptive exception
-			throw new \Exception("Error during login: " . $th->getMessage());
+			throw new Exception(sprintf('Error during login: %s', $th->getMessage()));
 		}
 	}
 
@@ -464,8 +443,7 @@ abstract class Application
 	 */
 	public function user(string $value = null)
 	{
-		if (is_null($value))
-			return $this->container->get('user');
+		if (is_null($value)) return $this->container->get('user');
 
 		return $this->container
 			->get('user')
@@ -554,11 +532,10 @@ abstract class Application
 	 */
 	public function __get($name)
 	{
-		if ($name === 'user') {
-			$this->setUser();
-		}
-
-		return $this->container->get($name);
+		return match ($name) {
+			($name === 'user') => $this->setUser(),
+			default => $this->container->get($name),
+		};
 	}
 
 	/**

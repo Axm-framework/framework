@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Axm;
 
 use Axm;
@@ -7,7 +9,7 @@ use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 use Axm\Console\CLIException;
 use ErrorException;
-
+use Exception;
 
 class HandlerErrors
 {
@@ -38,9 +40,8 @@ class HandlerErrors
     public function run()
     {
         if (true === env('APP_ENABLE_EXCEPTION_HANDLER')) {
-            if (Axm::is_cli()) {
-                return $this->getCLIHandler();
-            }
+
+            if (Axm::is_cli()) return $this->getCLIHandler();
 
             return $this->getHandler();
         }
@@ -103,6 +104,11 @@ class HandlerErrors
             error_log((string) $this->theme($e), 3, $this->getDirectory());
         }
 
+        if (env('APP_ENVIRONMENT') == 'production') {
+            header(sprintf("Location: %s", $this->renderErrorView($e->getCode())));
+            return;
+        }
+
         CLIException::handleCLIException($e);
         exit(1);
     }
@@ -148,6 +154,21 @@ class HandlerErrors
     }
 
     /**
+     * Renders the error view based on the specified HTTP error code.
+     * @return mixed The result of rendering the error view.
+     */
+    private function renderErrorView($code)
+    {
+        $config = require(APP_PATH . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR . 'Paths.php');
+        $file = $config['paths']['viewsErrorsPath'] . DIRECTORY_SEPARATOR . $code . '.php';
+
+        if (!is_file($file)) throw new Exception(sprintf('The view %s file does not exist', $file));
+
+        // Calling the render() method on the controller instance
+        return $file;
+    }
+
+    /**
      * Custom error handler method.
      *
      * @param int         $severity The severity level of the error.
@@ -159,12 +180,16 @@ class HandlerErrors
     public function errorHandler(int $severity, string $message, ?string $file = null, ?int $line = null)
     {
         // Check if the error should be reported based on error reporting settings.
-        if (!(error_reporting() & $severity)) {
+        if (!(error_reporting() & $severity)) return;
+
+        // Throw an ErrorException for the specified error.
+        $e = new ErrorException($message, 0, $severity, $file, $line);
+        if (env('APP_ENVIRONMENT') == 'production') {
+            header(sprintf("Location: %s", $this->renderErrorView($e->getCode())));
             return;
         }
 
-        // Throw an ErrorException for the specified error.
-        throw new ErrorException($message, 0, $severity, $file, $line);
+        throw $e;
     }
 
     /**
@@ -181,10 +206,20 @@ class HandlerErrors
         if ($error === null) return;
 
         ['type' => $type, 'message' => $message, 'file' => $file, 'line' => $line] = $error;
-
-        if (in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+        if ($this->isFatal($type)) {
             $this->exceptionHandler(new ErrorException($message, $type, 0, $file, $line));
         }
+    }
+
+    /**
+     * Determines if the type of error is fatal
+     *
+     * @param int $type
+     * @return bool
+     */
+    protected function isFatal(int $type): bool
+    {
+        return in_array($type, [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE]);
     }
 
     /**
