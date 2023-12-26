@@ -48,11 +48,11 @@ class BaseConfig
      * @param bool          $merge     Whether to merge the loaded configuration.
      * @return self Instance of the class.
      */
-    public function load(string|array $file, bool $merge = true): self
+    public function load(string|array $file, bool $merge = true, ?string $pathConfig = null): self
     {
         is_string($file)
-            ? $this->openFileConfig($file, $merge)
-            : $this->recursiveLoadFiles($file, $merge);
+            ? $this->openFileConfig($file, $merge, $pathConfig)
+            : $this->recursiveLoadFiles($file, $merge, $pathConfig);
 
         return self::$instance;
     }
@@ -130,11 +130,11 @@ class BaseConfig
      * @return array
      * @throws RuntimeException
      */
-    private function recursiveLoadFiles(array $files, bool $merge = true): array
+    private function recursiveLoadFiles(array $files, bool $merge = true, ?string $pathConfig = null): array
     {
         $config = [];
         foreach ($files as $file) {
-            $data = $this->openFileConfig($file, $merge);
+            $data = $this->openFileConfig($file, $merge, $pathConfig);
             $config = array_merge($config, $data);
         }
 
@@ -227,7 +227,6 @@ class BaseConfig
     {
         $this->cache = [];
     }
-
 
     /**
      * Magic method to retrieve configuration values.
