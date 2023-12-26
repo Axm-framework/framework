@@ -968,13 +968,13 @@ if (!function_exists('asset')) {
 	 * @param bool $secure Force the use of HTTPS in the URL 
 	 * @return string Full URL of the resource.
 	 */
-	function asset($path, $basePath = null)
+	function asset(string $path, $basePath = null): string
 	{
 		// Get the URL base of your application from the configuration or as you prefer.
 		$baseUrl = $basePath ? $basePath : '';
 
 		// Combines the base URL with the relative path of the resource.
-		$url = rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
+		$url = rtrim($baseUrl, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
 
 		$fullUrl = baseUrl($url);
 		return $fullUrl;
