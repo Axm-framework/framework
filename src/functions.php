@@ -348,24 +348,25 @@ if (!function_exists('baseUrl')) {
 if (!function_exists('asset')) {
 
 	/**
-	 * Generate the URL of a resource using the path relative to the resource directory 
-	 * 
-	 * @param string $dirFile
-	 * @return string
-	 * @throws FileNotFoundException
+	 * Generate the URL for an asset.
+	 *
+	 * This function takes a relative path to an asset and combines it with the base URL of the application,
+	 * producing the full URL to the asset. It ensures proper handling of directory separators.
+	 * @param string $path The relative path to the asset.
+	 * @param string|null $basePath The base URL of the application (optional). If not provided, it uses an empty string.
+	 * @return string The full URL to the asset.
 	 */
-	function asset(string $dirFile): string
+	function asset(string $path, ?string $basePath = null): string
 	{
-		$pathAssets = config('paths.assetsPath');
-		$fullPath = rtrim($pathAssets, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($dirFile, DIRECTORY_SEPARATOR);
+		// Get the URL base of your application from the configuration or as you prefer.
+		$baseUrl = $basePath ?? '';
 
-		if (!is_file($fullPath)) {
-			throw new RuntimeException("File not found: $fullPath");
-		}
+		// Combines the base URL with the relative path of the resource.
+		$url = rtrim($baseUrl, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
 
-		return baseUrl($fullPath);
+		$fullUrl = baseUrl($url);
+		return $fullUrl;
 	}
-
 }
 
 if (!function_exists('go')) {
