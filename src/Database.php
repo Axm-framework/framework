@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Axm;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -30,13 +32,13 @@ class Database
         // If there is already a connection, do nothing
         if (isset(static::$connection)) return;
 
-        $config = config('/DataBase.php');
+        $config = config()->load('DataBase.php');
 
-        $driver = $driver ?? $config['db']['default'] ?? 'mysql';
+        $driver = $driver ?? $config->db->default ?? 'mysql';
 
         $capsule = static::$connection = new Capsule;
         $capsule->addConnection(
-            $config['db']['connections'][$driver]
+            $config->db->connections[$driver]
         );
 
         // Set the event dispatcher used by Eloquent models... (optional)

@@ -743,16 +743,11 @@ if (!function_exists('config')) {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	function config(string $key = null, $rootBaseConfig = null)
+	function config(string $key = null)
 	{
 		$config = Axm\BaseConfig::make();
 
 		if (is_null($key)) return $config;
-
-		if (str_contains($key, '/')) {
-			$path = is_null($rootBaseConfig) ? $config::ROOT_PATH_CONFIG . $key : $rootBaseConfig;
-			return $config->load($path);
-		}
 
 		return $config->get($key);
 	}
