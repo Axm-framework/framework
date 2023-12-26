@@ -158,17 +158,13 @@ if (!function_exists('env')) {
 		static $cache = [];
 
 		// Check if the key is already in the cache
-		if (isset($cache[$key])) {
-			return $cache[$key];
-		}
+		if (isset($cache[$key])) return $cache[$key];
 
 		// Try to get the value from different sources
 		$value = $_SERVER[$key] ?? $_ENV[$key] ?? getenv($key) ?? null;
 
 		// Not found? Return the default value
-		if ($value === null) {
-			return $default;
-		}
+		if ($value === null) return $default;
 
 		// Store the value in the cache and return it
 		return $cache[$key] = $value;
@@ -183,27 +179,17 @@ if (!function_exists('cleanInput')) {
 	 * @param mixed $data The data to be cleaned.
 	 * @return mixed The cleaned data.
 	 */
-	function cleanInput($data)
-	{
-		if (is_array($data)) {
-			return array_map('cleanInput', $data);
-		} elseif (is_object($data)) {
-			return cleanInput((array)$data);
-		} else {
-			if (is_string($data)) {
-				// Filter and clean to prevent XSS attacks.
-				return filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES);
-			} elseif (is_int($data)) {
-				return filter_var($data, FILTER_SANITIZE_NUMBER_INT);
-			} elseif (is_float($data)) {
-				return filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-			} elseif (is_bool($data)) {
-				return filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-			} else {
-				// It is not a known data type, return the original data.
-				return $data;
-			}
-		}
+	function cleanInput($data) {
+		return match (true) {
+			is_array($data)  => array_map('cleanInput', $data),
+			is_object($data) => cleanInput((array)$data),
+			is_string($data) => filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES),
+			is_int($data)    => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
+			is_float($data)  => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+			is_bool($data)   => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+			
+			default => $data,
+		};
 	}
 }
 
@@ -218,19 +204,13 @@ if (!function_exists('show')) {
 	 * @param bool   $return If true, the data is returned as a string; if false, it's echoed (default is false).
 	 * @return mixed If $return is true, the data is returned as a string; otherwise, it's echoed.
 	 */
-	function show($data = null, $return = false)
+	function show($data = null, bool $return = false): string 
 	{
-		// Set the output to the provided data or an empty string if null.
-		$output = $data ?: '';
-
-		// If $return is true, return the data as a string.
-		if ($return) {
-			return $data;
-		}
-
-		// If $return is false, echo the data followed by a new line.
-		echo $output . PHP_EOL;
-		return;
+	  $output = $data ?? '';
+	  if($return) return $output; 
+	
+	  echo $output . PHP_EOL;
+	  return '';
 	}
 }
 
@@ -368,21 +348,24 @@ if (!function_exists('baseUrl')) {
 if (!function_exists('asset')) {
 
 	/**
+	 * Generate the URL of a resource using the path relative to the resource directory 
+	 * 
 	 * @param string $dirFile
 	 * @return string
+	 * @throws FileNotFoundException
 	 */
 	function asset(string $dirFile): string
 	{
-		$pathAssets = 'resources/assets/';
-		$fullPath = trim($pathAssets, '/') . '/' . trim($dirFile, '/');
+		$pathAssets = config('paths.assetsPath');
+		$fullPath = rtrim($pathAssets, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($dirFile, DIRECTORY_SEPARATOR);
 
-		if (!file_exists($fullPath)) {
-			throw new Exception("File not found: $fullPath");
+		if (!is_file($fullPath)) {
+			throw new RuntimeException("File not found: $fullPath");
 		}
 
-		$file = baseUrl($fullPath);
-		return $file;
+		return baseUrl($fullPath);
 	}
+
 }
 
 if (!function_exists('go')) {
