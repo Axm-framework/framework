@@ -353,9 +353,7 @@ abstract class Application
 	 */
 	public function getLocale()
 	{
-		if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-			return '';
-		}
+		if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) return '';
 
 		if (!extension_loaded('intl')) {
 			throw new Exception('The "intl" extension is not enabled on this server');
