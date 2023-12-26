@@ -75,7 +75,6 @@ abstract class Application
 	 */
 	public function config(string $key = null, $rootBaseConfig = null)
 	{
-		// return $config->get($key);
 		return config($key, $rootBaseConfig);
 	}
 
