@@ -169,24 +169,35 @@ class BaseConfig
     /**
      * Get a configuration value by key.
      *
-     * @param string $key
-     * @param mixed  $default
-     * @return mixed
+     * @param string|null $key The key for the configuration value. If null, the entire configuration array is returned.
+     * @param mixed $default The default value to return if the key is not found. Defaults to null.
+     * @return mixed The configuration value for the given key, or the entire configuration array if key is null.
      */
     public function get(string|null $key = null, $default = null)
     {
+        // If the key is null, return the entire configuration array
         if (is_null($key)) return (array) $this->config;
 
+        // Check if the value is already in the cache
+        if (array_key_exists($key, $this->cache)) {
+            return $this->cache[$key];
+        }
+
         $value = $this->config;
+
+        // Split the key into segments using the '.' character
         foreach (explode('.', $key) as $segment) {
+            // If $value is not an array or does not contain the $segment key, use the default value
             if (!is_array($value) || !array_key_exists($segment, $value)) {
                 $this->cache[$key] = $default;
                 return $default;
             }
 
+            // Update $value with the value of the current segment
             $value = $value[$segment];
         }
 
+        // Store the final value in the cache and return it
         $this->cache[$key] = $value;
         return $value;
     }
