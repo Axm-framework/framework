@@ -150,32 +150,6 @@ abstract class Application
 	/**
 	 * Attempts to log in a user based on provided data.
 	 *
-	 * @param array $data An associative array containing user login data.
-	 * @return bool Returns true if the login is successful, false otherwise.
-	 * @throws \Exception Throws an exception in case of an error during the login process.
-	 */
-	public function simpleKeyLogin(array $data): bool
-	{
-		$instance = new Auth;
-		return $instance->simpleKeyLogin($data);
-	}
-
-	/**
-	 * multipleKeyLogin
-	 *
-	 * @param  mixed $keys
-	 * @param  mixed $values
-	 * @return bool
-	 */
-	public function multipleKeyLogin(array $keys, array $values): bool
-	{
-		$instance = new Auth;
-		return $instance->multipleKeyLogin($keys, $values);
-	}
-
-	/**
-	 * Attempts to log in a user based on provided data.
-	 *
 	 * @param array|array[] $fields An array or nested arrays containing the fields to use for the database query.
 	 * @param array|array[] $values An array or nested arrays containing the corresponding values to match in the database query.
 	 * @param callable|null $callback A callback function to execute upon successful login.
@@ -185,7 +159,7 @@ abstract class Application
 	public function login(): bool
 	{
 		$instance = new Auth;
-		return $instance->login();
+		return $instance->resolverLogin(...func_get_args());
 	}
 
 	/**
