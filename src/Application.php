@@ -7,6 +7,7 @@ namespace Axm;
 use Axm;
 use Locale;
 use Axm\Container;
+use Axm\Auth\Auth;
 use Exception;
 
 /**
@@ -155,29 +156,8 @@ abstract class Application
 	 */
 	public function simpleKeyLogin(array $data): bool
 	{
-		try {
-			// Retrieve configuration values
-			$userId = $this->config('app.userId');
-			$userClass = $this->config('app.userClass');
-
-			// Extract field and value from the input data
-			[$field, $value] = $data;
-
-			// Retrieve user from the database
-			$result = $this->getUserFromDatabase($userClass, $field, $value);
-
-			// If a user is found, set the user session and return true
-			if ($result) {
-				$this->setUserSession($userId, $result);
-				return true;
-			}
-
-			// If no user is found, return false
-			return false;
-		} catch (\Throwable $th) {
-			// Handle errors and throw a more descriptive exception
-			throw new Exception('Error during login: ' . $th->getMessage());
-		}
+		$instance = new Auth;
+		return $instance->simpleKeyLogin($data);
 	}
 
 	/**
@@ -189,36 +169,8 @@ abstract class Application
 	 */
 	public function multipleKeyLogin(array $keys, array $values): bool
 	{
-		try {
-			// Retrieve configuration values
-			$userId = $this->config('app.userId');
-			$userClass = $this->config('app.userClass');
-
-			// Make sure the number of keys and values match
-			if (count($keys) !== count($values)) {
-				throw new \InvalidArgumentException('Number of keys and values must match.');
-			}
-
-			// Combine keys and values into an associative array
-			$userData = array_combine($keys, $values);
-
-			foreach ($userData as $field => $value) {
-				// Retrieve user from the database
-				$result = $this->getUserFromDatabase($userClass, $field, $value);
-
-				// If a user is found, set the user session and return true
-				if ($result) {
-					$this->setUserSession($userId, $result);
-					return true;
-				}
-			}
-
-			// If no user is found, return false
-			return false;
-		} catch (\Throwable $th) {
-			// Handle errors and throw a more descriptive exception
-			throw new Exception("Error during login: " . $th->getMessage());
-		}
+		$instance = new Auth;
+		return $instance->multipleKeyLogin($keys, $values);
 	}
 
 	/**
@@ -227,52 +179,13 @@ abstract class Application
 	 * @param array|array[] $fields An array or nested arrays containing the fields to use for the database query.
 	 * @param array|array[] $values An array or nested arrays containing the corresponding values to match in the database query.
 	 * @param callable|null $callback A callback function to execute upon successful login.
-	 *
 	 * @return bool Returns true if the login is successful, false otherwise.
 	 * @throws \Exception Throws an exception in case of an error during the login process.
 	 */
 	public function login(array $fields, array $values = []): bool
 	{
-		try {
-
-			$check = match (func_num_args()) {
-				1 => $this->simpleKeyLogin($fields),
-				2 => $this->multipleKeyLogin($fields, $values),
-				default => false,
-			};
-
-			return $check;
-		} catch (\Throwable $th) {
-			// Handle errors and throw a more descriptive exception
-			throw new Exception(sprintf('Error during login: %s', $th->getMessage()));
-		}
-	}
-
-	/**
-	 * Retrieves a user from the database based on provided field and value.
-	 *
-	 * @param string $userClass The class representing the user model.
-	 * @param string $field The field to use for the database query.
-	 * @param mixed $value The value to match in the database query.
-	 *
-	 * @return mixed|null Returns the user object if found, or null if no user is found.
-	 */
-	private function getUserFromDatabase(string $userClass, string $field, $value)
-	{
-		// Use prepared statements or an ORM to prevent SQL injection
-		return $userClass::where($field, $value)->first();
-	}
-
-	/**
-	 * Sets the user session based on the provided user ID and data.
-	 *
-	 * @param string $userId The key to use for storing user data in the session.
-	 * @param mixed $result The user data to store in the session.
-	 * @return void
-	 */
-	private function setUserSession($userId, $result)
-	{
-		app()->session->set($userId, $result);
+		$instance = new Auth;
+		return $instance->login($fields, $values);
 	}
 
 	/**
@@ -374,15 +287,28 @@ abstract class Application
 	 *
 	 * This method generates a CSRF token and stores it in a cookie. 
 	 * If a token already exists in the cookie, it is reused.
-	 * @return string The generated CSRF token.
+	 * @return string The generated or existing CSRF token.
 	 */
 	public function generateCsrfToken(): string
 	{
 		if (empty($_COOKIE['csrfToken'])) {
-			return $_COOKIE['csrfToken'] = bin2hex(random_bytes(50) . time());
+			$csrfToken = bin2hex(random_bytes(50) . time());
+			setcookie('csrfToken', $csrfToken, time() + 60 * config('session.expiration'));  // Set the cookie to expire in 24 hours
+			return $csrfToken;
 		}
 
 		return $_COOKIE['csrfToken'];
+	}
+
+	/**
+	 * Get the CSRF token.
+	 *
+	 * This method retrieves the CSRF token from the cookie, or generates a new one if not available.
+	 * @return string The CSRF token.
+	 */
+	public function getCsrfToken(): string
+	{
+		return $_COOKIE['csrfToken'] ?? $this->generateCsrfToken();
 	}
 
 	/**
@@ -395,29 +321,6 @@ abstract class Application
 	public function hasCsrfToken(string $token): bool
 	{
 		return $_COOKIE['csrfToken'] === $token;
-	}
-
-	/**
-	 * Get the CSRF token.
-	 *
-	 * This method retrieves the CSRF token from the session, or generates a new one if not available.
-	 * @return string|null The CSRF token or null if not found.
-	 */
-	public function getCsrfToken(): ?string
-	{
-		return $_COOKIE['csrfToken'] ?? $this->generateCsrfToken();
-	}
-
-	/**
-	 * Check if the provided token matches the socket token.
-	 *
-	 * This method compares the provided token with the socket token to determine if they match.
-	 * @param string $token The token to check against the socket token.
-	 * @return bool True if the provided token matches the socket token, false otherwise.
-	 */
-	public function checkSocketToken(string $token): bool
-	{
-		return $this->socketToken === $token;
 	}
 
 	/**
