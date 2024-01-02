@@ -179,7 +179,8 @@ if (!function_exists('cleanInput')) {
 	 * @param mixed $data The data to be cleaned.
 	 * @return mixed The cleaned data.
 	 */
-	function cleanInput($data) {
+	function cleanInput($data)
+	{
 		return match (true) {
 			is_array($data)  => array_map('cleanInput', $data),
 			is_object($data) => cleanInput((array)$data),
@@ -187,7 +188,7 @@ if (!function_exists('cleanInput')) {
 			is_int($data)    => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
 			is_float($data)  => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
 			is_bool($data)   => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-			
+
 			default => $data,
 		};
 	}
@@ -204,13 +205,13 @@ if (!function_exists('show')) {
 	 * @param bool   $return If true, the data is returned as a string; if false, it's echoed (default is false).
 	 * @return mixed If $return is true, the data is returned as a string; otherwise, it's echoed.
 	 */
-	function show($data = null, bool $return = false): string 
+	function show($data = null, bool $return = false): string
 	{
-	  $output = $data ?? '';
-	  if($return) return $output; 
-	
-	  echo $output . PHP_EOL;
-	  return '';
+		$output = $data ?? '';
+		if ($return) return $output;
+
+		echo $output . PHP_EOL;
+		return '';
 	}
 }
 
@@ -352,20 +353,16 @@ if (!function_exists('asset')) {
 	 *
 	 * This function takes a relative path to an asset and combines it with the base URL of the application,
 	 * producing the full URL to the asset. It ensures proper handling of directory separators.
-	 * @param string $path The relative path to the asset.
-	 * @param string|null $basePath The base URL of the application (optional). If not provided, it uses an empty string.
+	 * @param string      $path     The relative path to the asset.
+	 * @param string|null $basePath The base URL of the application (optional). If not provided, it uses '/resources/assets/' as the default.
 	 * @return string The full URL to the asset.
 	 */
 	function asset(string $path, ?string $basePath = null): string
 	{
 		// Get the URL base of your application from the configuration or as you prefer.
-		$baseUrl = $basePath ?? '';
+		$baseUrl = rtrim($basePath ?? '/resources/assets/', '/') . '/' . ltrim($path, '/');
 
-		// Combines the base URL with the relative path of the resource.
-		$url = rtrim($baseUrl, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
-
-		$fullUrl = baseUrl($url);
-		return $fullUrl;
+		return baseUrl($baseUrl);
 	}
 }
 
@@ -956,29 +953,6 @@ if (!function_exists('class_basename')) {
 		return is_object($class)
 			? basename(str_replace('\\', '/', get_class($class)))
 			: (string) basename(str_replace('\\', '/', $class));
-	}
-}
-
-if (!function_exists('asset')) {
-	/**
-	 * Generate the URL for an asset.
-	 *
-	 * This function takes a relative path to an asset and combines it with the base URL of the application,
-	 * producing the full URL to the asset. It ensures proper handling of directory separators.
-	 * @param string $path The relative path to the asset.
-	 * @param string|null $basePath The base URL of the application (optional). If not provided, it uses an empty string.
-	 * @return string The full URL to the asset.
-	 */
-	function asset(string $path, ?string $basePath = null): string
-	{
-		// Get the URL base of your application from the configuration or as you prefer.
-		$baseUrl = $basePath ?? '';
-
-		// Combines the base URL with the relative path of the resource.
-		$url = rtrim($baseUrl, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
-
-		$fullUrl = baseUrl($url);
-		return $fullUrl;
 	}
 }
 
