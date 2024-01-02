@@ -67,19 +67,19 @@ abstract class Controller
         $this->response = $app->response;
         $this->view = View::make();
 
-        $this->executeMiddleware();
+        $this->registerDefaultMiddleware();
     }
 
     /**
      * Execute the registered middlewares.
      * @return void
      */
-    private function executeMiddleware()
+    private function registerDefaultMiddleware()
     {
         $middlewares = BaseMiddleware::$httpMiddlewares;
-        foreach ($middlewares as $key => $middleware) {
-            if ($middleware instanceof BaseMiddleware) {
-                $this->registerMiddleware(new $middleware);
+        foreach ($middlewares as $middleware) {
+            if (is_subclass_of($middleware, BaseMiddleware::class)) {
+                $this->middlewares[] = new $middleware;
             }
         }
     }
