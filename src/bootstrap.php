@@ -44,7 +44,7 @@ defined('CLEAN_URI_PATH') or define('CLEAN_URI_PATH', substr($_SERVER['SCRIPT_NA
 require_once('functions.php');
 
 $path = APP_PATH . DIRECTORY_SEPARATOR . 'Config' . DIRECTORY_SEPARATOR;
-config()->load(['App.php', 'Paths.php']);
+config()->load(['App.php', 'Paths.php', 'Session.php']);
 
 require_once(VENDOR_PATH . DIRECTORY_SEPARATOR . 'vlucas' . DIRECTORY_SEPARATOR .
     'phpdotenv' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Dotenv.php');
