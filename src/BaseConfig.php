@@ -247,7 +247,7 @@ class BaseConfig
      */
     public function __get($key)
     {
-        $config = ((object) $this->config[$key]) ?? null;
+        $config = isset($this->config[$key]) ? (object) $this->config[$key] : null;
         return $config;
     }
 }
