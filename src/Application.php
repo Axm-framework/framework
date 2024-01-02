@@ -182,10 +182,10 @@ abstract class Application
 	 * @return bool Returns true if the login is successful, false otherwise.
 	 * @throws \Exception Throws an exception in case of an error during the login process.
 	 */
-	public function login(array $fields, array $values = []): bool
+	public function login(): bool
 	{
 		$instance = new Auth;
-		return $instance->login($fields, $values);
+		return $instance->login();
 	}
 
 	/**
