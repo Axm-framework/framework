@@ -281,7 +281,7 @@ abstract class Application
 	 */
 	public function getCsrfToken(): string
 	{
-		return $_COOKIE['csrfToken'] ?? $this->generateCsrfToken();
+		return $this->generateCsrfToken();
 	}
 
 	/**
