@@ -251,9 +251,9 @@ abstract class Application
 	/**
 	 * Generate security tokens, including CSRF tokens.
 	 */
-	private function generateTokens(): void
+	private function generateTokens(): string
 	{
-		$this->generateCsrfToken();
+		return bin2hex(random_bytes(64) . time());
 	}
 
 	/**
@@ -265,9 +265,10 @@ abstract class Application
 	 */
 	public function generateCsrfToken(): string
 	{
-		if (!isset($_COOKIE['csrfToken'])) {
-			$csrfToken = bin2hex(random_bytes(64) . time());
+		if (empty($_COOKIE['csrfToken'])) {
+			$csrfToken = $this->generateTokens();
 			setcookie('csrfToken', $csrfToken, time() + 60 * config('session.expiration'));  // Set the cookie to expire in 24 hours
+			return $csrfToken;
 		}
 
 		return $_COOKIE['csrfToken'];
