@@ -285,36 +285,6 @@ abstract class Application
 		return $csrfToken;
 	}
 
-
-	/**
-	 * Generate a CSRF token.
-	 *
-	 * This method generates a CSRF token and stores it in a cookie. 
-	 * If a token already exists in the cookie, it is reused.
-	 * @return string The generated or existing CSRF token.
-	 */
-	public function generateCsrfToken(): string
-	{
-		if (empty($_COOKIE['csrfToken'])) {
-			$csrfToken = $this->generateTokens();
-			setcookie('csrfToken', $csrfToken, time() + 60 * config('session.expiration'));  // Set the cookie to expire in 24 hours
-			return $csrfToken;
-		}
-
-		return $_COOKIE['csrfToken'];
-	}
-
-	/**
-	 * Get the CSRF token.
-	 *
-	 * This method retrieves the CSRF token from the cookie, or generates a new one if not available.
-	 * @return string The CSRF token.
-	 */
-	public function getCsrfToken(): string
-	{
-		return $this->generateCsrfToken();
-	}
-
 	/**
 	 * Check if the provided CSRF token matches the one in the session.
 	 *
