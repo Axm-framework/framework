@@ -265,10 +265,9 @@ abstract class Application
 	 */
 	public function generateCsrfToken(): string
 	{
-		if (empty($_COOKIE['csrfToken'])) {
-			$csrfToken = bin2hex(random_bytes(50) . time());
+		if (!isset($_COOKIE['csrfToken'])) {
+			$csrfToken = bin2hex(random_bytes(64) . time());
 			setcookie('csrfToken', $csrfToken, time() + 60 * config('session.expiration'));  // Set the cookie to expire in 24 hours
-			return $csrfToken;
 		}
 
 		return $_COOKIE['csrfToken'];
