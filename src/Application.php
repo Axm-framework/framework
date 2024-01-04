@@ -279,7 +279,7 @@ abstract class Application
 	 */
 	private function generateAndSetCsrfToken(): string
 	{
-		$csrfToken = $this->generateCsrfToken();
+		$csrfToken = $this->generateTokens();
 		$this->setCsrfCookie($csrfToken);
 		
 		return $csrfToken;
