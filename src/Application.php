@@ -158,7 +158,7 @@ abstract class Application
 	 */
 	public function login(): bool
 	{
-		$instance = new Auth;
+		$instance = new Auth($this);
 		return $instance->resolverLogin(...func_get_args());
 	}
 
