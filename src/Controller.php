@@ -9,7 +9,7 @@ use Axm\Views\View;
 use Axm\Http\Request;
 use Axm\Http\Response;
 use RuntimeException;
-use Axm\Middlewares\BaseMiddleware;
+use App\Middlewares\BaseMiddleware;
 use Axm\Middlewares\AuthMiddleware;
 
 /**
