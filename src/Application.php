@@ -255,6 +255,36 @@ abstract class Application
 	{
 		return bin2hex(random_bytes(64) . time());
 	}
+	
+	/**
+	 * Modify cookies for the CSRF token
+	 */
+	public function setCsrfCookie(string $csrfToken): void
+	{
+		setcookie('csrfToken', $csrfToken, time() + 60 * config('session.expiration'));
+	}
+
+	/**
+	 * Get the CSRF token. If the token is not present in the cookie, generate and set a new one.
+	 * @return string The generated or existing CSRF token.
+	 */
+	public function getCsrfToken(): string
+	{
+		return isset($_COOKIE['csrfToken']) ? $_COOKIE['csrfToken'] : $this->generateAndSetCsrfToken();
+	}
+
+	/**
+	 * Generate a CSRF token and set it in the cookie.
+	 * @return string The newly generated CSRF token.
+	 */
+	private function generateAndSetCsrfToken(): string
+	{
+		$csrfToken = $this->generateCsrfToken();
+		$this->setCsrfCookie($csrfToken);
+		
+		return $csrfToken;
+	}
+
 
 	/**
 	 * Generate a CSRF token.
