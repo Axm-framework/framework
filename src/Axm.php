@@ -96,7 +96,7 @@ class Axm
 	private static function initializeEnvironment(string $appEnvironment = null)
 	{
 		// Obtain the value of APP_ENVIRONMENT or use a default value
-		$environment = $appEnvironment ?? env('APP_ENVIRONMENT', 'production');
+		$environment = static::$_environment = $appEnvironment ?? env('APP_ENVIRONMENT', 'production');
 
 		// Set error reporting based on the environment
 		($environment === 'debug')
