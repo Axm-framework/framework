@@ -63,9 +63,10 @@ if (!function_exists('raxm')) {
 	{
 		// Get the Raxm instance from the application.
 		$raxm = app('raxm');
+		$names = $raxm::parserComponent($component);
 
 		// Initialize and use the specified Raxm component.
-		return $raxm::initializeComponent($component);
+		return $raxm::initializeComponent($names);
 	}
 }
 
