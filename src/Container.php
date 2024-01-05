@@ -39,10 +39,6 @@ class Container
      */
     private array $sharedInstances = [];
 
-    /**
-     * Reflection cache for improved performance.
-     */
-    private $reflectionCache = [];
 
     private function __construct()
     {
@@ -95,6 +91,10 @@ class Container
             throw new RuntimeException("Invalid instance returned by service: $id");
         }
 
+        if (isset($service['initial'])) {
+            $service['initial']();
+        }
+
         if (isset($service['shared']) && $instance !== null) {
             $this->sharedInstances[$id] = $instance;
         }
@@ -120,10 +120,15 @@ class Container
      * @param Closure $closure
      * @param bool $shared
      */
-    public function set(string $id, Closure $closure, bool $shared = false)
+    public function set(string $id, Closure $serviceClosure, ?Closure $initial = null, bool $shared = false)
     {
+        // if ($this->has($id)) {
+        //     throw new RuntimeException("Service already exists: $id");
+        // }
+
         $this->services[$id] = [
-            'closure' => $closure,
+            'closure' => $serviceClosure,
+            'initial' => $initial,
             'shared'  => $shared,
         ];
     }
@@ -148,7 +153,7 @@ class Container
             } catch (ReflectionException $e) {
                 throw new RuntimeException("Failed to instantiate class: $classname", 0, $e);
             }
-        }, true);
+        }, null, true);
 
         return $this;
     }
@@ -236,19 +241,21 @@ class Container
 
         foreach ($config as $id => $service) {
             if (isset($service['class'])) {
-                $class  = $service['class'];
-                $shared = $service['shared'] ?? false;
+                $class   = $service['class'];
+                $initial = $service['initial'] ?? null;
+                $shared  = $service['shared'] ?? false;
 
                 $closure = function (...$args) use ($class) {
                     return (new ReflectionClass($class))->newInstanceArgs($args);
                 };
 
-                $this->set($id, $closure, $shared);
+                $this->set($id, $closure, $initial, $shared);
             } elseif (isset($service['closure'])) {
                 $closure = $service['closure'];
+                $initial = $service['initial'] ?? null;
                 $shared  = $service['shared'] ?? false;
 
-                $this->set($id, $closure, $shared);
+                $this->set($id, $closure, $initial, $shared);
             } else {
                 throw new RuntimeException("Invalid service configuration for: $id");
             }
@@ -313,19 +320,21 @@ class Container
     {
         foreach ($services as $id => $service) {
             if (isset($service['class'])) {
-                $class  = $service['class'];
-                $shared = $service['shared'] ?? false;
+                $class   = $service['class'];
+                $initial = $service['initial'] ?? null;
+                $shared  = $service['shared'] ?? false;
 
                 $closure = function (...$args) use ($class) {
                     return (new ReflectionClass($class))->newInstanceArgs($args);
                 };
 
-                $this->set($id, $closure, $shared);
+                $this->set($id, $closure,  $initial, $shared);
             } elseif (isset($service['closure'])) {
                 $closure = $service['closure'];
+                $initial = $service['initial'] ?? null;
                 $shared  = $service['shared'] ?? false;
 
-                $this->set($id, $closure, $shared);
+                $this->set($id, $closure,  $initial, $shared);
             } else {
                 throw new RuntimeException("Invalid service configuration for: $id");
             }
@@ -413,6 +422,7 @@ class Container
         $data = [
             'id' => $id,
             'closure' => $this->services[$id]['closure'],
+            'initial' => $this->services[$id]['initial'],
             'shared'  => $this->services[$id]['shared'],
         ];
 

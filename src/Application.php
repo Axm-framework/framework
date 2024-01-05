@@ -29,10 +29,7 @@ abstract class Application
 	 */
 	private ?Container $container;
 
-	/**
-	 * @var string The socket token used for specific operations.
-	 */
-	private string $socketToken;
+	private ?BaseConfig $config;
 
 	/**
 	 * Constructor for the Application class.
@@ -61,8 +58,9 @@ abstract class Application
 	 */
 	private function init(): void
 	{
-		$this->getContainer()
-			->loadFromDirectory(APP_PATH . DIRECTORY_SEPARATOR . 'Providers');
+		$ctnr = $this->getContainer();
+		$this->config = config();
+		$ctnr->loadFromDirectory($this->config->paths->providersPath);
 
 		$this->openRoutesUser();
 	}
@@ -85,8 +83,8 @@ abstract class Application
 	public function openRoutesUser(): void
 	{
 		$ext = '.php';
-		$files = glob(ROOT_PATH . DIRECTORY_SEPARATOR .
-			'routes' . DIRECTORY_SEPARATOR . "*$ext");
+		$files = glob($this->config->paths->routesPath
+			. DIRECTORY_SEPARATOR . "*$ext");
 
 		foreach ($files as $file) include_once($file);
 	}
@@ -255,7 +253,7 @@ abstract class Application
 	{
 		return bin2hex(random_bytes(64) . time());
 	}
-	
+
 	/**
 	 * Modify cookies for the CSRF token
 	 */
@@ -281,7 +279,7 @@ abstract class Application
 	{
 		$csrfToken = $this->generateTokens();
 		$this->setCsrfCookie($csrfToken);
-		
+
 		return $csrfToken;
 	}
 

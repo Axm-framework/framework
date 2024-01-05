@@ -66,7 +66,7 @@ if (!function_exists('raxm')) {
 		$names = $raxm::parserComponent($component);
 
 		// Initialize and use the specified Raxm component.
-		return $raxm::initializeComponent($names);
+		return $raxm::mountComponent(new $names, true);
 	}
 }
 
