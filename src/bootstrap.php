@@ -41,10 +41,6 @@ defined('CLEAN_URI_PATH') or define('CLEAN_URI_PATH', substr($_SERVER['SCRIPT_NA
                         FILES FOR INITIALIZATION
 ------------------------------------------------------------------------- */
 
-require_once('functions.php');
-
-config()->load(['App.php', 'Paths.php', 'Session.php']);
-
 require_once(VENDOR_PATH . DIRECTORY_SEPARATOR . 'vlucas' . DIRECTORY_SEPARATOR .
     'phpdotenv' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Dotenv.php');
 
@@ -53,3 +49,7 @@ try {
 } catch (\Throwable $th) {
     trigger_error($th);
 }
+
+require_once('functions.php');
+
+config()->load(['App.php', 'Paths.php', 'Session.php']);
