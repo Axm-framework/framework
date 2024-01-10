@@ -29,6 +29,9 @@ abstract class Application
 	 */
 	private ?Container $container;
 
+	/**
+	 * @var BaseConfig|null
+	 */
 	private ?BaseConfig $config;
 
 	/**
@@ -40,7 +43,29 @@ abstract class Application
 	public function __construct($config = [])
 	{
 		Axm::setApplication($this);
+		$this->preInit();
 		$this->init();
+	}
+
+	/**
+	 * pre-Initialize the application by loading services,
+	 * configuration files,routes, and generating security tokens.
+	 */
+	private function preInit(): void
+	{
+		$this->getContainer();
+		$this->config = config();
+	}
+
+	/**
+	 * Initialize the application by loading services, including internal functions,
+	 * configuration files,routes, and generating security tokens.
+	 */
+	private function init(): void
+	{
+		$providersPath = $this->config->paths->providersPath;
+		$this->container->registerFromDirectory($providersPath);
+		$this->openRoutesUser();
 	}
 
 	/**
@@ -50,19 +75,6 @@ abstract class Application
 	public function getContainer(): Container
 	{
 		return $this->container ??= Container::getInstance();
-	}
-
-	/**
-	 * Initialize the application by loading services, including internal functions,
-	 * configuration files,routes, and generating security tokens.
-	 */
-	private function init(): void
-	{
-		$ctnr = $this->getContainer();
-		$this->config = config();
-		$ctnr->loadFromDirectory($this->config->paths->providersPath);
-
-		$this->openRoutesUser();
 	}
 
 	/**
@@ -94,9 +106,9 @@ abstract class Application
 	 *
 	 * @param string $path The path to the configuration file.
 	 * @param string $root An optional root directory for the path.
-	 * @return mixed The result of the configuration file load operation.
+	 * @return mixed The result of the configuration file register operation.
 	 */
-	public function load(string $path, string $root = APP_PATH)
+	public function register(string $path, string $root = APP_PATH)
 	{
 		$filePath = $root . DIRECTORY_SEPARATOR . str_replace(
 			'.',
@@ -104,7 +116,7 @@ abstract class Application
 			pathinfo($path, PATHINFO_FILENAME)
 		) . '.' . pathinfo($path, PATHINFO_EXTENSION);
 
-		return $this->container->load($filePath);
+		return $this->container->register($filePath);
 	}
 
 	/**
@@ -239,9 +251,8 @@ abstract class Application
 	{
 		if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) return '';
 
-		if (!extension_loaded('intl')) {
+		if (!extension_loaded('intl'))
 			throw new Exception('The "intl" extension is not enabled on this server');
-		}
 
 		return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 	}

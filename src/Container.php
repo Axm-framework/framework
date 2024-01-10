@@ -8,6 +8,7 @@ use Closure;
 use ReflectionFunction;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionParameter;
 use ReflectionException;
 use ReflectionNamedType;
 use RuntimeException;
@@ -39,18 +40,10 @@ class Container
      */
     private array $sharedInstances = [];
 
-
-    private function __construct()
-    {
-    }
-
-    private function __clone()
-    {
-    }
-
-    public function __wakeup()
-    {
-    }
+    /**
+     * @var string
+     */
+    private string $nameMethodBoot = 'boot';
 
     /**
      * Get the instance of the container.
@@ -69,34 +62,36 @@ class Container
     /**
      * Get a service by its ID.
      *
-     * @param string $id
+     * @param string $alias
      * @return mixed
      */
-    public function get($id)
+    public function get($alias)
     {
-        if (isset($this->sharedInstances[$id])) {
-            return $this->sharedInstances[$id];
+        if (isset($this->sharedInstances[$alias])) {
+            return $this->sharedInstances[$alias];
         }
 
-        if (!$this->has($id)) {
-            throw new RuntimeException("Service not found: $id");
-        }
+        if (!$this->has($alias))
+            throw new RuntimeException("Service not found: $alias");
 
-        $service = $this->services[$id];
+        $service = $this->services[$alias];
 
         $parameters = $this->getParameters($service['closure']);
         $instance = $service['closure'](...$parameters);
 
-        if (!is_object($instance)) {
-            throw new RuntimeException("Invalid instance returned by service: $id");
-        }
-
-        if (isset($service['initial'])) {
-            $service['initial']();
-        }
+        if (!is_object($instance))
+            throw new RuntimeException("Invalid instance returned by service: $alias");
 
         if (isset($service['shared']) && $instance !== null) {
-            $this->sharedInstances[$id] = $instance;
+            $this->sharedInstances[$alias] = $instance;
+        }
+
+        if (method_exists($instance, $this->nameMethodBoot)) {
+            try {
+                $instance->{$this->nameMethodBoot}();
+            } catch (\Throwable $th) {
+                throw new RuntimeException(sprintf('Error: %s.', $th->getMessage()));
+            }
         }
 
         return $instance;
@@ -105,32 +100,31 @@ class Container
     /**
      * Check if a service exists in the container.
      *
-     * @param string $id
+     * @param string $alias
      * @return bool
      */
-    public function has($id): bool
+    public function has($alias): bool
     {
-        return isset($this->services[$id]);
+        return isset($this->services[$alias]);
     }
 
     /**
      * Set a service in the container.
      *
-     * @param string $id
+     * @param string $alias
      * @param Closure $closure
      * @param bool $shared
+     * @param bool $overwrite
      */
-    public function set(string $id, Closure $serviceClosure, ?Closure $initial = null, bool $shared = false)
+    public function set(string $alias, Closure $serviceClosure, ?Closure $initial = null, bool $shared = false, bool $overwrite = true)
     {
-        // if ($this->has($id)) {
-        //     throw new RuntimeException("Service already exists: $id");
-        // }
-
-        $this->services[$id] = [
-            'closure' => $serviceClosure,
-            'initial' => $initial,
-            'shared'  => $shared,
-        ];
+        if ($overwrite) {
+            $this->services[$alias] = [
+                'closure' => $serviceClosure,
+                'initial' => $initial,
+                'shared'  => $shared,
+            ];
+        }
     }
 
     /**
@@ -161,14 +155,14 @@ class Container
     /**
      * Set or change the shared instance of a service.
      *
-     * @param string $id
+     * @param string $alias
      * @param bool $shared
      * @return Container
      */
-    public function setShared(string $id, bool $shared): Container
+    public function setShared(string $alias, bool $shared): Container
     {
-        if ($this->has($id)) {
-            $this->services[$id]['shared'] = $shared;
+        if ($this->has($alias)) {
+            $this->services[$alias]['shared'] = $shared;
         }
 
         return $this;
@@ -177,44 +171,27 @@ class Container
     /**
      * Check if an instance is shared.
      *
-     * @param string $id
+     * @param string $alias
      * @return bool
      */
-    public function isShared(string $id): bool
+    public function isShared(string $alias): bool
     {
-        return isset($this->services[$id]['shared']);
-    }
-
-    /**
-     * Define an alias for a service.
-     *
-     * @param string $id
-     * @param string $alias
-     * @return Container
-     */
-    public function setAlias(string $id, string $alias): Container
-    {
-        if ($this->has($id)) {
-            $this->services[$alias] = $this->services[$id];
-            unset($this->services[$id]);
-        }
-
-        return $this;
+        return isset($this->services[$alias]['shared']);
     }
 
     /**
      * Extend a service definition with additional configuration.
      *
-     * @param string $id
+     * @param string $alias
      * @param Closure $extension
      * @return Container
      */
-    public function extend(string $id, Closure $extension): Container
+    public function extend(string $alias, Closure $extension): Container
     {
-        if ($this->has($id)) {
-            $originalClosure = $this->services[$id]['closure'];
+        if ($this->has($alias)) {
+            $originalClosure = $this->services[$alias]['closure'];
 
-            $this->services[$id]['closure'] = function (...$args) use ($originalClosure, $extension) {
+            $this->services[$alias]['closure'] = function (...$args) use ($originalClosure, $extension) {
                 $instance = $originalClosure(...$args);
                 return $extension($instance, $this);
             };
@@ -224,53 +201,87 @@ class Container
     }
 
     /**
-     * Load service configurations from a file.
+     * Register services from a file.
      *
-     * @param string $file
+     * @param string $serviceFilePath
      * @throws RuntimeException
      */
-    public function load(string $file)
+    public function register(string $serviceFilePath)
     {
-        $filePath = $file;
+        $this->validateServiceFile($serviceFilePath);
 
-        if (!is_file($filePath)) {
-            throw new RuntimeException("Configuration file not found: $filePath");
-        }
+        $config = require $serviceFilePath;
+        foreach ($config as $alias => $service) {
+            $class   = $service['class']   ?? null;
+            $closure = $service['closure'] ?? null;
+            $initial = $service['initial'] ?? null;
+            $shared  = $service['shared']  ?? false;
+            $boot    = $service['boot']    ?? null;
 
-        $config = include_once $filePath;
+            $callback = $this->getServiceCallback($alias, $class, $closure);
 
-        foreach ($config as $id => $service) {
-            if (isset($service['class'])) {
-                $class   = $service['class'];
-                $initial = $service['initial'] ?? null;
-                $shared  = $service['shared'] ?? false;
-
-                $closure = function (...$args) use ($class) {
-                    return (new ReflectionClass($class))->newInstanceArgs($args);
-                };
-
-                $this->set($id, $closure, $initial, $shared);
-            } elseif (isset($service['closure'])) {
-                $closure = $service['closure'];
-                $initial = $service['initial'] ?? null;
-                $shared  = $service['shared'] ?? false;
-
-                $this->set($id, $closure, $initial, $shared);
-            } else {
-                throw new RuntimeException("Invalid service configuration for: $id");
+            // Register the service with the provided parameters
+            $this->set($alias, $callback, $initial, $shared);
+            if (($boot !== null) && is_callable($boot)) {
+                fn () => $boot();
             }
         }
     }
 
     /**
-     * Remove a service from the container.
+     * Get the appropriate callback for the service.
      *
-     * @param string $id
+     * @param string     $alias
+     * @param string|null $class
+     * @param \Closure|null $closure
+     * @return \Closure
+     * @throws RuntimeException
      */
-    public function remove(string $id): void
+    private function getServiceCallback(string $alias, ?string $class, ?Closure $closure): Closure
     {
-        unset($this->services[$id]);
-        unset($this->sharedInstances[$id]);
+        return match (true) {
+            ($class   !== null) => fn (...$args) => (new ReflectionClass($class))->newInstanceArgs($args),
+            ($closure !== null) => $closure,
+            default => throw new RuntimeException("Invalid service configuration for: $alias"),
+        };
+    }
+
+    /**
+     * Validate that the service file exists.
+     *
+     * @param string $serviceFilePath
+     * @throws RuntimeException
+     */
+    private function validateServiceFile(string $serviceFilePath)
+    {
+        if (!is_file($serviceFilePath)) {
+            throw new RuntimeException("Configuration file not found: $serviceFilePath");
+        }
+    }
+
+    /**
+     * Register multiple services at once.
+     *
+     * @param string $directory
+     * @param string $ext
+     * @throws RuntimeException
+     */
+    public function registerFromDirectory(string $directory, string $ext = '.php'): void
+    {
+        $files = glob("$directory/*$ext");
+        foreach ($files as $file) {
+            $this->register($file);
+        }
+    }
+
+    /**
+     * Remove a service from the container.
+     * @param string $alias
+     */
+    public function remove(string $alias): void
+    {
+        unset($this->services[$alias]);
+        unset($this->sharedInstances[$alias]);
     }
 
     /**
@@ -284,7 +295,6 @@ class Container
 
     /**
      * Get all registered service IDs in the container.
-     *
      * @return array
      */
     public function getServices(): array
@@ -294,16 +304,14 @@ class Container
 
     /**
      * Get all shared service IDs registered in the container.
-     *
      * @return array
      */
     public function getSharedServices(): array
     {
         $sharedServices = [];
-
-        foreach ($this->services as $id => $service) {
+        foreach ($this->services as $alias => $service) {
             if ($service['shared']) {
-                $sharedServices[] = $id;
+                $sharedServices[] = $alias;
             }
         }
 
@@ -311,49 +319,19 @@ class Container
     }
 
     /**
-     * Register multiple services at once.
+     * Set alias for a service.
      *
-     * @param array $services
-     * @throws RuntimeException
+     * @param string $alias
+     * @param string $alias
+     * @return Container
      */
-    public function register(array $services): void
+    public function setAlias(string $alias, string $newAlias): Container
     {
-        foreach ($services as $id => $service) {
-            if (isset($service['class'])) {
-                $class   = $service['class'];
-                $initial = $service['initial'] ?? null;
-                $shared  = $service['shared'] ?? false;
-
-                $closure = function (...$args) use ($class) {
-                    return (new ReflectionClass($class))->newInstanceArgs($args);
-                };
-
-                $this->set($id, $closure,  $initial, $shared);
-            } elseif (isset($service['closure'])) {
-                $closure = $service['closure'];
-                $initial = $service['initial'] ?? null;
-                $shared  = $service['shared'] ?? false;
-
-                $this->set($id, $closure,  $initial, $shared);
-            } else {
-                throw new RuntimeException("Invalid service configuration for: $id");
-            }
+        if ($this->has($alias)) {
+            $this->services[$alias] = $newAlias;
         }
-    }
 
-    /**
-     * Load all service configuration files from a directory.
-     *
-     * @param string $directory
-     * @param string $ext
-     */
-    public function loadFromDirectory(string $directory, string $ext = '.php'): void
-    {
-        $files = glob("$directory/*$ext");
-
-        foreach ($files as $file) {
-            $this->load($file);
-        }
+        return $this;
     }
 
     /**
@@ -365,69 +343,91 @@ class Container
      */
     private function getParameters(callable $callable): array
     {
-        if (!is_callable($callable)) {
+        if (!is_callable($callable))
             throw new InvalidArgumentException('Callable must be valid');
-        }
 
         $reflection = is_array($callable)
             ? new ReflectionMethod($callable[0], $callable[1])
             : new ReflectionFunction($callable);
 
         $parameters = [];
+
         foreach ($reflection->getParameters() as $param) {
-            $paramType = $param->getType();
+            $typeName = $this->getParameterTypeName($param);
+            $defaultValue = $this->getParameterDefaultValue($param);
 
-            if ($paramType instanceof ReflectionNamedType) {
-                $typeName = $paramType->getName();
-                if ($paramType->allowsNull()) {
-                    $typeName = '?' . $typeName; // Handle nullable types
-                }
-            } else {
-                $typeName = 'mixed'; // Handle non-class types (int, bool, etc.)
-            }
-
-            if ($param->isDefaultValueAvailable()) {
-                $defaultValue = $param->getDefaultValue();
-                if (is_array($defaultValue) || is_scalar($defaultValue)) {
-                    $parameters[] = "$typeName \${$param->getName()} = " . var_export($defaultValue, true);
-                } else {
-                    $parameters[] = "$typeName \${$param->getName()} = null";
-                }
-            } elseif ($param->isVariadic()) {
-                $parameters[] = "$typeName ... \${$param->getName()}";
-            } else {
-                $parameters[] = "$typeName \${$param->getName()}";
-            }
+            $parameters[] = "$typeName \${$param->getName()}$defaultValue";
         }
 
         return $parameters;
     }
 
     /**
+     * Get the type name of a parameter.
+     *
+     * @param ReflectionParameter $param
+     * @return string
+     */
+    private function getParameterTypeName(ReflectionParameter $param): string
+    {
+        $paramType = $param->getType();
+        return $paramType instanceof ReflectionNamedType
+            ? ($paramType->allowsNull() ? '?' : '') . $paramType->getName()
+            : 'mixed';
+    }
+
+    /**
+     * Get the default value representation for a parameter.
+     *
+     * @param ReflectionParameter $param
+     * @return string
+     */
+    private function getParameterDefaultValue(ReflectionParameter $param): string
+    {
+        if ($param->isDefaultValueAvailable()) {
+            $defaultValue = $param->getDefaultValue();
+
+            // Limitar la longitud de la cadena a 50 caracteres
+            $formattedValue = mb_strlen(var_export($defaultValue, true)) > 50
+                ? substr(var_export($defaultValue, true), 0, 50) . '...'
+                : var_export($defaultValue, true);
+
+            return ' = ' . (is_array($defaultValue) || is_scalar($defaultValue)
+                ? $formattedValue
+                : 'null');
+        }
+
+        if ($param->isVariadic()) {
+            return ' ...';
+        }
+
+        return '';
+    }
+
+    /**
      * Dump information about a service.
      *
-     * @param string|null $id
+     * @param string|null $alias
      * @param array|null $options
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function dump($id = null, array $options = null)
+    public function dump($alias = null, array $options = null)
     {
-        if (is_null($id)) return dump($this->services);
+        if (is_null($alias)) return dump($this->services);
 
-        if (!isset($this->services[$id])) {
-            throw new InvalidArgumentException("Service not found: $id");
-        }
+        if (!isset($this->services[$alias]))
+            throw new InvalidArgumentException("Service not found: $alias");
 
         $data = [
-            'id' => $id,
-            'closure' => $this->services[$id]['closure'],
-            'initial' => $this->services[$id]['initial'],
-            'shared'  => $this->services[$id]['shared'],
+            'id' => $alias,
+            'closure' => $this->services[$alias]['closure'],
+            'initial' => $this->services[$alias]['initial'],
+            'shared'  => $this->services[$alias]['shared'],
         ];
 
         if (isset($options['class'])) {
-            $data['class'] = $this->services[$id]['class'];
+            $data['class'] = $this->services[$alias]['class'];
         }
 
         return dump($data);
@@ -468,11 +468,18 @@ class Container
 
     /**
      * Magic method to remove a service by property access.
-     *
      * @param string $key
      */
     public function __unset($key)
     {
         $this->remove($key);
+    }
+
+    private function __construct()
+    {
+    }
+
+    private function __clone()
+    {
     }
 }
