@@ -55,6 +55,8 @@ abstract class Application
 	{
 		$this->getContainer();
 		$this->config = config();
+		$providersPath = $this->config->paths->providersPath;
+		$this->container->registerFromDirectory($providersPath);
 	}
 
 	/**
@@ -63,8 +65,6 @@ abstract class Application
 	 */
 	private function init(): void
 	{
-		$providersPath = $this->config->paths->providersPath;
-		$this->container->registerFromDirectory($providersPath);
 		$this->openRoutesUser();
 	}
 
@@ -183,10 +183,10 @@ abstract class Application
 	}
 
 	/**
-	 * Get the event handler intent.
+	 * Get the events handler intent.
 	 * @return mixed The event handler intent.
 	 */
-	public function event()
+	public function events()
 	{
 		return $this->event;
 	}

@@ -144,13 +144,9 @@ abstract class Controller
      * @param string $ext
      * @return string|null
      */
-    public function renderView(
-        string $view,
-        ?array $params = [],
-        bool $buffer = true,
-        string $ext = '.php'
-    ): ?string {
-        return $this->view::render($view, $params, $buffer, $ext);
+    public function renderView(string $view, ?array $params = [], string $ext = '.php'): ?string
+    {
+        return $this->view::render($view, $params, $ext);
     }
 
     /**
