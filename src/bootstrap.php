@@ -33,6 +33,8 @@ const APP_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'app';
 // Defines the path for writing files
 const STORAGE_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'storage';
 
+const APP_NAMESPACE = 'App\\';
+
 // Defines the clean path of the request URI
 defined('CLEAN_URI_PATH') or define('CLEAN_URI_PATH', substr($_SERVER['SCRIPT_NAME'], 0, -9));
 
