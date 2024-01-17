@@ -5,474 +5,473 @@ declare(strict_types=1);
 namespace Axm;
 
 use Closure;
-use ReflectionFunction;
+use Exception;
+use Traversable;
+use ArrayIterator;
+use ArrayAccess;
+use IteratorAggregate;
+use Countable;
 use ReflectionClass;
-use ReflectionMethod;
-use ReflectionParameter;
-use ReflectionException;
-use ReflectionNamedType;
 use RuntimeException;
-use InvalidArgumentException;
+use ReflectionMethod;
+use ReflectionException;
+use ReflectionFunction;
+use ReflectionFunctionAbstract;
 
-
-/**
- *  Class Container 
- * 
- * @author Juan Cristobal <juancristobalgd1@gmail.com>
- * @link http://www.axm.com/
- * @license http://www.axm.com/license/
- * @package Axm
- */
-class Container
+class Container implements ArrayAccess, IteratorAggregate, Countable
 {
-    /**
-     * @var Container|null
-     */
-    private static ?Container $instance = null;
-
-    /**
-     * @var array
-     */
-    private array $services = [];
-
-    /**
-     * @var array
-     */
-    private array $sharedInstances = [];
-
-    /**
-     * @var string
-     */
+    protected $bind = [];
+    protected array $instances = [];
     private string $nameMethodBoot = 'boot';
+    protected $aliases = [];
 
     /**
-     * Get the instance of the container.
-     *
-     * @return Container
+     * Get the singleton instance of the class.
+     * @return self
      */
-    public static function getInstance(): Container
+    public static function getInstance(): self
     {
-        if (!self::$instance) {
-            self::$instance = new self();
-        }
+        static $instance = null;
 
-        return self::$instance;
-    }
-
-    /**
-     * Get a service by its ID.
-     *
-     * @param string $alias
-     * @return mixed
-     */
-    public function get($alias)
-    {
-        if (isset($this->sharedInstances[$alias])) {
-            return $this->sharedInstances[$alias];
-        }
-
-        if (!$this->has($alias))
-            throw new RuntimeException("Service not found: $alias");
-
-        $service = $this->services[$alias];
-
-        $parameters = $this->getParameters($service['closure']);
-        $instance = $service['closure'](...$parameters);
-
-        if (!is_object($instance))
-            throw new RuntimeException("Invalid instance returned by service: $alias");
-
-        if (isset($service['shared']) && $instance !== null) {
-            $this->sharedInstances[$alias] = $instance;
-        }
-
-        if (method_exists($instance, $this->nameMethodBoot)) {
-            try {
-                $instance->{$this->nameMethodBoot}();
-            } catch (\Throwable $th) {
-                throw new RuntimeException(sprintf('Error: %s.', $th->getMessage()));
-            }
+        if ($instance === null) {
+            $instance = new self();
         }
 
         return $instance;
     }
 
     /**
-     * Check if a service exists in the container.
+     * Register a service in the container.
      *
-     * @param string $alias
-     * @return bool
+     * @param string|array|object $abstract Abstract type of service to be registered.
+     * @param mixed $concrete (optional) Concrete type of service to be registered.
+     * @param bool $shared (optional) Determines if the service should be shared.
      */
-    public function has($alias): bool
+    public function bind(string|array $abstract, $concrete = null)
     {
-        return isset($this->services[$alias]);
-    }
-
-    /**
-     * Set a service in the container.
-     *
-     * @param string $alias
-     * @param Closure $closure
-     * @param bool $shared
-     * @param bool $overwrite
-     */
-    public function set(string $alias, Closure $serviceClosure, ?Closure $initial = null, bool $shared = false, bool $overwrite = true)
-    {
-        if ($overwrite) {
-            $this->services[$alias] = [
-                'closure' => $serviceClosure,
-                'initial' => $initial,
-                'shared'  => $shared,
-            ];
-        }
-    }
-
-    /**
-     * Register a class as a singleton service in the container.
-     *
-     * @param string $classname
-     * @param array|null $constructorArgs
-     * @return Container
-     * @throws RuntimeException
-     */
-    public function singleton(string $classname, ?array $constructorArgs = null)
-    {
-        $this->set($classname, function () use ($classname, $constructorArgs) {
-            try {
-                $reflectionClass = new ReflectionClass($classname);
-                $instance = ($constructorArgs !== null)
-                    ? $reflectionClass->newInstanceArgs($constructorArgs)
-                    : $reflectionClass->newInstance();
-                return $instance;
-            } catch (ReflectionException $e) {
-                throw new RuntimeException("Failed to instantiate class: $classname", 0, $e);
+        if (is_array($abstract)) {
+            foreach ($abstract as $key => $val) {
+                $this->bind($key, $val);
             }
-        }, null, true);
-
-        return $this;
-    }
-
-    /**
-     * Set or change the shared instance of a service.
-     *
-     * @param string $alias
-     * @param bool $shared
-     * @return Container
-     */
-    public function setShared(string $alias, bool $shared): Container
-    {
-        if ($this->has($alias)) {
-            $this->services[$alias]['shared'] = $shared;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Check if an instance is shared.
-     *
-     * @param string $alias
-     * @return bool
-     */
-    public function isShared(string $alias): bool
-    {
-        return isset($this->services[$alias]['shared']);
-    }
-
-    /**
-     * Extend a service definition with additional configuration.
-     *
-     * @param string $alias
-     * @param Closure $extension
-     * @return Container
-     */
-    public function extend(string $alias, Closure $extension): Container
-    {
-        if ($this->has($alias)) {
-            $originalClosure = $this->services[$alias]['closure'];
-
-            $this->services[$alias]['closure'] = function (...$args) use ($originalClosure, $extension) {
-                $instance = $originalClosure(...$args);
-                return $extension($instance, $this);
-            };
-        }
-
-        return $this;
-    }
-
-    /**
-     * Register services from a file.
-     *
-     * @param string $serviceFilePath
-     * @throws RuntimeException
-     */
-    public function register(string $serviceFilePath)
-    {
-        $this->validateServiceFile($serviceFilePath);
-
-        $config = require $serviceFilePath;
-        foreach ($config as $alias => $service) {
-            $class   = $service['class']   ?? null;
-            $closure = $service['closure'] ?? null;
-            $initial = $service['initial'] ?? null;
-            $shared  = $service['shared']  ?? false;
-            $boot    = $service['boot']    ?? null;
-
-            $callback = $this->getServiceCallback($alias, $class, $closure);
-
-            // Register the service with the provided parameters
-            $this->set($alias, $callback, $initial, $shared);
-            if (($boot !== null) && is_callable($boot)) {
-                fn () => $boot();
+        } elseif ($concrete instanceof Closure) {
+            $this->bind[$abstract] = $concrete;
+        } elseif (is_object($concrete)) {
+            $this->instance($abstract, $concrete);
+        } else {
+            $abstract = $this->getAlias($abstract);
+            if ($abstract != $concrete) {
+                $this->bind[$abstract] = $concrete;
             }
         }
+
+        return $this;
+    }
+    /**
+     * Binds the given abstract to the given instance.
+     *
+     * @param string $abstract The abstract or interface name.
+     * @param object $instance The instance of the class that implements the abstract.
+     * @return static The container instance itself.
+     */
+    public function instance(string $abstract, $instance)
+    {
+        $abstract = $this->getAlias($abstract);
+
+        $this->instances[$abstract] = $instance;
+
+        return $this;
     }
 
     /**
-     * Get the appropriate callback for the service.
+     * Binds the given abstract to the concrete implementation as a singleton.
      *
-     * @param string     $alias
-     * @param string|null $class
-     * @param \Closure|null $closure
-     * @return \Closure
-     * @throws RuntimeException
+     * @param string $abstract The abstract or interface name.
+     * @param string|null $concrete The concrete implementation class name.
+     * @return void
      */
-    private function getServiceCallback(string $alias, ?string $class, ?Closure $closure): Closure
+    public function singleton(string $abstract, $concrete = null): void
     {
-        return match (true) {
-            ($class   !== null) => fn (...$args) => (new ReflectionClass($class))->newInstanceArgs($args),
-            ($closure !== null) => $closure,
-            default => throw new RuntimeException("Invalid service configuration for: $alias"),
-        };
+        $this->bind($abstract, $concrete, true);
     }
 
     /**
-     * Validate that the service file exists.
+     * Binds the given abstract to a factory closure.
      *
-     * @param string $serviceFilePath
-     * @throws RuntimeException
+     * @param string $abstract The abstract or interface name.
+     * @param Closure $factory A closure that returns an instance of the concrete implementation.
      */
-    private function validateServiceFile(string $serviceFilePath)
+    public static function factory(string $name, string $namespace = '', ...$args)
     {
-        if (!is_file($serviceFilePath)) {
-            throw new RuntimeException("Configuration file not found: $serviceFilePath");
+        $class = str_contains($name, '\\') ? $name : $namespace . ucwords($name);
+
+        return Container::getInstance()->buildClass($class, $args);
+    }
+
+    /**
+     * Calls the given callable with the specified parameters.
+     *
+     * @param callable $callable The callable to call.
+     * @param array $parameters The parameters to pass to the callable.
+     * @param bool $accessible Whether to allow access to protected and private methods.
+     * @return mixed The result of calling the callable.
+     */
+    public function call($callable, array $parameters = [], bool $accessible = false)
+    {
+        if ($callable instanceof Closure) {
+            return $this->buildFunction($callable, $parameters);
+        } elseif (is_string($callable) && !str_contains($callable, '::')) {
+            return $this->buildFunction($callable, $parameters);
+        } else {
+            return $this->buildMethod($callable, $parameters, $accessible);
         }
     }
 
     /**
-     * Register multiple services at once.
+     * Build a function or a Closure with the given variables.
      *
-     * @param string $directory
-     * @param string $ext
-     * @throws RuntimeException
+     * @param string|Closure $function The function or Closure to invoke.
+     * @param $parameters The variables to pass to the function.
+     * @return mixed The result of the function call.
+     * @throws RuntimeException If the function does not exist.
+     */
+    public function buildFunction(string|Closure $function, array $parameters = [])
+    {
+        try {
+            $reflect = new ReflectionFunction($function);
+        } catch (ReflectionException $e) {
+            throw new RuntimeException("Function not exists: {$function}() " . $e->getMessage());
+        }
+
+        $args = $this->bindParams($reflect, $parameters);
+        return $function(...$args);
+    }
+
+    /**
+     * Invokes a method on a class with the given parameters.
+     *
+     * @param array|string $method The method to invoke, either as an array [class, method]
+     * @param array $parameters The parameters to pass to the method.
+     * @param bool $accessible Whether to make the method accessible if it is not public.
+     * @return mixed The result of the method call.
+     * @throws Exception If the method does not exist.
+     */
+    public function buildMethod($method, array $parameters = [], bool $accessible = false): mixed
+    {
+        if (is_array($method)) {
+            [$class, $method] = $method;
+
+            $class = is_object($class) ? $class : $this->buildClass($class);
+        } else {
+            [$class, $method] = explode('::', $method);
+        }
+
+        try {
+            $reflect = new ReflectionMethod($class, $method);
+        } catch (ReflectionException $e) {
+            $class = is_object($class) ? $class::class : $class;
+            throw new Exception("Method not exists: " . $class . '::' . $method . '()' . ' ' . $e->getMessage());
+        }
+
+        $args = $this->bindParams($reflect, $parameters);
+
+        if ($accessible) {
+            $reflect->setAccessible($accessible);
+        }
+
+        return $reflect->invokeArgs(is_object($class) ? $class : null, $args);
+    }
+
+    /**
+     * Resolves and returns the given abstract.
+     *
+     * @param string $abstract abstract or interface name.
+     * @param array $parameters An array of parameters to pass to the constructor of the concrete implementation.
+     * @return object
+     */
+    public function make(string $abstract, array $parameters = [], bool $newInstance = false): object
+    {
+        $abstract = $this->getAlias($abstract);
+
+        if (!$newInstance && isset($this->instances[$abstract])) {
+            return $this->instances[$abstract];
+        }
+
+        $instance = $this->resolveInstance($abstract, $parameters);
+
+        if (!$newInstance) {
+            $this->instances[$abstract] = $instance;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Resolves the given abstract to an instance of a class.
+     *
+     * @param string $abstract The abstract or interface name.
+     * @param array $parameters An array of parameters to be passed to the constructor of the class.
+     * @return object The instance of the class that implements the abstract.
+     */
+    protected function resolveInstance(string $abstract, array $parameters): object
+    {
+        if (isset($this->bind[$abstract]) && $this->bind[$abstract] instanceof Closure) {
+            return $this->buildFunction($this->bind[$abstract], $parameters);
+        } else {
+            return $this->buildClass($abstract, $parameters);
+        }
+    }
+
+    /**
+     * Initializes the services.
+     *
+     * This method iterates over the array of services, creates an instance of each class,
+     * and calls the method specified in the `$this->nameMethodBoot` property if it exists.
+     */
+    public function initializeServices()
+    {
+        $services = $this->services();
+        foreach ($services as $alias => $className) {
+
+            $instance = $this->make($alias);
+            if (isset($instance) && method_exists($instance, $this->nameMethodBoot)) {
+                $instance->{$this->nameMethodBoot}();
+            }
+        }
+    }
+
+    /**
+     * Creates a new instance of given abstract class.
+     *
+     * @param string $abstract abstract or interface name.
+     * @param array $parameters An array of parameters to to the constructor. * @return object
+     */
+    public function buildClass(string $abstract, array $parameters = [])
+    {
+        try {
+            $reflect = new ReflectionClass($abstract);
+        } catch (ReflectionException $e) {
+            throw new Exception($e->getMessage());
+        }
+
+        $constructor = $reflect->getConstructor();
+        $args = $constructor ? $this->bindParams($constructor, $parameters) : [];
+        $object = $reflect->newInstanceArgs($args);
+
+        return $object;
+    }
+
+    /**
+     * This method binds the values in the `$params` array to the parameters of the method
+     * 
+     * represented by the ReflectionFunctionAbstract object passed to it.
+     * @param ReflectionFunctionAbstract $reflection A reflection of a constructor or method.
+     * @return array An array of bound parameters.
+     */
+    protected function bindParams(ReflectionFunctionAbstract $reflection, array $params = [])
+    {
+        $bindings = [];
+        foreach ($reflection->getParameters() as $param) {
+            $name = $param->getName();
+
+            if (isset($params[$name])) {
+                $bindings[$name] = $params[$name];
+            } else if ($param->isOptional()) {
+                $bindings[$name] = $param->getDefaultValue();
+            } else {
+                throw new Exception("Missing required parameter $name");
+            }
+        }
+
+        return $bindings;
+    }
+
+    /**
+     * Retrieves the alias for the given abstract class or interface.
+     *
+     * @param string $abstract The abstract class or interface to get the alias for.
+     * @return string The alias for the abstract class or interface.
+     */
+    public function getAlias(string $abstract): string
+    {
+        if (isset($this->bind[$abstract])) {
+            $bind = $this->bind[$abstract];
+
+            if (is_string($bind)) {
+                return $this->getAlias($bind);
+            }
+        }
+
+        return $abstract;
+    }
+
+    /**
+     * Registers the definitions from the given directory.
+     * 
+     * @param string $directory The directory to scan for definitions.
+     * @param string $ The file extension to look for. Default is '.php'.
+     * @return void
      */
     public function registerFromDirectory(string $directory, string $ext = '.php'): void
     {
-        $files = glob("$directory/*$ext");
+        $files = glob("$directory/*$ext") ?? [];
         foreach ($files as $file) {
-            $this->register($file);
+            $this->loadDefinitions($file);
         }
     }
 
     /**
-     * Remove a service from the container.
-     * @param string $alias
-     */
-    public function remove(string $alias): void
-    {
-        unset($this->services[$alias]);
-        unset($this->sharedInstances[$alias]);
-    }
-
-    /**
-     * Clear all services from the container.
-     */
-    public function clear(): void
-    {
-        $this->services = [];
-        $this->sharedInstances = [];
-    }
-
-    /**
-     * Get all registered service IDs in the container.
-     * @return array
-     */
-    public function getServices(): array
-    {
-        return array_keys($this->services);
-    }
-
-    /**
-     * Get all shared service IDs registered in the container.
-     * @return array
-     */
-    public function getSharedServices(): array
-    {
-        $sharedServices = [];
-        foreach ($this->services as $alias => $service) {
-            if ($service['shared']) {
-                $sharedServices[] = $alias;
-            }
-        }
-
-        return $sharedServices;
-    }
-
-    /**
-     * Set alias for a service.
+     * Loads the definitions from the given file.
      *
-     * @param string $alias
-     * @param string $alias
-     * @return Container
+     * @param string $file The file to load the definitions from.
+     * @return void
      */
-    public function setAlias(string $alias, string $newAlias): Container
+    public function loadDefinitions(string $file): void
     {
-        if ($this->has($alias)) {
-            $this->services[$alias] = $newAlias;
-        }
+        $definitions = require $file;
+        foreach ($definitions as $name => $definition) {
 
-        return $this;
+            $this->bind($name, $definition);
+        }
     }
 
     /**
-     * Get the parameters of a callable.
+     * Returns the currently bound services.
      *
-     * @param callable $callable
-     * @return array
-     * @throws InvalidArgumentException
+     * @return array The array of bound services.
      */
-    private function getParameters(callable $callable): array
+    public function services()
     {
-        if (!is_callable($callable))
-            throw new InvalidArgumentException('Callable must be valid');
-
-        $reflection = is_array($callable)
-            ? new ReflectionMethod($callable[0], $callable[1])
-            : new ReflectionFunction($callable);
-
-        $parameters = [];
-
-        foreach ($reflection->getParameters() as $param) {
-            $typeName = $this->getParameterTypeName($param);
-            $defaultValue = $this->getParameterDefaultValue($param);
-
-            $parameters[] = "$typeName \${$param->getName()}$defaultValue";
-        }
-
-        return $parameters;
+        return $this->bind ?? [];
     }
 
     /**
-     * Get the type name of a parameter.
+     * Checks if the given abstract is bound or already resolved.
      *
-     * @param ReflectionParameter $param
-     * @return string
+     * @param string $abstract The abstract to check.
+     * @return bool True if the abstract is bound or resolved, false otherwise.
      */
-    private function getParameterTypeName(ReflectionParameter $param): string
+    public function has(string $abstract): bool
     {
-        $paramType = $param->getType();
-        return $paramType instanceof ReflectionNamedType
-            ? ($paramType->allowsNull() ? '?' : '') . $paramType->getName()
-            : 'mixed';
+        $abstract = $this->getAlias($abstract);
+        return isset($this->bind[$abstract]) || isset($this->instances[$abstract]);
     }
 
     /**
-     * Get the default value representation for a parameter.
+     * Returns an instance of the given abstract.
      *
-     * @param ReflectionParameter $param
-     * @return string
+     * @param string $abstract The abstract to retrieve.
+     * @return object The instance of the abstract.
      */
-    private function getParameterDefaultValue(ReflectionParameter $param): string
+    public function get(string $abstract)
     {
-        if ($param->isDefaultValueAvailable()) {
-            $defaultValue = $param->getDefaultValue();
-
-            // Limitar la longitud de la cadena a 50 caracteres
-            $formattedValue = mb_strlen(var_export($defaultValue, true)) > 50
-                ? substr(var_export($defaultValue, true), 0, 50) . '...'
-                : var_export($defaultValue, true);
-
-            return ' = ' . (is_array($defaultValue) || is_scalar($defaultValue)
-                ? $formattedValue
-                : 'null');
+        if ($this->has($abstract)) {
+            return $this->make($abstract);
         }
 
-        if ($param->isVariadic()) {
-            return ' ...';
-        }
-
-        return '';
+        throw new Exception('class not exists: ' . $abstract);
     }
 
     /**
-     * Dump information about a service.
+     * Checks if the given abstract is shared.
      *
-     * @param string|null $alias
-     * @param array|null $options
-     * @return mixed
-     * @throws InvalidArgumentException
+     * @param string $abstract The abstract to check.
+     * @return bool True if the abstract is shared, false otherwise.
      */
-    public function dump($alias = null, array $options = null)
+    public function isShared($abstract): bool
     {
-        if (is_null($alias)) return dump($this->services);
-
-        if (!isset($this->services[$alias]))
-            throw new InvalidArgumentException("Service not found: $alias");
-
-        $data = [
-            'id' => $alias,
-            'closure' => $this->services[$alias]['closure'],
-            'initial' => $this->services[$alias]['initial'],
-            'shared'  => $this->services[$alias]['shared'],
-        ];
-
-        if (isset($options['class'])) {
-            $data['class'] = $this->services[$alias]['class'];
-        }
-
-        return dump($data);
+        $abstract = $this->getAlias($abstract);
+        return isset($this->shared[$abstract]);
     }
 
     /**
-     * Magic method to get a service by property access.
-     *
-     * @param string $key
-     * @return mixed
+     * Unbinds the given abstract from the container.
+     * @param string $abstract The abstract class or interface name.
      */
-    public function __get($key)
+    public function unbind(string $abstract): void
+    {
+        unset($this->bind[$abstract]);
+        unset($this->instances[$abstract]);
+    }
+
+    /**
+     * Deletes the given named instance from the container.
+     */
+    public function delete(string $name)
+    {
+        $name = $this->getAlias($name);
+
+        if (isset($this->instances[$name])) {
+            unset($this->instances[$name]);
+        }
+    }
+
+    /**
+     * Deletes the given named instance from the container.
+     * @param string $name The name of the instance to delete
+     */
+    public function exists(string $abstract): bool
+    {
+        $abstract = $this->getAlias($abstract);
+
+        return isset($this->instances[$abstract]);
+    }
+
+    /**
+     * Returns the instances that this node has
+     */
+    public function instances(): array
+    {
+        return $this->instances;
+    }
+
+    public function __get(string $key)
     {
         return $this->get($key);
     }
 
-    /**
-     * Magic method to set a service by property access.
-     *
-     * @param string $key
-     * @param mixed $value
-     */
-    public function __set($key, $value)
+    public function __set(string $key, $value)
     {
-        $this->set($key, $value);
+        $this->bind($key, $value);
     }
 
-    /**
-     * Magic method to check if a service exists by property access.
-     *
-     * @param string $key
-     * @return bool
-     */
-    public function __isset($key)
+    public function __isset(string $key): bool
     {
         return $this->has($key);
     }
 
-    /**
-     * Magic method to remove a service by property access.
-     * @param string $key
-     */
-    public function __unset($key)
+    public function __unset(string $key)
     {
-        $this->remove($key);
+        $this->unbind($key);
+    }
+
+    public function count(): int
+    {
+        return count($this->instances);
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->instances);
+    }
+
+    public function offsetExists(mixed $key): bool
+    {
+        return $this->exists($key);
+    }
+
+    public function offsetGet(mixed $key): mixed
+    {
+        return $this->make($key);
+    }
+
+    public function offsetSet(mixed $key, mixed $value): void
+    {
+        $this->bind($key, $value);
+    }
+
+    public function offsetUnset(mixed $key): void
+    {
+        $this->delete($key);
     }
 
     private function __construct()

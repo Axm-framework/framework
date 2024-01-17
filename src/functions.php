@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Axm\Config;
+use Axm\Container;
 use Axm\Lang\Lang;
 use Axm\Views\View;
 use Illuminate\Support\Str;
@@ -727,7 +729,7 @@ if (!function_exists('config')) {
 	 */
 	function config(string $key = null)
 	{
-		$config = Axm\BaseConfig::make();
+		$config = Config::make();
 
 		if (is_null($key)) return $config;
 

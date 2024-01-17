@@ -19,20 +19,22 @@ use Exception;
  * @author  Juan Cristobal <juancristobalgd1@gmail.com>
  * @package Framework
  */
-abstract class Application
+class Application extends Container
 {
 	const EVENT_BEFORE_REQUEST = 'beforeRequest';
 	const EVENT_AFTER_REQUEST  = 'afterRequest';
 
-	/**
-	 * @var Container|null The container for managing components.
-	 */
-	private ?Container $container;
-
-	/**
-	 * @var BaseConfig|null
-	 */
-	private ?BaseConfig $config;
+	protected $bind = [
+		'config'     => Axm\Config::class,
+		'session'    => Axm\Session\Session::class,
+		'request'    => Axm\Http\Request::class,
+		'response'   => Axm\Http\Response::class,
+		'router'     => Axm\Http\Router::class,
+		'controller' => \App\Controllers\BaseController::class,
+		'database'   => Axm\Database::class,
+		// 'cache'      => Axm\Cache\Cache::class,
+		'event'      => Axm\EventManager::class,
+	];
 
 	/**
 	 * Constructor for the Application class.
@@ -53,10 +55,8 @@ abstract class Application
 	 */
 	private function preInit(): void
 	{
-		$this->getContainer();
-		$this->config = config();
-		$providersPath = $this->config->paths->providersPath;
-		$this->container->registerFromDirectory($providersPath);
+		$this->registerProviders();
+		$this->initializeServices();
 	}
 
 	/**
@@ -69,12 +69,18 @@ abstract class Application
 	}
 
 	/**
-	 * Get the container instance.
-	 * @return Container The container instance.
+	 * Register service providers.
+	 *
+	 * This method reads the service provider configurations from the `providers.php` file
+	 * and registers them with the application container.
 	 */
-	public function getContainer(): Container
+	public function registerProviders()
 	{
-		return $this->container ??= Container::getInstance();
+		$pathConfig = config('paths.providersPath') . DIRECTORY_SEPARATOR;
+		$provider   = include $pathConfig . 'providers.php';
+		$providers  = array_merge_recursive($this->bind, $provider);
+
+		$this->bind($providers);
 	}
 
 	/**
@@ -95,28 +101,11 @@ abstract class Application
 	public function openRoutesUser(): void
 	{
 		$ext = '.php';
-		$files = glob($this->config->paths->routesPath
-			. DIRECTORY_SEPARATOR . "*$ext");
-
-		foreach ($files as $file) include_once($file);
-	}
-
-	/**
-	 * Load a configuration file.
-	 *
-	 * @param string $path The path to the configuration file.
-	 * @param string $root An optional root directory for the path.
-	 * @return mixed The result of the configuration file register operation.
-	 */
-	public function register(string $path, string $root = APP_PATH)
-	{
-		$filePath = $root . DIRECTORY_SEPARATOR . str_replace(
-			'.',
-			DIRECTORY_SEPARATOR,
-			pathinfo($path, PATHINFO_FILENAME)
-		) . '.' . pathinfo($path, PATHINFO_EXTENSION);
-
-		return $this->container->register($filePath);
+		$pathConfig = config('paths.routesPath') . DIRECTORY_SEPARATOR;
+		$files = glob($pathConfig . "*$ext");
+		foreach ($files as $file) {
+			require_once($file);
+		}
 	}
 
 	/**
@@ -270,7 +259,8 @@ abstract class Application
 	 */
 	public function setCsrfCookie(string $csrfToken): void
 	{
-		setcookie('csrfToken', $csrfToken, time() + 60 * config('session.expiration'));
+		$expiration = config('session.expiration');
+		setcookie('csrfToken', $csrfToken, time() + 60 * $expiration);
 	}
 
 	/**
@@ -326,73 +316,11 @@ abstract class Application
 	 */
 	public function user(string $value = null)
 	{
-		if (is_null($value)) return $this->container->get('user');
+		if (is_null($value)) return $this->container->make('user');
 
 		return $this->container
-			->get('user')
+			->make('user')
 			->{$value} ?? null;
-	}
-
-	/**
-	 * Create and return a singleton instance of a service.
-	 *
-	 * This method creates and returns a singleton instance of a service identified by its alias.
-	 * @param string $alias The alias of the service.
-	 * @return object The singleton instance of the service.
-	 */
-	public function singleton($alias)
-	{
-		return $this->container->singleton($alias);
-	}
-
-	/**
-	 * Add a service to the container and return it.
-	 *
-	 * This method adds a service identified by its alias to the container and returns 
-	 * the service instance.
-	 * @param string $alias The alias of the service.
-	 * @param mixed $args The arguments or configuration for creating the service.
-	 * @return object The added service instance.
-	 */
-	public function addService(string $alias, $args)
-	{
-		$this->container->set($alias, $args);
-		return $this->container->get($alias);
-	}
-
-	/**
-	 * Get a service instance by its alias.
-	 *
-	 * This method retrieves a service instance from the container based on its alias.
-	 * @param string $alias The alias of the service.
-	 * @return object|null The service instance or null if not found.
-	 */
-	public function getService(string $alias)
-	{
-		return $this->container->get($alias);
-	}
-
-	/**
-	 * Get all registered services.
-	 *
-	 * This method returns an array containing all registered services in the container.
-	 * @return array An array of registered services.
-	 */
-	public function getServices()
-	{
-		return $this->container->getServices();
-	}
-
-	/**
-	 * Check if a service with the given alias exists in the container.
-	 *
-	 * This method checks whether a service with the specified alias exists in the container.
-	 * @param string $alias The alias of the service to check.
-	 * @return bool True if the service exists, false otherwise.
-	 */
-	public function hasService(string $alias): bool
-	{
-		return $this->container->has($alias);
 	}
 
 	/**
@@ -403,7 +331,7 @@ abstract class Application
 	 */
 	public function removeService(string $alias)
 	{
-		return $this->container->remove($alias);
+		return $this->container->unbind($alias);
 	}
 
 	/**
@@ -415,59 +343,11 @@ abstract class Application
 	 */
 	public function __get($name)
 	{
-		return match ($name) {
-			($name === 'user') => $this->setUser(),
-			default => $this->container->get($name),
+		return match (true) {
+			($name == 'config') => config(),
+			($name == 'user')   => $this->setUser(),
+			default => $this->get($name),
 		};
-	}
-
-	/**
-	 * Magic method to dynamically set properties.
-	 *
-	 * This magic method allows you to set properties of the container dynamically.
-	 * @param string $name The name of the property to set.
-	 * @param mixed $value The value to set for the property.
-	 */
-	public function __set($name, $value)
-	{
-		$this->container->set($name, $value);
-	}
-
-	/**
-	 * Magic method to check if a property exists.
-	 *
-	 * This magic method checks if a property with the given name exists in the container.
-	 * @param string $name The name of the property to check.
-	 * @return bool True if the property exists, false otherwise.
-	 */
-	public function __isset($name)
-	{
-		return $this->container->has($name);
-	}
-
-	/**
-	 * Magic method to unset properties.
-	 *
-	 * This magic method allows you to unset properties of the container dynamically.
-	 * @param string $name The name of the property to unset.
-	 */
-	public function __unset($name)
-	{
-		$this->container->remove($name);
-	}
-
-	/**
-	 * Magic method to call container methods dynamically.
-	 *
-	 * This magic method allows you to call methods of the container dynamically.
-	 * @param string $name The name of the method to call.
-	 * @param array $arguments The arguments to pass to the method.
-	 */
-	public function __call($name, $arguments)
-	{
-		if (!method_exists($this, $name)) {
-			$this->container->$name(...$arguments);
-		}
 	}
 
 	/**

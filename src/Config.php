@@ -16,7 +16,7 @@ use RuntimeException;
  * @package Axm
  */
 
-class BaseConfig
+class Config
 {
     private static $instance;
     private array $config = [];
@@ -28,7 +28,7 @@ class BaseConfig
      * private __construct
      * @return void
      */
-    private function __construct()
+    public function __construct()
     {
     }
 
