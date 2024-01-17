@@ -171,18 +171,17 @@ class Axm
 	 */
 	public static function app(string|object|null $alias = null, Closure|null $callback = null, bool $shared = false)
 	{
-		if ($alias === null && $callback === null) {
+		if ($alias === null) {
 			return self::getSingleton();
 		}
 
 		$alias = is_object($alias) ? get_class($alias) : $alias;
 
-		if (!self::$_app->hasService($alias)) {
-			$callback = $callback ?? fn () => new $alias;
-			return self::$_app->addService($alias, $callback, $shared);
+		if (!self::$_app->has($alias)) {
+			return self::$_app->make($alias);
 		}
 
-		return self::$_app->getService($alias)
+		return self::$_app->get($alias)
 			?? throw new RuntimeException(sprintf('Service %s not found.', $alias));
 	}
 
