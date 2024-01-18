@@ -20,7 +20,7 @@ use ReflectionFunctionAbstract;
 
 class Container implements ArrayAccess, IteratorAggregate, Countable
 {
-    protected $bind = [];
+    protected $storage = [];
     protected array $instances = [];
     private string $nameMethodBoot = 'boot';
     protected $aliases = [];
@@ -47,27 +47,27 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
      * @param mixed $concrete (optional) Concrete type of service to be registered.
      * @param bool $shared (optional) Determines if the service should be shared.
      */
-    public function bind(string|array $abstract, $concrete = null)
+    public function set(string|array $abstract, $concrete = null)
     {
         if (is_array($abstract)) {
             foreach ($abstract as $key => $val) {
-                $this->bind($key, $val);
+                $this->set($key, $val);
             }
         } elseif ($concrete instanceof Closure) {
-            $this->bind[$abstract] = $concrete;
+            $this->storage[$abstract] = $concrete;
         } elseif (is_object($concrete)) {
             $this->instance($abstract, $concrete);
         } else {
             $abstract = $this->getAlias($abstract);
             if ($abstract != $concrete) {
-                $this->bind[$abstract] = $concrete;
+                $this->storage[$abstract] = $concrete;
             }
         }
 
         return $this;
     }
     /**
-     * Binds the given abstract to the given instance.
+     * storages the given abstract to the given instance.
      *
      * @param string $abstract The abstract or interface name.
      * @param object $instance The instance of the class that implements the abstract.
@@ -83,7 +83,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Binds the given abstract to the concrete implementation as a singleton.
+     * storages the given abstract to the concrete implementation as a singleton.
      *
      * @param string $abstract The abstract or interface name.
      * @param string|null $concrete The concrete implementation class name.
@@ -91,11 +91,33 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
      */
     public function singleton(string $abstract, $concrete = null): void
     {
-        $this->bind($abstract, $concrete, true);
+        $this->set($abstract, $concrete, true);
+    }
+
+    /** 
+     * Creates a new secondary instance of the container with 
+     * the ability to access the scope of the parent.
+     *  
+     * @return static The new container object
+     **/
+    public function createChild(): static
+    {
+        return new static($this);
     }
 
     /**
-     * Binds the given abstract to a factory closure.
+     * Register a service provider to the container.
+     * @return $this This object for chaining.
+     */
+    public function registerServiceProvider($provider)
+    {
+        $provider->register($this);
+
+        return $this;
+    }
+
+    /**
+     * storages the given abstract to a factory closure.
      *
      * @param string $abstract The abstract or interface name.
      * @param Closure $factory A closure that returns an instance of the concrete implementation.
@@ -214,8 +236,8 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
      */
     protected function resolveInstance(string $abstract, array $parameters): object
     {
-        if (isset($this->bind[$abstract]) && $this->bind[$abstract] instanceof Closure) {
-            return $this->buildFunction($this->bind[$abstract], $parameters);
+        if (isset($this->storage[$abstract]) && $this->storage[$abstract] instanceof Closure) {
+            return $this->buildFunction($this->storage[$abstract], $parameters);
         } else {
             return $this->buildClass($abstract, $parameters);
         }
@@ -261,7 +283,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * This method binds the values in the `$params` array to the parameters of the method
+     * This method bind the values in the `$params` array to the parameters of the method
      * 
      * represented by the ReflectionFunctionAbstract object passed to it.
      * @param ReflectionFunctionAbstract $reflection A reflection of a constructor or method.
@@ -269,20 +291,19 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
      */
     protected function bindParams(ReflectionFunctionAbstract $reflection, array $params = [])
     {
-        $bindings = [];
+        $storageings = [];
         foreach ($reflection->getParameters() as $param) {
             $name = $param->getName();
 
             if (isset($params[$name])) {
-                $bindings[$name] = $params[$name];
+                $storageings[$name] = $params[$name];
             } else if ($param->isOptional()) {
-                $bindings[$name] = $param->getDefaultValue();
+                $storageings[$name] = $param->getDefaultValue();
             } else {
                 throw new Exception("Missing required parameter $name");
             }
         }
-
-        return $bindings;
+        return $storageings;
     }
 
     /**
@@ -293,14 +314,13 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
      */
     public function getAlias(string $abstract): string
     {
-        if (isset($this->bind[$abstract])) {
-            $bind = $this->bind[$abstract];
+        if (isset($this->storage[$abstract])) {
+            $storage = $this->storage[$abstract];
 
-            if (is_string($bind)) {
-                return $this->getAlias($bind);
+            if (is_string($storage)) {
+                return $this->getAlias($storage);
             }
         }
-
         return $abstract;
     }
 
@@ -330,7 +350,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
         $definitions = require $file;
         foreach ($definitions as $name => $definition) {
 
-            $this->bind($name, $definition);
+            $this->set($name, $definition);
         }
     }
 
@@ -341,7 +361,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
      */
     public function services()
     {
-        return $this->bind ?? [];
+        return $this->storage ?? [];
     }
 
     /**
@@ -353,7 +373,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
     public function has(string $abstract): bool
     {
         $abstract = $this->getAlias($abstract);
-        return isset($this->bind[$abstract]) || isset($this->instances[$abstract]);
+        return isset($this->storage[$abstract]) || isset($this->instances[$abstract]);
     }
 
     /**
@@ -384,12 +404,11 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
     }
 
     /**
-     * Unbinds the given abstract from the container.
-     * @param string $abstract The abstract class or interface name.
+     * Unset the given abstract from the container
      */
-    public function unbind(string $abstract): void
+    public function unset(string $abstract): void
     {
-        unset($this->bind[$abstract]);
+        unset($this->storage[$abstract]);
         unset($this->instances[$abstract]);
     }
 
@@ -399,7 +418,6 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
     public function delete(string $name)
     {
         $name = $this->getAlias($name);
-
         if (isset($this->instances[$name])) {
             unset($this->instances[$name]);
         }
@@ -431,7 +449,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
 
     public function __set(string $key, $value)
     {
-        $this->bind($key, $value);
+        $this->set($key, $value);
     }
 
     public function __isset(string $key): bool
@@ -441,7 +459,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
 
     public function __unset(string $key)
     {
-        $this->unbind($key);
+        $this->unset($key);
     }
 
     public function count(): int
@@ -466,7 +484,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
 
     public function offsetSet(mixed $key, mixed $value): void
     {
-        $this->bind($key, $value);
+        $this->set($key, $value);
     }
 
     public function offsetUnset(mixed $key): void
