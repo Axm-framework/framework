@@ -24,7 +24,7 @@ class Application extends Container
 	const EVENT_BEFORE_REQUEST = 'beforeRequest';
 	const EVENT_AFTER_REQUEST  = 'afterRequest';
 
-	protected $bind = [
+	protected $class = [
 		'config'     => Axm\Config::class,
 		'session'    => Axm\Session\Session::class,
 		'request'    => Axm\Http\Request::class,
@@ -78,9 +78,9 @@ class Application extends Container
 	{
 		$pathConfig = config('paths.providersPath') . DIRECTORY_SEPARATOR;
 		$provider   = include $pathConfig . 'providers.php';
-		$providers  = array_merge_recursive($this->bind, $provider);
+		$providers  = array_merge_recursive($this->class, $provider);
 
-		$this->bind($providers);
+		$this->set($providers);
 	}
 
 	/**
