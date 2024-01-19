@@ -51,22 +51,6 @@ if (!function_exists('memoize')) {
 	}
 }
 
-if (!function_exists('raxmScripts')) {
-
-	/**
-	 * Enable the use of Raxm scripts and assets in the View.
-	 *
-	 * This function is used to enable the inclusion of Raxm scripts and assets in a View template.
-	 * It sets a flag in the View class to indicate that Raxm assets should be included.
-	 * @return bool True to enable Raxm scripts and assets in the View; false otherwise.
-	 */
-	function raxmScripts()
-	{
-		// Set a flag in the View class to enable Raxm scripts and assets.
-		return View::$raxmAssets = true;
-	}
-}
-
 if (!function_exists('view')) {
 
 	/**
