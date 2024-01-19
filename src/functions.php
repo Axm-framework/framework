@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Axm\Config;
-use Axm\Container;
 use Axm\Lang\Lang;
 use Axm\Views\View;
 use Illuminate\Support\Str;
@@ -49,26 +48,6 @@ if (!function_exists('memoize')) {
 			// Check if the result is already cached; if not, compute and cache it.
 			return $cache[$key] ?? ($cache[$key] = $fn(...$args));
 		};
-	}
-}
-
-if (!function_exists('raxm')) {
-
-	/**
-	 * Initialize and use a Raxm component.
-	 *
-	 * This function is used to initialize and use a Raxm component within the application.
-	 * @param string $component The name of the Raxm component to initialize and use.
-	 * @return mixed The result of initializing and using the specified Raxm component.
-	 */
-	function raxm(string $component)
-	{
-		// Get the Raxm instance from the application.
-		$raxm = app('raxm');
-		$names = $raxm::parserComponent($component);
-
-		// Initialize and use the specified Raxm component.
-		return $raxm::mountComponent(new $names, true);
 	}
 }
 
@@ -734,6 +713,29 @@ if (!function_exists('config')) {
 		if (is_null($key)) return $config;
 
 		return $config->get($key);
+	}
+}
+
+if (!function_exists('ifthen')) {
+
+	function ifthen($condition, array $listconditions, $default = null)
+	{
+		$results = [];
+		foreach ($listconditions as $check => $action) {
+			if (($condition && $check()) || (!$condition && !$check())) {
+				if (is_callable($action)) {
+					$results[] = $action();
+					continue;
+				}
+
+				[$callable, $args] = $action;
+				$results[] = $callable(...$args);
+			} else {
+				return $default !== null ? $default() : null;
+			}
+		}
+
+		return $results;
 	}
 }
 
