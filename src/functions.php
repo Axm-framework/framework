@@ -149,13 +149,17 @@ if (!function_exists('cleanInput')) {
 	{
 		return match (true) {
 			is_array($data)  => array_map('cleanInput', $data),
-			is_object($data) => cleanInput((array)$data),
-			is_string($data) => filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES),
+			is_object($data) => cleanInput((array) $data),
+			filter_var($data, FILTER_VALIDATE_EMAIL) => filter_var($data, FILTER_SANITIZE_EMAIL),
+			filter_var($data, FILTER_VALIDATE_URL)   => filter_var($data, FILTER_SANITIZE_URL),
+			filter_var($data, FILTER_VALIDATE_IP)    => filter_var($data, FILTER_VALIDATE_IP),
+			is_string($data) => preg_replace('/[\x00-\x1F\x7F]/u', '', filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES)),
 			is_int($data)    => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
 			is_float($data)  => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
 			is_bool($data)   => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+			is_null($data)   => settype($data, 'NULL'),
 
-			default => $data,
+			default => filter_var($data, FILTER_SANITIZE_SPECIAL_CHARS),
 		};
 	}
 }
