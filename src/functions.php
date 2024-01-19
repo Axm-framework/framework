@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Axm\Config;
+use Axm\Container;
 use Axm\Lang\Lang;
 use Axm\Views\View;
 use Illuminate\Support\Str;
@@ -48,6 +49,22 @@ if (!function_exists('memoize')) {
 			// Check if the result is already cached; if not, compute and cache it.
 			return $cache[$key] ?? ($cache[$key] = $fn(...$args));
 		};
+	}
+}
+
+if (!function_exists('raxmScripts')) {
+
+	/**
+	 * Enable the use of Raxm scripts and assets in the View.
+	 *
+	 * This function is used to enable the inclusion of Raxm scripts and assets in a View template.
+	 * It sets a flag in the View class to indicate that Raxm assets should be included.
+	 * @return bool True to enable Raxm scripts and assets in the View; false otherwise.
+	 */
+	function raxmScripts()
+	{
+		// Set a flag in the View class to enable Raxm scripts and assets.
+		return View::$raxmAssets = true;
 	}
 }
 
@@ -137,6 +154,7 @@ if (!function_exists('env')) {
 	}
 }
 
+
 if (!function_exists('cleanInput')) {
 
 	/**
@@ -150,9 +168,9 @@ if (!function_exists('cleanInput')) {
 		return match (true) {
 			is_array($data)  => array_map('cleanInput', $data),
 			is_object($data) => cleanInput((array) $data),
-			filter_var($data, FILTER_VALIDATE_EMAIL) => filter_var($data, FILTER_SANITIZE_EMAIL),
-			filter_var($data, FILTER_VALIDATE_URL)   => filter_var($data, FILTER_SANITIZE_URL),
-			filter_var($data, FILTER_VALIDATE_IP)    => filter_var($data, FILTER_VALIDATE_IP),
+			is_email($data)  => filter_var($data, FILTER_SANITIZE_EMAIL),
+			is_url($data)    => filter_var($data, FILTER_SANITIZE_URL),
+			is_ip($data)     => filter_var($data, FILTER_VALIDATE_IP),
 			is_string($data) => preg_replace('/[\x00-\x1F\x7F]/u', '', filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES)),
 			is_int($data)    => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
 			is_float($data)  => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
@@ -163,6 +181,49 @@ if (!function_exists('cleanInput')) {
 		};
 	}
 }
+
+if (!function_exists('is_email')) {
+
+	/**
+	 * Check if a string is a valid email address.
+	 *
+	 * @param string $email The email address to be checked.
+	 * @return bool True if it's a valid email address, false otherwise.
+	 */
+	function is_email($email): bool
+	{
+		return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+	}
+}
+
+if (!function_exists('is_url')) {
+
+	/**
+	 * Check if a string is a valid URL.
+	 *
+	 * @param string $url The URL to be checked.
+	 * @return bool True if it's a valid URL, false otherwise.
+	 */
+	function is_url($url): bool
+	{
+		return filter_var($url, FILTER_VALIDATE_URL) !== false;
+	}
+}
+
+if (!function_exists('is_ip')) {
+
+	/**
+	 * Check if a string is a valid IP address.
+	 *
+	 * @param string $ip The IP address to be checked.
+	 * @return bool True if it's a valid IP address, false otherwise.
+	 */
+	function is_ip($ip): bool
+	{
+		return filter_var($ip, FILTER_VALIDATE_IP) !== false;
+	}
+}
+
 
 if (!function_exists('show')) {
 
@@ -807,9 +868,11 @@ if (!function_exists('helpers')) {
 			throw new InvalidArgumentException('The $helpers variable must be an array.');
 		}
 
+		$config = config();
+
 		// Define paths for helper files
-		$appPath = config('paths.helpersPath'); // Default application path
-		$axmHelpersPath = config('paths.helpersAxmPath'); // Axm system path
+		$appPath = $config->paths->helpersPath;            // Default application path
+		$axmHelpersPath = $config->paths->helpersAxmPath; // Axm system path
 
 		// Load custom helpers from the provided path
 		if ($customPath) {
