@@ -150,6 +150,15 @@ abstract class Controller
     }
 
     /**
+     * Get the view object associated with this controller.
+     * @return View|null.
+     */
+    public function view(): ?View
+    {
+        return $this->view;
+    }
+
+    /**
      * Register a middleware in the controller.
      *
      * @param BaseMiddleware $middleware
