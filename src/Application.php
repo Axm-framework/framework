@@ -26,6 +26,7 @@ class Application extends Container
 
 	protected $class = [
 		'config'     => Axm\Config::class,
+		'event'      => Axm\EventManager::class,
 		'session'    => Axm\Session\Session::class,
 		'request'    => Axm\Http\Request::class,
 		'response'   => Axm\Http\Response::class,
@@ -33,7 +34,7 @@ class Application extends Container
 		'controller' => \App\Controllers\BaseController::class,
 		'database'   => Axm\Database::class,
 		// 'cache'      => Axm\Cache\Cache::class,
-		'event'      => Axm\EventManager::class,
+
 	];
 
 	/**
