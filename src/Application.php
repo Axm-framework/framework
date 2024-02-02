@@ -31,10 +31,10 @@ class Application extends Container
 		'request'    => Axm\Http\Request::class,
 		'response'   => Axm\Http\Response::class,
 		'router'     => Axm\Http\Router::class,
+		'view'       => Axm\Views\View::class,
 		'controller' => \App\Controllers\BaseController::class,
 		'database'   => Axm\Database::class,
 		// 'cache'      => Axm\Cache\Cache::class,
-
 	];
 
 	/**
