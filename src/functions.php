@@ -52,21 +52,21 @@ if (!function_exists('memoize')) {
 	}
 }
 
-if (!function_exists('raxmScripts')) {
+// if (!function_exists('raxmScripts')) {
 
-	/**
-	 * Enable the use of Raxm scripts and assets in the View.
-	 *
-	 * This function is used to enable the inclusion of Raxm scripts and assets in a View template.
-	 * It sets a flag in the View class to indicate that Raxm assets should be included.
-	 * @return bool True to enable Raxm scripts and assets in the View; false otherwise.
-	 */
-	function raxmScripts()
-	{
-		// Set a flag in the View class to enable Raxm scripts and assets.
-		return View::$raxmAssets = true;
-	}
-}
+// 	/**
+// 	 * Enable the use of Raxm scripts and assets in the View.
+// 	 *
+// 	 * This function is used to enable the inclusion of Raxm scripts and assets in a View template.
+// 	 * It sets a flag in the View class to indicate that Raxm assets should be included.
+// 	 * @return bool True to enable Raxm scripts and assets in the View; false otherwise.
+// 	 */
+// 	function raxmScripts()
+// 	{
+// 		// Set a flag in the View class to enable Raxm scripts and assets.
+// 		return View::$raxmAssets = true;
+// 	}
+// }
 
 if (!function_exists('view')) {
 
@@ -81,13 +81,13 @@ if (!function_exists('view')) {
 	 * @param string $ext     The file extension of the View template (default is '.php').
 	 * @return void
 	 */
-	function view(string $view, array $params = [], string $ext = '.php')
+	function view(string $view, string|array $params = null, bool $withLayout = false, string $ext = '.php'): string
 	{
 		// Render the View template using the provided parameters.
-		$renderedView = Axm::app()->controller->renderView($view, $params, $ext);
+		$output = Axm::app()->controller->renderView($view, $params, $withLayout, $ext);
 
 		// Display the rendered View template using the 'show' function.
-		return show($renderedView);
+		return $output . PHP_EOL;
 	}
 }
 
