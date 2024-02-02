@@ -65,7 +65,7 @@ abstract class Controller
         $app = Axm::app();
         $this->request = $app->request;
         $this->response = $app->response;
-        $this->view = View::make();
+        $this->view = $app->view;
 
         $this->registerDefaultMiddleware();
     }
@@ -101,7 +101,7 @@ abstract class Controller
      */
     public function getLayout(): string
     {
-        return $this->layout ?? View::$nameLayoutByDefault;
+        return $this->layout;
     }
 
     /**
@@ -144,9 +144,9 @@ abstract class Controller
      * @param string $ext
      * @return string|null
      */
-    public function renderView(string $view, ?array $params = [], string $ext = '.php'): ?string
+    public function renderView(string $view, string|array $params = null,bool $withLayout = true, string $ext = '.php'): ?string
     {
-        return $this->view::render($view, $params, $ext);
+        return $this->view->render($view, $ext)->withData($params)->withLayout($withLayout)->get();
     }
 
     /**
