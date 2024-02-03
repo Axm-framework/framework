@@ -81,7 +81,7 @@ if (!function_exists('view')) {
 	 * @param string $ext     The file extension of the View template (default is '.php').
 	 * @return void
 	 */
-	function view(string $view, string|array $params = null, bool $return = false, bool $withLayout = false, string $ext = '.php')
+	function view(string $view, string|array $params = null, bool $return = true, bool $withLayout = false, string $ext = '.php')
 	{
 		// Render the View template using the provided parameters.
 		$output = Axm::app()->controller->renderView($view, $params, $withLayout, $ext);
@@ -765,29 +765,6 @@ if (!function_exists('config')) {
 		if (is_null($key)) return $config;
 
 		return $config->get($key);
-	}
-}
-
-if (!function_exists('ifthen')) {
-
-	function ifthen($condition, array $listconditions, $default = null)
-	{
-		$results = [];
-		foreach ($listconditions as $check => $action) {
-			if (($condition && $check()) || (!$condition && !$check())) {
-				if (is_callable($action)) {
-					$results[] = $action();
-					continue;
-				}
-
-				[$callable, $args] = $action;
-				$results[] = $callable(...$args);
-			} else {
-				return $default !== null ? $default() : null;
-			}
-		}
-
-		return $results;
 	}
 }
 

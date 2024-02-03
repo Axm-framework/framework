@@ -144,7 +144,7 @@ abstract class Controller
      * @param string $ext
      * @return string|null
      */
-    public function renderView(string $view, string|array $params = null,bool $withLayout = true, string $ext = '.php'): ?string
+    public function renderView(string $view, string|array $params = null, bool $withLayout = true, string $ext = '.php'): ?string
     {
         return $this->view->render($view, $ext)->withData($params)->withLayout($withLayout)->get();
     }
