@@ -54,4 +54,4 @@ try {
 
 require_once('functions.php');
 
-config()->load(['App.php', 'Paths.php', 'Session.php']);
+config()->load(['App.php', 'Paths.php', 'Session.php', 'View.php']);
