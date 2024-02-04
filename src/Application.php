@@ -51,7 +51,7 @@ class Application extends Container
 	}
 
 	/**
-	 * pre-Initialize the application by loading services,
+	 * Pre-Initialize the application by loading services,
 	 * configuration files,routes, and generating security tokens.
 	 */
 	private function preInit(): void
@@ -237,14 +237,15 @@ class Application extends Container
 	 * @return string The user's preferred locale or an empty string if not available.
 	 * @throws Exception If the "intl" extension is not enabled on the server.
 	 */
-	public function getLocale()
+	public function getLocale(): string|false
 	{
-		if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) return '';
-
 		if (!extension_loaded('intl'))
 			throw new Exception('The "intl" extension is not enabled on this server');
 
-		return Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+		$http = Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '');
+		$locale = !empty($http) ? $http : 'en_US';
+
+		return $locale;
 	}
 
 	/**
