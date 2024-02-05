@@ -86,7 +86,7 @@ if (!function_exists('view')) {
 		// Render the View template using the provided parameters.
 		$output = Axm::app()->controller->renderView($view, $params, $withLayout, $ext);
 
-		if ($show) {
+		if (!$show) {
 			return $output;
 		}
 
