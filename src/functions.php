@@ -128,6 +128,18 @@ if (!function_exists('endSection')) {
 	}
 }
 
+if (!function_exists('partials')) {
+
+	function partials(string $partial_name,  array $data = [])
+	{
+		$partialsPath = config('paths.partialsPath'); // Make sure we have our paths set up!
+
+		$partial_file = $partialsPath . DIRECTORY_SEPARATOR . $partial_name . '.php';
+		$partials = Axm::app()->view->file($partial_file, $data);
+		return $partials;
+	}
+}
+
 if (!function_exists('env')) {
 
 	/**
