@@ -1,74 +1,108 @@
 <!-- markdownlint-disable no-inline-html -->
 <p align="center">
   <br><br>
-  <img src="art/axm.png/" height="120"/>
+  <img src="https://github.com/Axm-framework/axm/blob/main/public/axm.png" height="120" alt="Logo"/>
   <br>
 </p>
 
 <p align="center">
-	<a href="https://packagist.org/packages/axm/framework"
-		><img
-			src="https://poser.pugx.org/axm/framework/v/stable"
-			alt="Latest Stable Version"
-	/></a>
-	<a href="https://packagist.org/packages/axm/framework"
-		><img
-			src="https://poser.pugx.org/axm/framework/downloads"
-			alt="Total Downloads"
-	/></a>
-	<a href="https://packagist.org/packages/axm/framework"
-		><img
-			src="https://poser.pugx.org/axm/framework/license"
-			alt="License"
-	/></a>
+ <a href="https://packagist.org/packages/axm/axm"
+  ><img
+   src="https://poser.pugx.org/axm/axm/v/stable"
+   alt="Latest Stable Version"
+ /></a>
+ <a href="https://packagist.org/packages/axm/axm"
+  ><img
+   src="https://poser.pugx.org/axm/axm/downloads"
+   alt="Total Downloads"
+ /></a>
+ <a href="https://packagist.org/packages/axm/axm"
+  ><img
+   src="https://poser.pugx.org/axm/axm/license"
+   alt="License"
+ /></a>
 </p>
-<br />
-<br />
 
-⚡️ The PHP framework that defies the speed of light
-Say goodbye to complex and slow frameworks and embrace the future of web development with Axm! This revolutionary PHP framework offers a clean, simple, and powerful solution. With its intuitive structure, Axm provides flexibility without sacrificing simplicity. Its smooth learning curve allows you to quickly create exceptional web applications and APIs. Unleash the potential of PHP with Axm and join visionary developers who are already achieving results. Discover the transformative power of Axm today!
+<br>
 
-❤️ Why Axm?
-Axm is a highly efficient and feature-rich framework that excels in providing a solid foundation for building powerful web applications and APIs. It offers a comprehensive set of tools and features that streamline the development process and enable developers to create high-performance, scalable, and maintainable solutions.
+## ⚡️ In bed, size doesn't matter; web, speed does
 
-One of the key advantages of Axm is its simplicity and ease of use. The framework follows a minimalistic approach, focusing on clean and intuitive code syntax. This simplicity not only enhances developer productivity but also promotes code readability and maintainability.
+Say goodbye to complex and slow frameworks and embrace the future of web development with Axm! This modern PHP framework offers a clean, simple and powerful solution. With its intuitive structure, Axm provides flexibility without sacrificing simplicity. Its gentle learning curve allows you to quickly create exceptional web applications and APIs. Discover the transformative power of Axm today.
 
-Furthermore, Axm boasts a modular architecture that promotes code reusability and separation of concerns. With its modular structure, developers can easily organize and manage different components of their applications, leading to improved code organization and flexibility.
+## 😎 Basic Usage
 
-The problems
-While PHP frameworks can enhance web development efficiency, it is crucial to acknowledge the challenges and limitations they present. Here are some additional issues commonly associated with contemporary PHP frameworks:
+This is a "hello world" application created using Axm. After [installing](#-installation) Axm.
 
-Steep learning curve: PHP frameworks often entail a demanding learning curve, particularly for developers who are unfamiliar with the framework's conventions or the language itself. Acquiring proficiency in a framework's intricate concepts and functionalities requires time and effort.
+```php
+<?php
 
-Performance overhead: Certain PHP frameworks introduce unnecessary performance overhead due to the additional abstraction layers and feature sets they provide. This can impact the overall execution speed of the application, especially in scenarios where high performance is crucial.
+use Axm\Http\Router as Route;
 
-Code maintenance complexity: Frameworks generally enforce specific coding standards and conventions, necessitating adherence to established practices. For developers unaccustomed to these standards, maintaining and updating the codebase becomes more intricate and time-consuming.
+Route::get('/', function () {
+  echo '<h1>Hola Mundo</h1>';
+});
 
-Limited flexibility: PHP frameworks often impose a certain level of rigidity, constraining developers in terms of code structure and handling specific use cases. The predefined architecture and conventions may not always align with unique project requirements, resulting in reduced flexibility and potentially cumbersome workarounds.
+Route::get('/home', App\Controllers\HomeController::class);
 
-Compatibility challenges: PHP frameworks tend to be tightly integrated into specific ecosystems, making it challenging to seamlessly integrate packages or components that do not align with the framework's architecture or lack direct support. This restricts developers from leveraging a broader range of tools and libraries.
+```
 
-Excess code and package overhead: Many PHP frameworks come bundled with extensive codebases, classes, and packages, leading to the inclusion of unnecessary complexity in applications. This additional baggage can result in bloated codebases and adversely impact performance.
+You may quickly test this using the Axm CLI:
 
-Understanding these potential challenges associated with PHP frameworks is essential when considering their adoption. Developers must carefully evaluate their project's requirements and weigh the benefits against the drawbacks to make an informed decision.
+```bash
+php axm serve
+```
 
-How Axm tackles these
-Axm excels at addressing common problems encountered in PHP frameworks through a number of specific technical features and approaches:
+Or with the built-in PHP server:
 
-Ease of learning: Axm is designed to be the most accessible and easy to learn framework. Even developers new to PHP can start building powerful applications in a matter of minutes by reading the documentation or following tutorials. Axm requires only a basic knowledge of PHP.
+```bash
+php -S localhost:8000
+```
 
-Lightweight: Axm stands out for being one of the lightest frameworks available. Its optimized and efficient architecture makes it fast and agile compared to other frameworks. Axm minimizes resource usage and offers exceptional performance, resulting in very fast web applications.
+## ❤️ Why Axm?
 
-High speed: The combination of its lightness and optimization make Axm extremely fast. Its optimized code and efficient structure enable fast execution of applications, which improves user experience and optimizes response times.
+Axm is a highly efficient and feature-rich framework that excels at providing a solid foundation for building powerful web applications and APIs. It offers a comprehensive set of tools and features that streamline the development process and enable developers to create high-performance, scalable and maintainable solutions.
 
-High productivity: Axm is designed to maximize developer productivity. It offers a wide range of features and tools that simplify and streamline the development process. From global functions that allow access to classes from anywhere in the application to intuitive modules and features, Axm allows developers to focus on building their applications without having to deal with repetitive or complex tasks.
+One of the main advantages of Axm is its simplicity and ease of use. The framework follows a minimalist approach, focusing on clean and intuitive code syntax. This simplicity not only improves developer productivity, but also enhances code readability and maintainability.
 
-Modularity: Axm follows a modular approach in its architecture. It is based on independent and easily installable modules, which allows developers to use only the features and functionalities they need in their applications. This modularity not only makes Axm lighter, but also improves code organization and component reuse.
+### The problems
 
-Library compatibility: Axm has been designed to be compatible with several existing libraries and frameworks in the PHP ecosystem. This allows developers to take advantage of different libraries and use them together with Axm to build more complete and powerful applications. Axm integrates seamlessly with these libraries, making it easy to collaborate and extend functionality.
++ Although PHP frameworks can improve the efficiency of web development, it is crucial to recognize the challenges and limitations they present. Here are some additional problems commonly associated with contemporary PHP frameworks:
 
-Scalability: Axm is highly scalable and can adapt to projects of any size. Its flexible and modular architecture allows applications to scale efficiently, either to handle a sudden increase in workload or to add new functionality as the project grows. Axm ensures optimal performance and seamless scalability to adapt to the changing needs of web applications.
+1. **Steep learning curve:** PHP frameworks often carry a demanding learning curve, especially for developers who are unfamiliar with the conventions of the framework or the language itself. Becoming proficient in the intricate concepts and functionality of a framework takes time and effort.
 
+2. **Performance overhead:** Certain PHP frameworks introduce unnecessary performance overhead due to the layers of abstraction and additional feature sets they provide. This can affect the overall execution speed of the application, especially in scenarios where high performance is crucial.
+
+3. **Complexity of code maintenance:** Frameworks often impose specific coding standards and conventions, forcing adherence to established practices. For developers who are not accustomed to these standards, maintaining and updating the code base becomes more complicated and time-consuming.
+
+4. **Limited flexibility:** PHP frameworks often impose a certain level of rigidity, limiting developers in terms of code structure and handling of specific use cases. Predefined architecture and conventions do not always align with unique project requirements, resulting in reduced flexibility and potentially cumbersome solutions.
+
+5. **Excess code and packages:** Many PHP frameworks come with extensive code bases, classes and packages, leading to the inclusion of unnecessary complexity in applications. This additional baggage can lead to bloated code bases and negatively affect performance.
+
+Understanding these potential challenges associated with PHP frameworks is essential when considering their adoption. Developers should carefully evaluate their project requirements and weigh the benefits against the drawbacks to make an informed decision.
+
+### How Axm tackles these
+
++ Axm excels at solving common problems found in PHP frameworks through a number of technical features and specific approaches:
+
+1. **Ease of learning:** Axm is designed to be the most accessible and easy-to-learn framework. Even developers new to PHP can start creating powerful applications in a matter of minutes by reading the documentation or following tutorials. Axm requires only basic knowledge of PHP.
+
+2. **Lightweight:** Axm stands out as one of the lightest frameworks available. Its optimized and efficient architecture makes it fast and agile compared to other frameworks. Axm minimizes resource usage and offers exceptional performance, resulting in very fast web applications.
+
+3. **High speed:** The combination of its lightness and optimization makes Axm extremely fast. Its optimized code and efficient structure enable fast execution of applications, which improves user experience and optimizes response times.
+
+4. **High productivity:** Axm is designed to maximize developer productivity. It offers a wide range of features and tools that simplify and streamline the development process. From global functions that allow access to classes from anywhere in the application to intuitive modules and features, Axm allows developers to focus on building their applications without having to deal with the time-consuming and costly tasks of creating and deploying them.
+
+5. **Compatibility with libraries:** Axm has been designed to be compatible with several existing libraries and frameworks in the PHP ecosystem, allowing developers to take advantage of different libraries and use them together with Axm to build more complete and powerful applications, making it easier to collaborate and extend functionalities.
+
+6. **Scalability:** Axm is highly scalable and can be adapted to projects of any size. Its flexible and modular architecture allows applications to scale efficiently, either to handle a sudden increase in workload or to add new functionality as the project grows.Axm guarantees optimal performance and seamless scalability to adapt to the changing needs of web applications.
+
+## 📦 Installation
+
+You can also use [Composer](https://getcomposer.org/) to install Axm in your project quickly.
+
+```bash
+composer create-project axm/axm
+```
 
 ## 📢 Stay In Touch
 
@@ -91,3 +125,7 @@ To report a security vulnerability, you can reach out to [@juancristobal_g](http
 ## 🚀 Sponsoring Axm
 
 Your cash contributions go a long way to help us make Axm even better for you. You can sponsor Axm and any of our packages on [open collective](https://opencollective.com/Axm) or check the [contribution page](https://axmphp.com/support/) for a list of ways to contribute.
+
+## 📝 License
+
+[MIT](https://github.com/Axm-framework/axm/blob/main/LICENSE)

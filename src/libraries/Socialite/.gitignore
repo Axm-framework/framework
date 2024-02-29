@@ -1,0 +1,8 @@
+vendor
+composer.lock
+
+# phpenv local config
+.php-version
+
+/results/
+.phpunit.result.cache

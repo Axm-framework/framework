@@ -1,78 +1,61 @@
 <?php
 
-namespace Axm;
-
-
 abstract class Facade
 {
-    /**
-     * @var bool Indicates whether a new instance should always be created.
-     */
-    protected static $alwaysNewInstance;
+    protected static $providers = [];
 
     /**
-     * Creates an instance of the facade.
+     * Set the providers.
      *
-     * @param string $class Class or identifier.
-     * @param array  $args  Variable arguments.
-     * @param bool   $newInstance Indicates if a new instance should always be created.
-     * @return object Instance of the class.
+     * @param array $p key/value array with providers
      */
-    protected static function createFacade(string $class = null, array $args = [], bool $newInstance = false): object
+    public static function providers(array $p)
     {
-        $class = static::getFacadeClass() ?? $class ?? static::class;
-        return Container::getInstance()->make(
-            $class,
-            $args,
-            $newInstance || static::$alwaysNewInstance
-        );
+        self::$providers = $p;
+    }
+
+    public static function getProviders()
+    {
+        return self::$providers;
     }
 
     /**
-     *  Gets the class corresponding to the facade 
-     *  @return string Corresponding class.
+     * Getter for the alias of the component.
      */
-    protected static function getFacadeClass()
+    protected static function getAlias()
     {
+        throw new \RuntimeException('Not implemented');
+    }
+
+    protected static function getInstance($name)
+    {
+        return isset(self::$providers[$name]) ? self::$providers[$name] : null;
     }
 
     /**
-     * Creates an instance of the facade with parameters 
-     * @return object Instance of the class.
-     */
-    public static function instance(...$args): ?object
-    {
-        if (static::class !== self::class) {
-            return self::createFacade(null, $args);
-        }
-    }
-
-    /**
-     * Calls a method of the corresponding class 
+     * Handle dynamic, static calls to the object.
      *
-     * @param string $class Class or identifier 
-     * @param array $args Arguments variables 
-     * @param bool $newInstance Indicates whether a new instance should always be created 
+     * @param string $method
+     * @param array  $args
      * @return mixed
+     * @throws \RuntimeException
      */
-    public static function make(string $class, array $args = [], bool $newInstance = false): mixed
+    public static function __callStatic($method, $args)
     {
-        if (static::class !== self::class) {
-            return self::__callStatic('make', func_get_args());
+        $instance = self::getInstance(static::getAlias());
+        if (!$instance) {
+            throw new \RuntimeException('A facade root has not been set.');
         }
 
-        return static::createFacade($class, $args, $newInstance);
-    }
-
-    /**
-     * Method to be called 
-     * 
-     * @param string $method Method to be called 
-     * @param array $params Parameters of the method 
-     * @return mixed Result of the method called 
-     **/
-    public static function __callStatic($method, $params): mixed
-    {
-        return call_user_func_array([static::createFacade(), $method], $params);
+        switch (count($args)) {
+            case 0:
+                return $instance->$method();
+            case 1:
+                return $instance->$method($args[0]);
+            case 2:
+                return $instance->$method($args[0], $args[1]);
+            default:
+                return call_user_func_array([$instance, $method], $args);
+        }
     }
 }

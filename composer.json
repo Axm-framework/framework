@@ -11,7 +11,7 @@
         "orm",
         "form",
         "validation",
-        "psr-7"
+        "psr"
     ],
     "homepage": "https://axmphp.com",
     "license": "MIT",
@@ -25,33 +25,20 @@
         "ext-zip": "*",
         "ext-mbstring": "*",
         "ext-intl": "*",
-        "symfony/var-dumper": "^6.3.5",
-        "vlucas/phpdotenv": "^5.5",
-        "illuminate/database": "*",
-
-        "axm/http": "^1.0.18",
-        "axm/views": "^1.0.14",
-        "axm/middlewares": "^1.0.4",
-        "axm/session": "^1.0.5",
-        "axm/console": "^1.0.41",
-        "axm/helpers": "^1.0.6",
         "axm/fluent": "^1.0.7"
     },
     "require-dev": {
+        "symfony/var-dumper": "^6.3.5",
         "phpunit/phpunit": "^9.6"
-    },
-    "suggest": {
-        "ext-fileinfo": "Improves mime type detection for files"
     },
     "autoload": {
         "psr-4": {
 			"Axm\\": "src"
 		},
 		"files": [
-			"src/Axm.php"
+			"src/autoload.php"
 		]
     },  
-
     "config": {
         "optimize-autoloader": true,
         "sort-packages": false

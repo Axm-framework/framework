@@ -1,0 +1,53 @@
+name: Bump Version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bump_version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Check for uncommitted changes
+        run: |
+          if [[ $(git status --porcelain) ]]; then
+            echo "There are uncommitted changes. Aborting..."
+            exit 1
+          fi
+
+      - name: Get latest version
+        id: get_tag
+        run: |
+          if git describe --tags --abbrev=0 > /dev/null 2>&1; then
+            VERSION=$(git describe --tags --abbrev=0)
+          else
+            VERSION="v1.0.0"
+            echo "Setting version to $VERSION as no tags were found."
+          fi
+          echo "current_version=$VERSION" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Bump release version
+        id: bump_version
+        uses: christian-draeger/increment-semantic-version@1.1.0
+        with:
+          current-version: ${{ env.current_version }}
+          version-fragment: "bug" # Possible options are [ major | feature | bug | alpha | beta | pre | rc ]
+
+      - name: Log bumped version
+        run: echo "Next version is ${{ steps.bump_version.outputs.next-version }}"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.bump_version.outputs.next-version }}
+          release_name: Release ${{ steps.bump_version.outputs.next-version }}

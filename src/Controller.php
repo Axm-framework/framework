@@ -2,15 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Axm;
-
-use Axm;
-use Axm\Views\View;
-use Axm\Http\Request;
-use Axm\Http\Response;
-use RuntimeException;
+// use Axm;
+use Views\View;
+use Http\Request;
+use Http\Response;
 use App\Middlewares\BaseMiddleware;
-use Axm\Middlewares\AuthMiddleware;
+use App\Middlewares\AuthMiddleware;
 
 /**
  * Class Controller
@@ -20,7 +17,7 @@ use Axm\Middlewares\AuthMiddleware;
  * @license http://www.axm.com/license/
  * @package Axm
  */
-abstract class Controller
+class Controller
 {
     /**
      * @var object|null The current user.
@@ -62,10 +59,10 @@ abstract class Controller
      */
     public function __construct()
     {
-        $app = Axm::app();
-        $this->request = $app->request;
-        $this->response = $app->response;
-        $this->view = $app->view;
+        $app = app();
+        $this->request = app('request', new Request());
+        $this->response = app('response', new Response());
+        $this->view = app('response', new View());
 
         $this->registerDefaultMiddleware();
     }
@@ -192,6 +189,22 @@ abstract class Controller
     }
 
     /**
+     * 
+     */
+    public function response(): ?Response
+    {
+        return $this->response;
+    }
+
+    /**
+     * 
+     */
+    public function request(): ?Request
+    {
+        return $this->request;
+    }
+
+    /**
      * Handle calls to methods that do not exist.
      *
      * @param string $name
@@ -201,6 +214,6 @@ abstract class Controller
      */
     public function __call($name, $arguments)
     {
-        throw new RuntimeException(sprintf('Method [  %s ] does not exist', $name));
+        throw new \RuntimeException(sprintf('Method [  %s ] does not exist', $name));
     }
 }

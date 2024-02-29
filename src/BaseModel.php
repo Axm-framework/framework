@@ -1,8 +1,6 @@
 <?php
 
-namespace Axm;
-
-use Axm\Model;
+use Model\Model;
 
 /**
  *  Class BaseModel 

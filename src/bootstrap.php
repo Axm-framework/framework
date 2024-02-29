@@ -6,16 +6,11 @@
  * @license http://www.axm.com/license/
  * @package Axm
  * 
--------------------------------------------------------------------------
-                        SETUP OUR PATH CONSTANTS
--------------------------------------------------------------------------*/
+------------------------------------------------------------------------------
+                        SETUP OUR PATH CONSTANTS                         
+-------------------------------------------------------------------------------*/
 
-// Define the root path
-defined('AXM_BEGIN_TIME') or define('AXM_BEGIN_TIME', time());
-
-// Defines the application charset
-const APP_CHARSET = 'UTF-8';
-
+// Get the current directory
 defined('ROOT_PATH') or define('ROOT_PATH', getcwd());
 
 // Define the public path
@@ -25,7 +20,7 @@ const PUBLIC_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'public';
 const VENDOR_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor';
 
 // Define AXM framework installation path
-const AXM_PATH = VENDOR_PATH . DIRECTORY_SEPARATOR . 'axm';
+const AXM_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'core';
 
 // Define the application path
 const APP_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'app';
@@ -35,23 +30,12 @@ const STORAGE_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'storage';
 
 const APP_NAMESPACE = 'App\\';
 
-// Defines the clean path of the request URI
-defined('CLEAN_URI_PATH') or define('CLEAN_URI_PATH', substr($_SERVER['SCRIPT_NAME'], 0, -9));
-
 /**
--------------------------------------------------------------------------
-                        FILES FOR INITIALIZATION
-------------------------------------------------------------------------- */
-
-require_once(VENDOR_PATH . DIRECTORY_SEPARATOR . 'vlucas' . DIRECTORY_SEPARATOR .
-    'phpdotenv' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Dotenv.php');
-
-try {
-    \Dotenv\Dotenv::createImmutable(ROOT_PATH)->load();
-} catch (\Throwable $th) {
-    trigger_error($th);
-}
-
-require_once('functions.php');
-
-config()->load(['App.php', 'Paths.php', 'Session.php', 'View.php']);
+--------------------------------------------------------------------------------
+                       FILES FOR INITIALIZATION                                     
+-------------------------------------------------------------------------------- */
+require(ROOT_PATH . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'autoload.php');
+require(ROOT_PATH . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'HandlerErrors.php');
+require(ROOT_PATH . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR . 'functions.php');
+// Add Composer autoload to load external dependencies
+require VENDOR_PATH . DIRECTORY_SEPARATOR . 'autoload.php';

@@ -38,7 +38,7 @@ jobs:
         id: bump_version
         uses: christian-draeger/increment-semantic-version@1.1.0
         with:
-          current-version: ${{ env.current_version }}
+          current-version: ${{env.current_version}}
           version-fragment: "bug" # Possible options are [ major | feature | bug | alpha | beta | pre | rc ]
 
       - name: Log bumped version

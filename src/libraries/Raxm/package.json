@@ -1,0 +1,17 @@
+{
+    "main": "dist/raxm.js",
+    "name": "raxm-raxm",
+    "scripts": {
+        "build": "node ./scripts/build.js",
+        "watch": "node ./scripts/build.js --watch"
+    },
+    "author": "Juan Cristobal",
+    "license": "MIT",
+    "devDependencies": {
+        "brotli-size": "^4.0.0",
+        "esbuild": "^0.14.49"
+    },
+    "dependencies": {
+        "nprogress": "^0.2.0"
+    }
+}

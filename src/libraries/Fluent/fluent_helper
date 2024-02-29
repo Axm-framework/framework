@@ -1,0 +1,21 @@
+<?php
+
+use Fluent\Fluent;
+
+if (!function_exists('__')) {
+
+    /**
+     * Create a Fluent instance for method chaining.
+     *
+     * This function is used to create a Fluent instance, allowing for method chaining
+     * on the provided object. It enhances the readability and expressiveness of code by enabling
+     * a sequence of method calls on the object.
+     * @param object $obj The object on which method chaining is desired.
+     * @return Axm\Fluent\Fluent An instance of the Fluent class for method chaining.
+     */
+    function __($obj)
+    {
+        // Return a new instance of the Fluent class for method chaining
+        return new Fluent($obj);
+    }
+}
