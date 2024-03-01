@@ -16,6 +16,9 @@ set_exception_handler(static function (Throwable $e) {
 
 function handlerErrors($errno, $errstr, $errfile, $errline)
 {
+    if (error_reporting() === 0) 
+        return false;
+
     if (php_sapi_name() === 'cli') {
         handleCliError($errno, $errstr, $errfile, $errline);
     }
