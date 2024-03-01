@@ -48,7 +48,7 @@ function theme(\Throwable $e): string
     $trace = $e->getTraceAsString();
 
     $date = date('d-m-Y H:i:s');
-    $axm_v = 1.0 ?? '';
+    $axm_v = app()->version() ?? '1.0';
     $php_v = PHP_VERSION;
     $info = sprintf('Date: %s    Axm Framework version: %s    PHP version: %s', $date, $axm_v, $php_v);
     $output = $title

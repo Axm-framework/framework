@@ -237,9 +237,9 @@ final class App extends Container
     /**
      * Get the version of a specified library.
      */
-    public function version(string $libraryName = 'axm/axm'): ?string
+    public function version(string $libraryName = 'axm/framework'): ?string
     {
-        $v = InstalledVersions::getVersion($libraryName);
+        $v = \InstalledVersions::getVersion($libraryName);
         return $v;
     }
 
