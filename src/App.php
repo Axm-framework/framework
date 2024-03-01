@@ -313,10 +313,7 @@ final class App extends Container
 
     /**
      * Run the application.
-     *
-     * This method triggers events before and after handling the request 
-     * and dispatches the router.
-     */
+     **/
     public function run(): void
     {
         (new Http\Router())
