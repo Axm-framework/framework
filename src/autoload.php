@@ -12,8 +12,6 @@ function axm_autoloader(string $class)
         'Facade'          => AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Facade.php',
         'Controller'      => AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Controller.php',
         'BaseModel'       => AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'BaseModel.php',
-        // 'Config'        => AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Config.php',
-        // 'Router'        => AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Router.php',
     ];
 
     if (isset($classMap[$class])) {
