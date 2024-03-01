@@ -332,8 +332,6 @@ class Router
     /**
      * Calls a callback function, passing the necessary arguments.
      *
-     * This method inspects the parameters of the given callback function and prepares the arguments
-     * accordingly.
      * @param callable $callback The callback function to be called.
      * @return mixed The result of calling the callback function with the prepared arguments.
      * @throws ReflectionException If there is an error reflecting the callback function.
@@ -506,8 +504,6 @@ class Router
             DIRECTORY_SEPARATOR . $this->app->config('app.errorPages.404');
 
         $controller = $this->app->controller;
-
-        // Calling the render() method on the controller instance
         return $controller->renderView($viewFile);
     }
 

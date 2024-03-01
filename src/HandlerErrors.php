@@ -94,6 +94,7 @@ function handleWebError($errno, $errstr, $errfile, $errline)
     $whoops = new Run();
     $handler = new PrettyPageHandler();
     $handler->setPageTitle("¡Oops! Ha ocurrido un error");
+    $handler->setEditor(env('DEBUGBAR_EDITOR'));
     $whoops->pushHandler($handler);
     $whoops->handleError($errno, $errstr, $errfile, $errline);
 }
