@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Validation;
 
-use Axm;
 use RuntimeException;
 
 /*
@@ -366,14 +365,14 @@ class Validator
      * Apply a custom validation rule to a specific field.
      *
      * This function checks if the provided validation rule is an instance of the
-     * `Axm\Validation\Rules\CustomRule` class, and if so, it executes it on the specified field.
-     * @param mixed  $ruleItem The validation rule to apply. It should be an instance of `Axm\Validation\Rules\CustomRule`.
+     * `Validation\Rules\CustomRule` class, and if so, it executes it on the specified field.
+     * @param mixed  $ruleItem The validation rule to apply. It should be an instance of `Validation\Rules\CustomRule`.
      * @param string $field    The name of the field to which the custom validation rule will be applied.
      * @return void
      */
     private function applyCustomValidation($ruleItem, string $field)
     {
-        if ($ruleItem instanceof Axm\Validation\Rules\CustomRule) {
+        if ($ruleItem instanceof Validation\Rules\CustomRule) {
             // Prepare the parameters before executing the custom validation rule.
             $updatedParameters = $this->prepareParametersBeforeExecution('custom_rule', $field, []);
 
