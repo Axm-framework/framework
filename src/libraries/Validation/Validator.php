@@ -71,7 +71,6 @@ class Validator
      * @param string $field   The name of the field where the error occurred.
      * @param string $rule    The name of the validation rule that failed.
      * @param string $message (Optional) Custom error message. If not provided, the default message for the rule will be used.
-     *
      * @return void
      */
     public function addError(string $field, string $rule, string $message = '')
@@ -153,7 +152,6 @@ class Validator
 
     /**
      * Get the validation rules defined for this validator.
-     *
      * @return array The validation rules as an associative array.
      */
     public function getRules(): array
@@ -170,7 +168,7 @@ class Validator
      * @param int|null $code  An optional error code for more advanced error handling.
      * @return array
      */
-    public function setError(string $field, string $rule, string $message): array
+    public function setError(string $field, string $rule, string $message): void
     {
         $this->errors[$field] = [];
         $addError = [
@@ -301,8 +299,6 @@ class Validator
 
     /**
      * Check if the validation process has failed.
-     *
-     * This method checks whether the validation process has failed by invoking the "startValidation" method.
      * @return bool True if the validation process has failed, false otherwise.
      */
     public function fails(): bool
@@ -364,19 +360,15 @@ class Validator
     /**
      * Apply a custom validation rule to a specific field.
      *
-     * This function checks if the provided validation rule is an instance of the
-     * `Validation\Rules\CustomRule` class, and if so, it executes it on the specified field.
      * @param mixed  $ruleItem The validation rule to apply. It should be an instance of `Validation\Rules\CustomRule`.
      * @param string $field    The name of the field to which the custom validation rule will be applied.
      * @return void
      */
     private function applyCustomValidation($ruleItem, string $field)
     {
-        if ($ruleItem instanceof Validation\Rules\CustomRule) {
+        if ($ruleItem instanceof \Validation\Rules\CustomRule) {
             // Prepare the parameters before executing the custom validation rule.
             $updatedParameters = $this->prepareParametersBeforeExecution('custom_rule', $field, []);
-
-            // Execute the custom validation rule.
             $this->executeRule($updatedParameters);
         }
     }
@@ -442,8 +434,6 @@ class Validator
     /**
      * Parses a validation rule and extracts its components.
      *
-     * This method splits a validation rule into its rule name, field name, and values.
-     * It handles special cases for 'same' and 'unique' rules.
      * @param string $ruleItem The validation rule to parse (e.g., 'ruleName:parameter').
      * @param string $field    The name of the field being validated.
      * @return array An array with the parsed rule, field name, and values.
@@ -560,8 +550,6 @@ class Validator
     /**
      * Compile a conditional rule for validation.
      *
-     * This function takes a conditional rule in the form of parameters and splits it into fields and values
-     * based on a list of allowed comparison operators.
      * @param string $rule       The name of the rule.
      * @param array  $parameters The parameters of the conditional rule.
      * @throws RuntimeException If a valid parameter is not provided.
@@ -731,7 +719,6 @@ class Validator
             throw new RuntimeException('The class name cannot be empty.');
         }
 
-
         if (!class_exists($class)) {
             throw new RuntimeException(sprintf('Validation class [ %s ] does not exist.', $class));
         }
@@ -743,20 +730,6 @@ class Validator
 
         return $instance;
     }
-
-    // private function instantiateClass(string $classRuleName, string $nameSpace = 'Axm\\Validation\\Rules\\', string $method = 'validate'): object
-    // {
-    //     $class = $nameSpace . ucfirst($classRuleName);
-
-    //     return match (true) {
-    //         empty($classRuleName) => throw new RuntimeException('The class name cannot be empty.'),
-    //         !class_exists($class) => throw new RuntimeException(sprintf('Validation class [ %s ] does not exist.', $class)),
-    //         !method_exists($instance = $this->getOrCreateInstance($class), $method) => throw new RuntimeException(sprintf('Method [ %s ] does not exist in class [ %s ] .', $method, $class)),
-
-    //         default => $instance,
-    //     };
-    // }
-
 
     /**
      * Get an existing instance of the class or create a new one.
