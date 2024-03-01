@@ -10,7 +10,6 @@ use Console\ConsoleApplication;
  *
  * The Application class represents the core of the framework.
  * It is responsible for managing the application's lifecycle and components.
- *
  * @author  Juan Cristobal <juancristobalgd1@gmail.com>
  * @package Framework
  */
