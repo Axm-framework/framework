@@ -40,7 +40,7 @@ final class App extends Container
     {
         $this->setApp();
         $this->loadEnv();
-        $this->initializeEnvironment();
+        $this->configureEnvironment();
         $this->registerProviders();
         $this->bootServices();
     }
@@ -62,42 +62,26 @@ final class App extends Container
     }
 
     /**
-     * Initializes the application environment.
-     *
-     * This method sets up the application environment based on the value of
-     * APP_ENVIRONMENT. It configures error reporting and display settings
-     * according to the specified environment.
+     * Configure error reporting and display settings based on the environment.
      * @return void
      */
-    private function initializeEnvironment()
+    private function configureEnvironment()
     {
-        static $environment;
-        $environment ??= env('APP_ENVIRONMENT', 'production');
+        static $initialized = false;
+        if (!$initialized) {
+            $environment = env('APP_ENVIRONMENT', 'production');
 
-        ($environment === 'debug')
-            ? self::configureForDebug()
-            : self::configureForProduction();
-    }
+            if ($environment === 'debug') {
+                ini_set('display_errors', 1);
+                error_reporting(E_ALL);
+            } else {
+                error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED
+                    & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+                ini_set('display_errors', 0);
+            }
 
-    /**
-     * Configure error reporting and display settings for debugging.
-     * @return void
-     */
-    private static function configureForDebug()
-    {
-        ini_set('display_errors', 1);
-        error_reporting(E_ALL);
-    }
-
-    /**
-     * Configure error reporting and display settings for production.
-     * @return void
-     */
-    private static function configureForProduction()
-    {
-        error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED
-            & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-        ini_set('display_errors', 0);
+            $initialized = true;
+        }
     }
 
     /**
