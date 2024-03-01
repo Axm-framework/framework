@@ -73,6 +73,8 @@ class Serve extends BaseCommand
      */
     protected $process;
 
+    protected int $waitTimeInSeconds = 2;
+
     /**
      * Run the server
      */
@@ -102,15 +104,17 @@ class Serve extends BaseCommand
     protected function findAvailablePort(string $host, int $port): ?int
     {
         $maxTries = $this->maxTries;
+        $waitTime = $this->waitTimeInSeconds; // Tiempo de espera entre intentos en segundos
+
         for ($i = 0; $i < $maxTries; $i++) {
             if ($this->checkPort($host, $port)) {
                 return $port;
             }
 
-            $port++;
+            sleep($waitTime); // Espera antes de intentar nuevamente
         }
 
-        return false;
+        return null;
     }
 
     /**
