@@ -88,10 +88,10 @@ class Serve extends BaseCommand
         $scheme = 'http'; // Assuming default scheme is http for simplicity
 
         // Attempt alternative ports
-        if (!$port = $this->findAvailablePort($host, $port)) {
-            CLI::error('Could not bind to any port');
-            exit;
-        }
+        // if (!$port = $this->findAvailablePort($host, $port)) {
+        //     CLI::error('Could not bind to any port');
+        //     exit;
+        // }
 
         // Server up
         $this->printServerInfo($scheme, $host, $port);
