@@ -239,7 +239,7 @@ final class App extends Container
      */
     public function version(string $libraryName = 'axm/framework'): ?string
     {
-        $v = \InstalledVersions::getVersion($libraryName);
+        $v = InstalledVersions::getVersion($libraryName);
         return $v;
     }
 
