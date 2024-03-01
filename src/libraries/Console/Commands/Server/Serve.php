@@ -101,34 +101,26 @@ class Serve extends BaseCommand
     /**
      * Find an available port
      */
-    protected function findAvailablePort(string $host, int $port): ?int
+    protected function findAvailablePort(string $host, int $startPort): ?int
     {
-        $maxTries = $this->maxTries;
-        $waitTime = $this->waitTimeInSeconds; // Tiempo de espera entre intentos en segundos
-
-        for ($i = 0; $i < $maxTries; $i++) {
+        $maxTries = $this->maxTries;    
+        for ($port = $startPort; $port < $startPort + $maxTries; $port++) {
             if ($this->checkPort($host, $port)) {
                 return $port;
             }
-
-            sleep($waitTime); // Espera antes de intentar nuevamente
         }
-
+    
         return null;
     }
-
-    /**
-     * Check if a port is available
-     */
+    
     protected function checkPort(string $host, int $port): bool
     {
-        $socket = @fsockopen($host, $port);
-        if ($socket !== false) {
-            fclose($socket);
-            return false;
-        }
-        return true;
+        $url = "http://$host:$port";
+        $headers = @get_headers($url);
+    
+        return !empty($headers);
     }
+    
 
     /**
      * Shutdown the server
