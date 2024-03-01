@@ -28,6 +28,9 @@ function handlerErrors($errno, $errstr, $errfile, $errline)
 
 function handlerException(Throwable $e)
 {
+    if (error_reporting() === 0) 
+    return false;
+
     $log = Config::get('app.initLogReportings');
 
     if ($log === true) {
