@@ -17,6 +17,7 @@ Certainly! Here's comprehensive documentation for the `Validator` class along wi
 The `Validator` class is a versatile tool for data validation in PHP applications. It allows you to define validation rules and check if data meets those rules. This documentation provides an in-depth guide to using the `Validator` class.
 
 #### Table of Contents
+
 1. [Class Overview](#class-overview)
 2. [Installation](#installation)
 3. [Basic Usage](#basic-usage)
@@ -31,6 +32,7 @@ The `Validator` class is a versatile tool for data validation in PHP application
 #### 1. Class Overview
 
 The `Validator` class provides the following features:
+
 - Validation of data against user-defined rules.
 - Support for custom validation rules.
 - Rule chaining for complex validation scenarios.
