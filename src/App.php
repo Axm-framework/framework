@@ -40,6 +40,7 @@ final class App extends Container
     {
         $this->setApp();
         $this->loadEnv();
+        $this->initializeEnvironment();
         $this->registerProviders();
         $this->bootServices();
     }
@@ -58,6 +59,45 @@ final class App extends Container
     private function loadEnv(): void
     {
         Env::load(ROOT_PATH . DIRECTORY_SEPARATOR . '.env');
+    }
+
+    /**
+     * Initializes the application environment.
+     *
+     * This method sets up the application environment based on the value of
+     * APP_ENVIRONMENT. It configures error reporting and display settings
+     * according to the specified environment.
+     * @return void
+     */
+    private function initializeEnvironment()
+    {
+        static $environment;
+        $environment ??= env('APP_ENVIRONMENT', 'production');
+
+        ($environment === 'debug')
+            ? self::configureForDebug()
+            : self::configureForProduction();
+    }
+
+    /**
+     * Configure error reporting and display settings for debugging.
+     * @return void
+     */
+    private static function configureForDebug()
+    {
+        ini_set('display_errors', 1);
+        error_reporting(E_ALL);
+    }
+
+    /**
+     * Configure error reporting and display settings for production.
+     * @return void
+     */
+    private static function configureForProduction()
+    {
+        error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED
+            & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+        ini_set('display_errors', 0);
     }
 
     /**
