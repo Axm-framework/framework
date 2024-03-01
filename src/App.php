@@ -16,23 +16,6 @@ use Console\ConsoleApplication;
  */
 final class App extends Container
 {
-    protected $class = [
-        'app'        => App::class,
-        'config'     => Config::class,
-        'session'    => Session\Session::class,
-        'request'    => Http\Request::class,
-        'response'   => Http\Response::class,
-        'router'     => Http\Router::class,
-        'view'       => Views\View::class,
-        'controller' => App\Controllers\BaseController::class,
-        'database'   => Database\Database::class,
-        'validator'  => Validation\Validator::class,
-        'auth'       => Auth\Auth::class,
-        'console'    => Console\ConsoleApplication::class,
-        // 'event'      => EventManager::class,
-        // 'cache'      => Cache\Cache::class,
-    ];
-
     /**
      * Constructor for the Application class.
      */
@@ -94,7 +77,7 @@ final class App extends Container
     {
         $pathConfig = config('paths.providersPath') . DIRECTORY_SEPARATOR;
         $providers  = include $pathConfig . 'providers.php';
-        $this->services(array_merge($this->class, $providers));
+        $this->services($providers);
     }
 
     /**
@@ -103,10 +86,8 @@ final class App extends Container
     public function bootServices()
     {
         $services = config('boot');
-        $method = 'boot';
-
         foreach ($services ?? [] as $class) {
-            $class::$method;
+            $class::boot();
         }
     }
 
