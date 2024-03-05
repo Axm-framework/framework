@@ -187,14 +187,13 @@ class Router
     }
 
     /**
-     * Gets the callback of a route.
+     * isset route.
      *
      * @param string $method
-     * @return array
      */
-    public function getRouteMap(string $method): array
+    public function isRoute(string $routeName, string $method = 'GET'): bool
     {
-        return static::$routeMap[$method] ?? [];
+        return isset(static::$routeMap[$method][$routeName]);
     }
 
     /**
@@ -228,8 +227,7 @@ class Router
     }
 
     /**
-     * Allows defining groups/prefixes of routes with shared 
-     * properties (middleware, namespace, etc).
+     * Allows defining groups/prefixes of routes with shared properties (middleware, namespace, etc).
      * @param string $prefix
      * @param callable $callback
      */
@@ -258,8 +256,7 @@ class Router
     }
 
     /**
-     * Dispatches the request, resolving the route callback 
-     * or handling unregistered routes.
+     * Dispatches the request, resolving the route callback or handling unregistered routes.
      */
     public function dispatch()
     {
@@ -314,10 +311,7 @@ class Router
     }
 
     /**
-     * Handles unregistered route cases, sending a 404 response in production or 
-     * throwing an exception in development.
-     *
-     * @return mixed Sends a 404 response or throws a RuntimeException.
+     * Handles unregistered route cases, sending a 404 response in production or throwing an exception in development.
      * @throws RuntimeException When no route is registered, and the application is not in production.
      */
     private function notRouteRegistered()
@@ -399,7 +393,6 @@ class Router
 
         $instance = $this->createInstance($callback);
         if (method_exists($instance, 'index')) {
-
             return $instance->response()->send($instance->index());
         }
 
@@ -477,21 +470,45 @@ class Router
     }
 
     /**
-     * Generates the URL associated with the path name.
+     * Generates the URL associated with the route name.
      *
      * @param string $routeName
      * @param array $params
      * @return string|null
      */
-    public static function url(string $routeName, array $params = null)
+    public function route(string $routeName, array $params = null)
     {
         if ($route = static::$routeMap['GET'][$routeName] ?? null) {
-            foreach ($params as $key => $value) {
+            foreach ($params ?? [] as $key => $value) {
                 $route = str_replace("{$key}", $value, $route);
             }
             return $route;
         }
         return null;
+    }
+
+    /**
+     * Generates the URL associated with the path name.
+     *
+     * @param string $routeName
+     * @return string|null
+     */
+    public function url(string $routeName)
+    {
+        return $this->baseUrl($routeName);
+    }
+
+    /**
+     * Returns the full site root. 
+     **/
+    public function baseUrl(string $path = '/'): string
+    {
+        $scheme = isset($_SERVER['HTTPS']) ? 'https' : 'http';
+        $scriptPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+        $baseUrl = "{$scheme}://{$_SERVER['HTTP_HOST']}{$scriptPath}";
+        $path = trim($this->prefix . '/' . ltrim($path, '/'), '/');
+
+        return "{$baseUrl}/{$path}";
     }
 
     /**
