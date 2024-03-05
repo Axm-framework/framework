@@ -48,16 +48,6 @@ if (!function_exists('app')) {
     }
 }
 
-if (!function_exists('url')) {
-
-    // Función para obtener la URL completa de una ruta relativa
-    function url(string $url = '')
-    {
-        $baseUrl = Router::getBaseUrl();
-        return $baseUrl . '/' . trim($url, '/');
-    }
-}
-
 function env(string $params, string|bool $default = null)
 {
     $env = Env::get($params, $default);
@@ -79,14 +69,11 @@ if (!function_exists('extend')) {
     /**
      * Extend the current View template with a layout.
      *
-     * This function is used to extend the current View template with a layout template.
-     * It calls the 'extend' method of the 'View' class to specify the layout template to use.
      * @param string $layout The name of the layout template to extend with.
      * @return void
      */
     function extend(string $layout)
     {
-        // Call the 'extend' method of the 'View' class to specify the layout template.
         return Views\View::extend($layout);
     }
 }
@@ -96,9 +83,6 @@ if (!function_exists('memoize')) {
     /**
      * Memoize the result of a callable function.
      *
-     * This function is used to cache and reuse the results of a callable function for the same 
-     * set of arguments. It returns a new callable function that stores and retrieves results from 
-     * a cache based on argument values.
      * @param callable $fn The callable function to memoize.
      * @return callable A memoized version of the original callable function.
      */
@@ -122,7 +106,6 @@ if (!function_exists('view')) {
     /**
      * Render and display a View template.
      *
-     * This function is used to render and display a View template within the application.
      * @param string $view    The name of the View template to render.
      * @param mixed  $params  Optional data to pass to the View template (default is null).
      * @param bool   $buffer  If true, the output is buffered; if false, it's immediately displayed (default is true).
@@ -136,15 +119,6 @@ if (!function_exists('view')) {
             ->withData($params)
             ->withLayout($withLayout)
             ->get();
-
-        // // Render the View template using the provided parameters.
-        // $output = app()->controller->renderView($view, $params, $withLayout, $ext);
-
-        // if (!$show) {
-        //     return $output;
-        // }
-
-        // echo $output . PHP_EOL;
     }
 }
 
@@ -153,15 +127,11 @@ if (!function_exists('section')) {
     /**
      * Begin a new named section in a View template.
      *
-     * This function is used to start a new named section within a View template.
-     * It calls the 'section' method of the 'View' class, allowing you to define content
-     * that can be yielded or included in other parts of the template.
      * @param string $name The name of the section being started.
      * @return void
      */
     function section(string $name)
     {
-        // Call the 'section' method of the 'View' class to begin a new named section.
         return Views\View::section($name);
     }
 }
@@ -170,14 +140,10 @@ if (!function_exists('endSection')) {
 
     /**
      * End the current section in a View.
-     *
-     * This function is used to mark the end of a section within a View template.
-     * It calls the 'endSection' method of the 'View' class.
      * @return void
      */
     function endSection()
     {
-        // Call the 'endSection' method of the 'View' class to mark the end of the section.
         return Views\View::endSection();
     }
 }
@@ -268,8 +234,6 @@ if (!function_exists('show')) {
     /**
      * Display or return data.
      *
-     * This function is used to either display data or return it as a string
-     * based on the provided parameters.
      * @param mixed  $data   The data to be displayed or returned (default is null).
      * @param bool   $return If true, the data is returned as a string; if false, it's echoed (default is false).
      * @return mixed If $return is true, the data is returned as a string; otherwise, it's echoed.
@@ -290,8 +254,6 @@ if (!function_exists('cVar')) {
      * Copies the value of an original variable, removes the original variable, 
      * and returns the copied value.
      *
-     * This function is primarily used for duplicating and removing variables 
-     * of types like $_COOKIE or $_SESSION.
      * @param mixed $var The variable whose value you want to copy and remove.
      * @return mixed The copied value of the original variable.
      */
@@ -299,7 +261,6 @@ if (!function_exists('cVar')) {
     {
         $result = $var;
 
-        // Unset the original variable to remove it.
         unset($var);
         return $result;
     }
@@ -310,16 +271,12 @@ if (!function_exists('randomId')) {
     /**
      * Checks if the 'randomId' function exists and defines it if not.
      *
-     * This function generates a random identifier of a specified size.
      * @param int $size The size of the random identifier (default is 50).
      * @return int A randomly generated identifier based on CRC32 hashing.
      */
     function randomId($size = 50)
     {
-        // Generate a random binary string of the specified size and convert it to hexadecimal.
         $randomBytesHex = bin2hex(random_bytes($size));
-
-        // Calculate a CRC32 hash of the hexadecimal string to create a random identifier.
         return crc32($randomBytesHex);
     }
 }
@@ -329,7 +286,6 @@ if (!function_exists('lang')) {
     /**
      * Checks if the 'lang' function exists and defines it if not.
      *
-     * This function is used for language localization and translation of messages.
      * @param string $key The key representing the message to be translated.
      * @return string The translated message, with optional placeholders replaced.
      */
@@ -337,12 +293,10 @@ if (!function_exists('lang')) {
     {
         // Get an instance of Lang
         $lang = Lang::make();
-
         if (empty($args)) {
             return $lang->trans($key);
         }
 
-        // Translate a key
         return $lang->trans($key, $args);
     }
 }
@@ -359,7 +313,6 @@ if (!function_exists('setFlash')) {
      */
     function setFlash(string $type, string $message)
     {
-        // Calls the 'setFlash' method from the 'session' component of the Axm application.
         return app()
             ->session
             ->setFlash($type, $message);
@@ -370,20 +323,10 @@ if (!function_exists('generateUrl')) {
 
     /**
      * This code checks if a function called "urlSite" exists. 
-     * 
-     * If it does not exist, the code creates a function called "urlSite" that takes in one parameter, 
-     * a string called $dir. The function then sets the scheme and host variables to the request scheme 
-     * and http host from the server respectively. It then sets the path variable to the value of $dir 
-     * after trimming off any slashes at the end. It then creates an url variable by concatenating the 
-     * scheme, host and path variables. If this url is not valid, it throws an exception. Otherwise,
-     * it returns the url.
      **/
     function generateUrl(string $dir = ''): string
     {
-        $url = app()
-            ->request
-            ->createNewUrl($dir);
-
+        $url = baseUrl($dir);
         // If the URL is not valid, throw an exception
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new RuntimeException(sprintf('Invalid URL: %s', $url));
@@ -397,21 +340,11 @@ if (!function_exists('generateUrl')) {
 if (!function_exists('baseUrl')) {
 
     /**
-     *  Returns the full site root, if the $dir parameter is not passed it will show only the root 
-     *  if the path to a file is passed it will show it, this function is used to show paths primarily. 
-     * e.g.: baseUrl('assets/css/bootstrap.min.css');
+     * Returns the full site root. 
      **/
-    function baseUrl(string $dir = ''): string
+    function baseUrl(string $path = '/'): string
     {
-        // If $dir is not empty, remove any forward-slashes or back-slashes from the beginning 
-        // or end of the string, add a forward-slash to the end and assign it to $dir
-        $dir = (!empty($dir)) ? rtrim($dir, '\/') . '/' : '';
-
-        // Concatenate PUBLIC_PATH and $dir to form the full URL of the current site 
-        // with the directory appended
-        $url = generateUrl(trim("$dir/"));
-
-        return $url;
+        return app()->router->url($path);
     }
 }
 
@@ -420,18 +353,16 @@ if (!function_exists('asset')) {
     /**
      * Generate the URL for an asset.
      *
-     * This function takes a relative path to an asset and combines it with the base URL of the application,
-     * producing the full URL to the asset. It ensures proper handling of directory separators.
-     * @param string      $path     The relative path to the asset.
+     * @param string $path The relative path to the asset.
      * @param string|null $basePath The base URL of the application (optional). If not provided, it uses '/resources/assets/' as the default.
      * @return string The full URL to the asset.
      */
     function asset(string $path, ?string $basePath = null): string
     {
-        // Get the URL base of your application from the configuration or as you prefer.
-        $baseUrl = rtrim($basePath ?? '/resources/assets/', '/') . '/' . ltrim($path, '/');
+        $basePath  = $basePath ?? 'app/resources/assets/';
+        $base = rtrim($basePath, '/') . '/' . ltrim($path, '/');
 
-        return baseUrl($baseUrl);
+        return baseUrl($base);
     }
 }
 
@@ -488,7 +419,7 @@ if (!function_exists('refresh')) {
     function refresh()
     {
         return app()
-            ->request
+            ->router
             ->getUri();
     }
 }
@@ -497,8 +428,6 @@ if (!function_exists('post')) {
 
     /**
      * Returns all data sent by the POST method. 
-     * if no parameter is passed it shows all the element, if parameters are passed it 
-     * shows the specific element 
      * e.g.: post(); || post('name'); 
      **/
     function post($key = null)
@@ -517,14 +446,10 @@ if (!function_exists('isLogged')) {
 
     /**
      * Check if a user is logged in.
-     *
-     * This function is used to determine whether a user is currently logged in within the application.
-     * It calls the 'isLogged' method of the 'Axm' application instance to perform the check.
      * @return bool True if a user is logged in; false otherwise.
      */
     function isLogged()
     {
-        // Call the 'isLogged' method of the 'Axm' application instance to check if a user is logged in.
         return app()->isLogged();
     }
 }
@@ -652,67 +577,7 @@ if (!function_exists('__')) {
      */
     function __($obj)
     {
-        // Return a new instance of the FluentInterface class for method chaining
         return new Fluent\Fluent($obj);
-    }
-}
-
-if (!function_exists('reflect')) {
-
-    /**
-     * Access and manipulate non-public properties and methods of an object using reflection.
-     *
-     * @param object $obj The object to be reflect.
-     * @return object An object with enhanced access to non-public members of $obj.
-     * @throws InvalidArgumentException If $obj is not a valid object.
-     */
-    function reflect($obj)
-    {
-        return new class($obj)
-        {
-            private $obj;
-            private $reflected;
-
-            public function __construct($obj)
-            {
-                $this->obj = $obj;
-                $this->reflected = new ReflectionClass($obj);
-            }
-
-            public function &__get($name)
-            {
-                $getProperty = function & () use ($name) {
-                    return $this->{$name};
-                };
-
-                $getProperty = $getProperty->bindTo($this->obj, get_class($this->obj));
-
-                return $getProperty();
-            }
-
-            public function __set($name, $value)
-            {
-                $setProperty = function () use ($name, &$value) {
-                    $this->{$name} = $value;
-                };
-
-                $setProperty = $setProperty->bindTo($this->obj, get_class($this->obj));
-
-                $setProperty();
-            }
-
-            public function __call($name, $params)
-            {
-                if (!$this->reflected->hasMethod($name)) {
-                    throw new RuntimeException("Method '{$name}' not found.");
-                }
-
-                $method = $this->reflected->getMethod($name);
-                $method->setAccessible(true);
-
-                return $method->invoke($this->obj, ...$params);
-            }
-        };
     }
 }
 
@@ -800,10 +665,6 @@ if (!function_exists('getRouteParams')) {
      * Get the route parameters from the current request.
      *
      * This function retrieves the route parameters from the current HTTP request. 
-     * Route parameters are typically used to
-     * capture values from the URL in a structured way and are commonly used in routing 
-     * systems to determine the action to
-     * be taken based on the requested URL.
      * @return array An associative array containing the route parameters.
      */
     function getRouteParams()
@@ -818,11 +679,6 @@ if (!function_exists('getUri')) {
 
     /**
      * Get the URI (Uniform Resource Identifier) of the current request.
-     *
-     * This function retrieves the URI of the current HTTP request. 
-     * The URI represents the unique identifier for the requested
-     * resource and typically includes the scheme, host, path, query parameters,
-     * and fragment identifier.
      * @return string The URI of the current request as a string.
      */
     function getUri()
@@ -877,7 +733,6 @@ if (!function_exists('esc')) {
     /**
      * Escapes and formats a text string for safe display in HTML.
      *
-     * This function combines HTML encoding and newline-to-break conversion.
      * @param string $text The input text to be escaped and formatted.
      * @return string The escaped and formatted text.
      */
