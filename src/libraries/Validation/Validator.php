@@ -711,7 +711,7 @@ class Validator
      * @return object An instance of the validation rule class.
      * @throws RuntimeException If class name or method is invalid.
      */
-    private function instantiateClass(string $classRuleName, string $nameSpace = 'Axm\\Validation\\Rules\\', string $method = 'validate'): object
+    private function instantiateClass(string $classRuleName, string $nameSpace = 'Validation\\Rules\\', string $method = 'validate'): object
     {
         $class = $nameSpace . ucfirst($classRuleName);
 
