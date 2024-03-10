@@ -73,8 +73,6 @@ class Serve extends BaseCommand
      */
     protected $process;
 
-    protected int $waitTimeInSeconds = 2;
-
     /**
      * Run the server
      */
@@ -85,16 +83,15 @@ class Serve extends BaseCommand
         $host = CLI::getOption('host', 'localhost');
         $port = (int) CLI::getOption('port', $this->defaultPort);
 
-        $scheme = 'http'; // Assuming default scheme is http for simplicity
-
         // Attempt alternative ports
         // if (!$port = $this->findAvailablePort($host, $port)) {
         //     CLI::error('Could not bind to any port');
         //     exit;
         // }
 
+        CLI::loading(1);
+
         // Server up
-        $this->printServerInfo($scheme, $host, $port);
         $this->startServer($php, $host, $port);
     }
 
@@ -103,32 +100,22 @@ class Serve extends BaseCommand
      */
     protected function findAvailablePort(string $host, int $startPort): ?int
     {
-        $maxTries = $this->maxTries;    
+        $maxTries = $this->maxTries;
         for ($port = $startPort; $port < $startPort + $maxTries; $port++) {
             if ($this->checkPort($host, $port)) {
                 return $port;
             }
         }
-    
+
         return null;
     }
-    
+
     protected function checkPort(string $host, int $port): bool
     {
         $url = "http://$host:$port";
         $headers = @get_headers($url);
-    
-        return !empty($headers);
-    }
-    
 
-    /**
-     * Shutdown the server
-     */
-    protected function shutdown()
-    {
-        CLI::info('Shutting down the server...');
-        proc_terminate($this->process);
+        return !empty($headers);
     }
 
     /**
@@ -154,6 +141,8 @@ class Serve extends BaseCommand
                         $this->shutdown();
                     }
                 }
+
+                $this->printServerInfo('http', $host, $port);
             }
 
             $code = proc_close($this->process);
@@ -161,6 +150,15 @@ class Serve extends BaseCommand
                 throw new RuntimeException("Unknown error (code: $code)", $code);
             }
         }
+    }
+
+    /**
+     * Shutdown the server
+     */
+    protected function shutdown()
+    {
+        CLI::info('Shutting down the server...');
+        proc_terminate($this->process);
     }
 
     /**
@@ -175,131 +173,3 @@ class Serve extends BaseCommand
         CLI::newLine(2);
     }
 }
-
-
-
-
-// declare(strict_types=1);
-
-// namespace Console\Commands\Server;
-
-// use Console\BaseCommand;
-// use Console\CLI;
-// use RuntimeException;
-
-// /**
-//  * Class Serve
-//  *
-//  * Launch the Axm PHP Development Server
-//  * @package Console\Commands\Server
-//  */
-// class Serve extends BaseCommand
-// {
-
-//     /**
-//      * Group
-//      * @var string
-//      */
-//     protected $group = 'Axm';
-
-//     /**
-//      * Name
-//      * @var string
-//      */
-//     protected $name = 'serve';
-
-//     /**
-//      * Description
-//      * @var string
-//      */
-//     protected $description = 'Launches the Axm PHP Development Server';
-
-//     /**
-//      * Usage
-//      * @var string
-//      */
-//     protected $usage = 'serve [--host] [--port]';
-
-//     /**
-//      * Options
-//      * @var array
-//      */
-//     protected $options = [
-//         '--php'  => 'The PHP Binary [default: "PHP_BINARY"]',
-//         '--host' => 'The HTTP Host [default: "localhost"]',
-//         '--port' => 'The HTTP Host Port [default: "8080"]',
-//     ];
-
-//     /**
-//      * The current port offset.
-//      * @var int
-//      */
-//     protected $portOffset = 0;
-
-//     /**
-//      * The max number of ports to attempt to serve from
-//      * @var int
-//      */
-//     protected $maxTries = 10;
-
-//     /**
-//      * Default port number
-//      * @var int
-//      */
-//     protected int $defaultPort = 8080;
-
-//     private string $host;
-//     private int $port;
-//     private string $documentRoot;
-//     private string $phpBinary;
-//     private $process;
-
-//     public function run(array $params)
-//     {
-//         $php  = CLI::getOption('php', PHP_BINARY);
-//         $host = CLI::getOption('host', 'localhost');
-//         $port = (int) CLI::getOption('port', $this->defaultPort);
-
-//         $this->documentRoot = getcwd();
-//         $this->validateOptions();
-
-//         $command = "{$php} -S {$host}:{$port} -t {$this->documentRoot}";
-
-//         $descriptors = [
-//             0 => ['pipe', 'r'],  // stdin
-//             1 => STDOUT,        // stdout
-//             2 => STDERR        // stderr
-//         ];
-
-//         $this->process = proc_open($command, $descriptors, $pipes);
-
-//         if (!is_resource($this->process)) {
-//             throw new RuntimeException("Failed to start server process.");
-//         }
-
-//         register_shutdown_function([$this, 'shutdown']);
-
-//         echo "Development server started at http://{$host}:{$port}\n";
-//         echo "Document root: {$this->documentRoot}\n";
-//         echo "Press Ctrl+C to stop the server.\n";
-
-//         while (proc_get_status($this->process)['running']) {
-//             usleep(100000); // Sleep for 100 milliseconds
-//         }
-//     }
-
-//     protected function validateOptions(): void
-//     {
-//         if (!is_dir($this->documentRoot) || !is_readable($this->documentRoot)) {
-//             throw new RuntimeException("Invalid document root: {$this->documentRoot}.");
-//         }
-//     }
-
-//     public function shutdown(): void
-//     {
-//         if ($this->process !== null) {
-//             echo "Shutting down the server...\n";
-//             proc_terminate($this->process);
-//         }
-//     }
-// }

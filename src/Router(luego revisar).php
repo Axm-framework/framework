@@ -85,7 +85,6 @@ final class Router
         return $this->parserController($result);
     }
 
-
     function parserController($result)
     {
         $httpMethod = strtoupper($result[0]);

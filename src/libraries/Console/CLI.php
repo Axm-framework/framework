@@ -7,7 +7,6 @@ use Validation\Validator;
 
 /**
  * Set of static methods useful for CLI request handling.
- *
  */
 class CLI
 {
@@ -276,7 +275,7 @@ class CLI
 
         if ($validator->fails()) {
             $msg = $validator->getFirstError();
-            static::error($validator->getFirstError());
+            static::error($msg);
             exit();
         }
 
@@ -419,10 +418,77 @@ class CLI
         }
     }
 
+    public static function loading(int $seconds)
+    {
+        $loadingChars = ['⠏', '⠛', '⠹', '⢸', '⣰', '⣤', '⣆', '⡇'];
+        $numChars = count($loadingChars);
+        $interval = 0.1; // Intervalo de tiempo entre cada carácter en segundos
+
+        $endTime = microtime(true) + $seconds;
+        while (microtime(true) < $endTime) {
+            for ($i = 0; $i < $numChars; $i++) {
+
+                $colors = static::$foreground_colors;
+                unset($colors['black'], $colors['white'], $colors['default'], $colors['dark_gray'], $colors['light_gray']);
+
+                $coloredChar = static::color($loadingChars[$i], array_rand($colors)); // Aplicar el color al carácter actual
+                static::fwrite(STDOUT, $coloredChar . ' ');  // Imprimir el carácter coloreado
+
+                usleep($interval * 1000000);     // Esperar el intervalo de tiempo
+                static::fwrite(STDOUT, "\r");   // Volver al principio de la línea para sobrescribir el carácter anterior
+            }
+        }
+
+        // Limpiar el último carácter de carga
+        static::fwrite(STDOUT, ' ');
+        static::write();
+    }
+
+    public static function progressBar(int $seconds)
+    {
+        $totalChars = 50; // Número total de caracteres en la barra de progreso
+        $progress = 0; // Inicializar el progreso
+        $startTime = microtime(true); // Tiempo de inicio
+        $endTime = $startTime + $seconds; // Tiempo de finalización
+
+        // Colores disponibles para la barra de progreso
+        $barColors = ['blue', 'green', 'yellow', 'red', 'purple', 'cyan'];
+        $numColors = count($barColors);
+
+        while (microtime(true) < $endTime) {
+            // Calcular el progreso actual
+            $progressPercentage = $progress == 0 ? 0 : min(100, ($progress / $totalChars) * 100);
+
+            // Calcular la cantidad de caracteres completados
+            $completedChars = (int) ($progress / $totalChars * $totalChars);
+
+            // Obtener el color actual de la barra de progreso
+            $currentColor = $barColors[$progress % $numColors];
+
+            // Construir la barra de progreso animada
+            $bar = str_repeat(CLI::color('█', $currentColor), $completedChars) . str_repeat('█', $totalChars - $completedChars);
+
+            // Calcular el tiempo restante estimado
+            $elapsedTime = microtime(true) - $startTime;
+            $remainingTime = $seconds - $elapsedTime;
+            $estimatedRemainingTime = $remainingTime / ($progressPercentage == 0 ? 1 : $progressPercentage / 100);
+
+            // Imprimir la barra de progreso y el porcentaje de avance
+            printf("\r%.1f%% %s Time Remaining: %.1f sec ",  $progressPercentage, $bar, $estimatedRemainingTime);
+
+            // Incrementar el progreso
+            $progress++;
+
+            // Esperar un breve intervalo de tiempo
+            usleep(1000000 * $seconds / $totalChars);
+        }
+
+        // Imprimir la barra de progreso completa
+        printf("\r100%% %s Time Remaining: 0 sec \n", str_repeat('█', $totalChars));
+    }
+
     /**
-     * isWindows
-     * if operating system === windows
-     * @return bool
+     * Is SO Windows
      */
     public static function isWindows(): bool
     {
@@ -540,7 +606,6 @@ class CLI
     /**
      * Checks whether the current stream resource supports or
      * refers to a valid terminal type device.
-     *
      * @param resource $resource
      */
     public static function streamSupports(string $function, $resource): bool
@@ -613,8 +678,6 @@ class CLI
 
     /**
      * Populates the CLI's dimensions.
-     *
-     * @codeCoverageIgnore
      */
     public static function generateDimensions()
     {
@@ -978,10 +1041,8 @@ class CLI
      */
     protected static function fwrite($handle, string $string)
     {
-        if (static::is_cli()) {
-
+        if (!is_cli()) {
             echo $string;
-
             return;
         }
 
