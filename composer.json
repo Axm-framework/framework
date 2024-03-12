@@ -36,9 +36,7 @@
     "autoload": {
         "psr-4": {
 			"Axm\\": "src"
-		},
-		"files": [
-		]
+		}
     },  
     "config": {
         "optimize-autoloader": true,
