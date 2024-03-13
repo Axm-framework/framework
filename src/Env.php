@@ -16,17 +16,25 @@ class Env
     /**
      * Load environment variables from a file
      * @param string $file Environment variables file path
+     * @return void
      */
-    public static function load(string $file)
+    public static function load(string $file): void
     {
-        $env = parse_ini_file($file, true) ?: [];
-        self::$data = array_merge(self::$data, $env);
+        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        foreach ($lines as $line) {
+            if (str_contains($line, '=') && !str_starts_with($line, '#')) {
+                [$name, $value] = explode('=', $line, 2);
+                $name  = trim($name);
+                $value = trim($value);
+                self::$data[$name] = self::expandValue($value);
+            }
+        }
     }
 
     /**
      * Get the value of an environment variable
      * 
-     * @param string|null $name Environment variable name
      * @param mixed $default Default value if the variable is not defined
      * @return mixed Value of the environment variable or default value
      */
@@ -37,8 +45,6 @@ class Env
 
     /**
      * Set the value of an environment variable
-     * 
-     * @param string $name Name of the environment variable Name of the environment variable
      * @param mixed $value Value of the environment variable
      */
     public static function set(string $name, $value): void
@@ -48,12 +54,22 @@ class Env
 
     /**
      * Check if an environment variable is seta
-     * 
-     * @param string $name Name of the environment variable Name of the environment variable
-     * @return bool true if defined, false otherwise
      */
     public static function has(string $name): bool
     {
         return isset(self::$data[$name]);
+    }
+
+    /**
+     * Expand variables in a string value, replacing placeholders with their corresponding values.
+     * @return string The string value with variables replaced.
+     */
+    protected static function expandValue(string $value): string
+    {
+        $value = trim($value, '"');
+
+        return preg_replace_callback('/\${(\w+)}/', function ($matches) {
+            return self::get($matches[1]) ?? $matches[0];
+        }, $value);
     }
 }
