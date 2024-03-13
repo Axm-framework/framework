@@ -443,7 +443,7 @@ class Router
             $pattern = '~^' . $this->compileRoute($route) . '$~';
             if (preg_match($pattern, $uri, $params)) {
                 $params = array_filter($params, 'is_string', ARRAY_FILTER_USE_KEY);
-                $this->request->setRouteParams($params);
+                $this->app->request->setRouteParams($params);
 
                 return $handler;
             }
