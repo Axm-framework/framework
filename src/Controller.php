@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-// use Axm;
 use Views\View;
 use Http\Request;
 use Http\Response;
+use Middlewares\AuthMiddleware;
 use App\Middlewares\BaseMiddleware;
-use App\Middlewares\AuthMiddleware;
 
 /**
  * Class Controller
@@ -62,7 +61,7 @@ class Controller
         $app = app();
         $this->request = app('request', new Request());
         $this->response = app('response', new Response());
-        $this->view = app('response', new View());
+        $this->view = app('view', new View());
 
         $this->registerDefaultMiddleware();
     }
