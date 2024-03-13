@@ -25,9 +25,7 @@ class Env
         foreach ($lines as $line) {
             if (str_contains($line, '=') && !str_starts_with($line, '#')) {
                 [$name, $value] = explode('=', $line, 2);
-                $name  = trim($name);
-                $value = trim($value);
-                self::$data[$name] = self::expandValue($value);
+                self::$data[trim($name)] = trim(self::expandValue($value));
             }
         }
     }
