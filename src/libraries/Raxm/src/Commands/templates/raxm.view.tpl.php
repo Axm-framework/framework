@@ -1,3 +1,0 @@
-<div>
-    <!-- code here -->
-</div>

@@ -1,2 +1,0 @@
-- Start with extracting a Blade component first, then only do a Raxm component if you need to
--
