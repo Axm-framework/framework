@@ -10,13 +10,17 @@ class Config
     protected static $config = [];
 
     /**
+     * default config path 
+     */
+    private const DEFAULT_DIR = APP_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
+
+    /**
      * Get config
      * 
-     * @param string $var fichero.sección.variable
      * @throws Exception
      * @return mixed
      */
-    public static function get($var)
+    public static function get(string $var)
     {
         $sections = explode('.', $var);
         self::$config[$sections[0]] ??= self::load($sections[0]);
@@ -25,13 +29,12 @@ class Config
             3 => self::$config[$sections[0]][$sections[1]][$sections[2]] ?? null,
             2 => self::$config[$sections[0]][$sections[1]] ?? null,
             1 => self::$config[$sections[0]] ?? null,
-            default => throw new \Exception('Máximo 3 niveles en Config::get(fichero.sección.variable), pedido: ' . $var)
+            default => throw new \Exception('Maximum 3 levels in Config::get(file.section.variable), order: ' . $var)
         };
     }
 
     /**
      * Get all configs
-     * 
      * @return array<array-key,mixed>
      */
     public static function getAll()
@@ -42,51 +45,44 @@ class Config
     /**
      * Set variable in config
      * 
-     * @param string $var   variable de configuración
-     * @param mixed  $value valor para atributo
      * @throws Exception
      * @return void
      */
-    public static function set($var, $value)
+    public static function set(string $var, $value)
     {
         $sections = explode('.', $var);
         match (count($sections)) {
             3 => self::$config[$sections[0]][$sections[1]][$sections[2]] = $value,
             2 => self::$config[$sections[0]][$sections[1]] = $value,
             1 => self::$config[$sections[0]] = $value,
-            default => throw new \Exception('Máximo 3 niveles en Config::set(fichero.sección.variable), pedido: ' . $var)
+            default => throw new \Exception('Maximum 3 levels in Config::get(file.section.variable), order: ' . $var)
         };
     }
 
     /**
      * Read config file
-     * 
-     * @param string $file  archivo .php o .ini
-     * @param bool   $force forzar lectura de .php o .ini
      * @return array<array-key,mixed>
      */
-    public static function read($file, $force = false)
+    public function read(string $file, string $path = null, bool $force = false)
     {
         if ($force) {
-            return self::$config[$file] = self::load($file);
+            return self::$config[$file] = self::load($file, $path);
         }
 
-        return self::$config[$file] ??= self::load($file);
+        return self::$config[$file] ??= self::load($file, $path);
     }
 
     /**
      * Load config file
-     * 
-     * @param string $file archivo
      * @return array<array-key,mixed>
      */
-    private static function load(string $file): array
+    public static function load(string $name, string $path = null): array
     {
-        if (is_file($fileConfig = APP_PATH . DIRECTORY_SEPARATOR
-            . 'config' . DIRECTORY_SEPARATOR . $file . '.php')) {
+        $path = $path ?? self::DEFAULT_DIR;
+        if (is_file($fileConfig = $path . $name . '.php')) {
             return require $fileConfig;
         }
 
-        throw new \Exception(sprintf('Error when opening the configuration file %s ', $fileConfig));
+        throw new \Exception(sprintf('Error when opening the configuration file [ %s ] ', $fileConfig));
     }
 }

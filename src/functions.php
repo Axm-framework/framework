@@ -16,8 +16,17 @@ if (!function_exists('config')) {
      * @param  mixed  $default
      * @return mixed
      */
-    function config(string $key)
+    function config(string $key = null, string $value = null)
     {
+        if (is_null($key)) {
+            return new Config;
+        }
+
+        if (!is_null($key) && !is_null($value)) {
+            Config::set($key, $value);
+            return;
+        }
+
         $config = Config::get($key);
         return $config;
     }

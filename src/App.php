@@ -20,10 +20,10 @@ final class App extends Container
      */
     public function __construct()
     {
-        $this->setApp();
         $this->loadEnv();
         $this->configureEnvironment();
-        $this->registerProviders();
+        $this->setApp();
+        $this->registerComponents();
         $this->bootServices();
     }
 
@@ -32,7 +32,7 @@ final class App extends Container
      */
     private function setApp()
     {
-        $this->singleton('app', fn () => $this);
+        $this->singleton('app', $this);
     }
 
     /**
@@ -72,11 +72,11 @@ final class App extends Container
      * This method reads the service provider configurations from the `providers.php` file
      * and registers them with the application container.
      */
-    public function registerProviders()
+    public function registerComponents()
     {
         $pathConfig = config('paths.providersPath') . DIRECTORY_SEPARATOR;
         $providers  = include $pathConfig . 'providers.php';
-        $this->services($providers);
+        $this->components($providers);
     }
 
     /**

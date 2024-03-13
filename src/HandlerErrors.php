@@ -16,7 +16,7 @@ set_exception_handler(static function (Throwable $e) {
 
 function handlerErrors($errno, $errstr, $errfile, $errline)
 {
-    if (error_reporting() === 0) 
+    if (error_reporting() === 0)
         return false;
 
     if (php_sapi_name() === 'cli') {
@@ -28,8 +28,8 @@ function handlerErrors($errno, $errstr, $errfile, $errline)
 
 function handlerException(Throwable $e)
 {
-    if (error_reporting() === 0) 
-    return false;
+    if (error_reporting() === 0)
+        return false;
 
     $log = Config::get('app.initLogReportings');
 
@@ -80,7 +80,7 @@ function handleCliError($errno, $errstr, $errfile, $errline)
 {
     $e = new ErrorException($errstr, $errno, 1, $errfile, $errline);
     Console\CLIException::handleCLIException($e);
-    
+
     $log = Config::get('app.initLogReportings');
 
     if ($log === true) {
@@ -110,6 +110,7 @@ function handleWebException(Throwable $e)
     $whoops = new Run();
     $handler = new PrettyPageHandler();
     $handler->setPageTitle("¡Oops! Ha ocurrido un error");
+    $handler->setEditor(env('DEBUGBAR_EDITOR'));
     $whoops->pushHandler($handler);
     $whoops->handleException($e);
 }

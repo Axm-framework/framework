@@ -59,9 +59,9 @@ class Controller
     public function __construct()
     {
         $app = app();
-        $this->request = app('request', new Request());
-        $this->response = app('response', new Response());
-        $this->view = app('view', new View());
+        $this->request = $app->request;
+        $this->response = $app->response;
+        $this->view = $app->view;
 
         $this->registerDefaultMiddleware();
     }

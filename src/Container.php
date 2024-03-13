@@ -3,16 +3,15 @@
 class Container
 {
     private $storage = [];
-    private static $instance;
-
+    private $instances = [];
 
     public static function getInstance()
     {
-        if (!isset(static::$instance)) {
-            static::$instance = new self();
+        if (!isset(static::$instances)) {
+            static::$instances = new self();
         }
 
-        return static::$instance;
+        return static::$instances;
     }
 
     public function bind(string $key, $value)
@@ -21,16 +20,13 @@ class Container
         return $value;
     }
 
-    public function singleton(string $key, callable $value)
+    public function singleton(string $key, object $value)
     {
-        $this->bind($key, function () use ($key, $value) {
-            static $instance;
-            $instance[$key] ??= $value($this);
+        if (!$this->has($key)) {
+            return $this->bind($key, $value);
+        }
 
-            return $instance[$key];
-        });
-
-        return $this;
+        return $this->storage[$key];
     }
 
     public function key(string $key)
@@ -59,7 +55,7 @@ class Container
         return $this->has($key);
     }
 
-    public function get(string $key): object
+    public function get(string $key): object|false
     {
         if ($this->has($key)) {
             $class = $this->storage[$key] ?? null;
@@ -79,7 +75,7 @@ class Container
         $this->storage[$this->key($key)] = $value;
     }
 
-    public function services(array $values): void
+    public function components(array $values): void
     {
         $this->storage += $values;
     }
