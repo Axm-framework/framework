@@ -2,7 +2,6 @@
 
 namespace Auth;
 
-use App;
 use Exception;
 
 /**
@@ -33,12 +32,12 @@ class Auth
 	/**
 	 * __construct
 	 *
-	 * @param  Axm\App $app
+	 * @param  \App $app
 	 * @param  string $usernameField
 	 * @param  string $passwordField
 	 * @return void
 	 */
-	public function __construct(App $app, string $usernameField = 'email', string $passwordField = 'password')
+	public function __construct(\App $app, string $usernameField = 'email', string $passwordField = 'password')
 	{
 		$this->app = $app;
 
@@ -140,12 +139,12 @@ class Auth
 	 *
 	 * @param  mixed $username
 	 * @param  mixed $password
-	 * @return void
+	 * @return bool
 	 */
 	public function attempt($username, $password)
 	{
 		if ($this->failedAttempts >= $this->maxFailedAttempts) {
-			throw new \Exception('You have reached the maximum number of failed attempts.');
+			throw new Exception('You have reached the maximum number of failed attempts.');
 		}
 
 		$this->userModel = $this->getUserFromDatabase($this->userClass, $this->usernameField, $username);

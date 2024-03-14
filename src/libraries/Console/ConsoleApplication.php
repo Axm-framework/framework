@@ -14,7 +14,6 @@ namespace Console;
 use Exception;
 use Console\CLI;
 use Console\Commands;
-use \Composer\InstalledVersions;
 
 /**
  * Clas ConsoleApplication
@@ -43,19 +42,7 @@ final class ConsoleApplication
     public function __construct()
     {
         $this->commands = new Commands();
-        $this->version ??= 1.0 ?? $this->getVersion();
-    }
-
-    /**
-     * Get the singleton instance of the Application class
-     */
-    public static function getInstance($config): self
-    {
-        if (self::$instance === null) {
-            self::$instance = new self($config);
-        }
-
-        return self::$instance;
+        $this->version ??= $this->getVersion();
     }
 
     /**

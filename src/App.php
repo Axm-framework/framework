@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Composer\InstalledVersions;
 use Console\ConsoleApplication;
 
 /**
@@ -75,7 +74,7 @@ final class App extends Container
     public function registerComponents()
     {
         $pathConfig = config('paths.providersPath') . DIRECTORY_SEPARATOR;
-        $providers  = include $pathConfig . 'providers.php';
+        $providers = include $pathConfig . 'providers.php';
         $this->components($providers);
     }
 
@@ -206,7 +205,9 @@ final class App extends Container
     public function setCsrfCookie(string $csrfToken): void
     {
         $expiration = config('session.expiration');
-        setcookie('csrfToken', $csrfToken, (int) time() + 60 * $expiration);
+        // Convertir el tiempo de expiración a un entero
+        $expirationInSeconds = (int) ($expiration * 60); // Convertir minutos a segundos
+        setcookie('csrfToken', $csrfToken, time() + $expirationInSeconds);
     }
 
     /**
@@ -243,7 +244,7 @@ final class App extends Container
      */
     public function version(string $libraryName = 'axm/framework'): ?string
     {
-        $v = InstalledVersions::getVersion($libraryName);
+        $v = \Composer\InstalledVersions::getVersion($libraryName);
         return $v;
     }
 
@@ -252,11 +253,12 @@ final class App extends Container
      */
     public function user(string $value = null)
     {
-        if (is_null($value)) return $this->get('user');
+        if (is_null($value))
+            return $this->get('user');
 
         return $this
             ->get('user')
-            ->{$value} ?? null;
+        ->{$value} ?? null;
     }
 
     /**
@@ -288,7 +290,7 @@ final class App extends Container
     public function createConsoleApplication()
     {
         static $console;
-        return $console ??= new ConsoleApplication($this);
+        return $console ??= $this->get('console');
     }
 
     /**
