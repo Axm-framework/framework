@@ -22,8 +22,8 @@ final class App extends Container
     {
         $this->loadEnv();
         $this->configureEnvironment();
-        $this->setApp();
         $this->registerComponents();
+        $this->setApp();
         $this->bootServices();
     }
 
@@ -206,7 +206,7 @@ final class App extends Container
     public function setCsrfCookie(string $csrfToken): void
     {
         $expiration = config('session.expiration');
-        setcookie('csrfToken', $csrfToken, time() + 60 * $expiration);
+        setcookie('csrfToken', $csrfToken, (int) time() + 60 * $expiration);
     }
 
     /**
