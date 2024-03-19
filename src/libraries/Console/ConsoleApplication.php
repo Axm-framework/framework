@@ -42,7 +42,19 @@ final class ConsoleApplication
     public function __construct()
     {
         $this->commands = new Commands();
-        $this->version ??= $this->getVersion();
+        $this->version ??= 1.0 ?? $this->getVersion();
+    }
+
+    /**
+     * Get the singleton instance of the Application class
+     */
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 
     /**
@@ -69,7 +81,7 @@ final class ConsoleApplication
     }
 
     /**
-     * Returns the Ax logo.
+     * Returns the AxmCli logo.
      * @return string 
      */
     public function rawLogo()
