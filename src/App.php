@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Console\ConsoleApplication;
-
 /**
  * Class Application
  *
@@ -14,6 +12,8 @@ use Console\ConsoleApplication;
  */
 final class App extends Container
 {
+    private static ?App $instance = null;
+
     /**
      * Constructor for the Application class.
      */
@@ -22,8 +22,20 @@ final class App extends Container
         $this->loadEnv();
         $this->configureEnvironment();
         $this->registerComponents();
-        $this->setApp();
+        // $this->setApp();
         $this->bootServices();
+    }
+
+    /**
+     * Singleton App
+     */
+    public static function getInstance(): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 
     /**
@@ -111,7 +123,7 @@ final class App extends Container
      */
     public function isLogged(): bool
     {
-        return !empty($this->user);
+        return !empty ($this->user);
     }
 
     /**
@@ -186,7 +198,7 @@ final class App extends Container
             throw new \Exception('The "Intl" extension is not enabled on this server');
 
         $http = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '');
-        $locale = !empty($http) ? $http : 'en_US';
+        $locale = !empty ($http) ? $http : 'en_US';
 
         return $locale;
     }
@@ -205,8 +217,7 @@ final class App extends Container
     public function setCsrfCookie(string $csrfToken): void
     {
         $expiration = config('session.expiration');
-        // Convertir el tiempo de expiración a un entero
-        $expirationInSeconds = (int) ($expiration * 60); // Convertir minutos a segundos
+        $expirationInSeconds = (int) ($expiration * 60);
         setcookie('csrfToken', $csrfToken, time() + $expirationInSeconds);
     }
 
@@ -216,7 +227,7 @@ final class App extends Container
      */
     public function getCsrfToken(): string
     {
-        return isset($_COOKIE['csrfToken']) ? $_COOKIE['csrfToken'] : $this->generateAndSetCsrfToken();
+        return isset ($_COOKIE['csrfToken']) ? $_COOKIE['csrfToken'] : $this->generateAndSetCsrfToken();
     }
 
     /**
@@ -256,9 +267,7 @@ final class App extends Container
         if (is_null($value))
             return $this->get('user');
 
-        return $this
-            ->get('user')
-        ->{$value} ?? null;
+        return $this->get('user')->{$value} ?? null;
     }
 
     /**
@@ -285,12 +294,11 @@ final class App extends Container
 
     /**
      * Returns a new instance of the ConsoleApplication class
-     * @return ConsoleApplication A new instance of the ConsoleApplication class.
      */
     public function createConsoleApplication()
     {
         static $console;
-        return $console ??= $this->get('console');
+        return $console ??= new \Console\ConsoleApplication;
     }
 
     /**
@@ -298,7 +306,7 @@ final class App extends Container
      **/
     public function run(): void
     {
-        (new Http\Router())
+        $this->get('router')
             ->openRoutesUser()
             ->dispatch();
     }
