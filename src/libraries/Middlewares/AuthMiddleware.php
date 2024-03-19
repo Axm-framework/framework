@@ -34,8 +34,6 @@ class AuthMiddleware extends BaseMiddleware
 
     /**
      * Execute the action, checking authentication and permissions.
-     *
-     * @return bool True if the action was executed successfully, false otherwise.
      * @throws RuntimeException If the user does not have sufficient permissions.
      */
     public function execute()

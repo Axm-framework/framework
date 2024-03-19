@@ -35,7 +35,7 @@ class RateLimiterMiddleware extends BaseMiddleware
         $this->lastRequestTime = microtime(true);
         $this->burstRequestsPerRequest = $burstRequestsPerRequest;
 
-        $this->rateLimiterFiber = new Fiber(function () {
+        $this->rateLimiterFiber = new Fiber(function() {
             while (true) {
                 $currentTime = microtime(true);
                 $timeSinceLastRequest = $currentTime - $this->lastRequestTime;
@@ -106,3 +106,4 @@ class RateLimiterMiddleware extends BaseMiddleware
         new self(10);
     }
 }
+

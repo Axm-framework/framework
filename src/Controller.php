@@ -167,7 +167,6 @@ class Controller
 
     /**
      * Get the registered middlewares.
-     * @return Middlewares\BaseMiddleware[]
      */
     public function getMiddlewares(): array
     {
@@ -188,7 +187,7 @@ class Controller
     }
 
     /**
-     * 
+     * Response Instance
      */
     public function response(): ?Response
     {
@@ -196,7 +195,7 @@ class Controller
     }
 
     /**
-     * 
+     * Request Instance
      */
     public function request(): ?Request
     {
