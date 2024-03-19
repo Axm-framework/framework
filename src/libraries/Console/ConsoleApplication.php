@@ -42,7 +42,7 @@ final class ConsoleApplication
     public function __construct()
     {
         $this->commands = new Commands();
-        $this->version ??= 1.0 ?? $this->getVersion();
+        $this->version ??= $this->getVersion();
     }
 
     /**
