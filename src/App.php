@@ -86,7 +86,7 @@ final class App extends Container
     public function registerComponents()
     {
         $pathConfig = config('paths.providersPath') . DIRECTORY_SEPARATOR;
-        $providers = include $pathConfig . 'providers.php';
+        $providers  = include $pathConfig . 'providers.php';
         $this->components($providers);
     }
 
@@ -285,8 +285,8 @@ final class App extends Container
      */
     public function __get(string $name)
     {
-        if ($name == 'user') {
-            return $this->setUser();
+        if ($name == 'config') {
+            return config($name);
         }
 
         return $this->get($name);
