@@ -582,11 +582,11 @@ if (!function_exists('__')) {
      * on the provided object. It enhances the readability and expressiveness of code by enabling
      * a sequence of method calls on the object.
      * @param object $obj The object on which method chaining is desired.
-     * @return Fluent\Fluent An instance of the Fluent class for method chaining.
+     * @return Axm\Fluent\Fluent An instance of the Fluent class for method chaining.
      */
     function __($obj)
     {
-        return new Fluent\Fluent($obj);
+        return new Axm\Fluent\Fluent($obj);
     }
 }
 
@@ -612,7 +612,7 @@ if (!function_exists('helpers')) {
      * @param string|array $helpers Names of the helpers to load, separated by spaces, commas, dots or an array.
      * @param string|null $customPath The path to custom helper files. If not provided, custom helpers are not loaded.
      * @return bool True if all helpers were loaded successfully, false otherwise.
-     * @throws HelperNotFoundException If a specified helper file does not exist in the given paths.
+     * @throws Exception If a specified helper file does not exist in the given paths.
      */
     function helpers($helpers, string $customPath = null, string $separator = '_')
     {
