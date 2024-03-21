@@ -20,7 +20,8 @@ const PUBLIC_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'public';
 const VENDOR_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'vendor';
 
 // Define AXM framework installation path
-const AXM_PATH = VENDOR_PATH . DIRECTORY_SEPARATOR . 'axm';
+const AXM_PATH = VENDOR_PATH . DIRECTORY_SEPARATOR . 'axm'
+    . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src';
 
 // Define the application path
 const APP_PATH = ROOT_PATH . DIRECTORY_SEPARATOR . 'app';
@@ -34,9 +35,9 @@ const APP_NAMESPACE = 'App\\';
 --------------------------------------------------------------------------------
                        FILES FOR INITIALIZATION                                     
 -------------------------------------------------------------------------------- */
-require(AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'autoload.php');
-require(AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'HandlerErrors.php');
-require(AXM_PATH . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'functions.php');
+require (AXM_PATH . DIRECTORY_SEPARATOR . 'autoload.php');
+require (AXM_PATH . DIRECTORY_SEPARATOR . 'HandlerErrors.php');
+require (AXM_PATH . DIRECTORY_SEPARATOR . 'functions.php');
 
 // Add Composer autoload to load external dependencies
 require VENDOR_PATH . DIRECTORY_SEPARATOR . 'autoload.php';
