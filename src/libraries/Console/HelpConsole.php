@@ -1,21 +1,19 @@
 <?php
 
-/**
- * This file is part of Axm framework.
- *
- * (c) Axm Foundation <admin@axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
-
- use Console\BaseCommand;
+use Console\BaseCommand;
 
 /**
+ * Axm Framework PHP.
+ *
  * CI Help command for the axm script.
  *
  * Lists the basic usage information for the axm script,
  * and provides a way to list help for other commands.
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 class Help extends BaseCommand
 {

@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Console;
+
+use Exception;
+use Console\CLI;
+use Console\Commands;
 
 /**
  * Axm Framework PHP.
@@ -9,14 +15,6 @@ namespace Console;
  * @link http://www.axm.com/
  * @license http://www.axm.com/license/
  * @package Console
- */
-
-use Exception;
-use Console\CLI;
-use Console\Commands;
-
-/**
- * Clas ConsoleApplication
  */
 final class ConsoleApplication
 {

@@ -7,11 +7,19 @@ namespace Console;
 use Throwable;
 
 /**
- * CLIException 
+ * Axm Framework PHP.
+ * 
+ * Class CLIException 
  * 
  * This class shows in a nice and detailed way the error in the console, 
  * this code has been inspired by the Laravel Colision library. 
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
+
 class CLIException
 {
     private const DELIMITER = '|';
@@ -23,7 +31,6 @@ class CLIException
 
     /**
      * Handles an exception and displays relevant information in the console.
-     * @param Throwable $e The exception to handle.
      */
     public static function handleCLIException(Throwable $e): void
     {
@@ -33,10 +40,7 @@ class CLIException
     }
 
     /**
-     * info
-     *
-     * @param  string $key
-     * @return void
+     * Message Info
      */
     public static function info(string $key)
     {
@@ -51,7 +55,6 @@ class CLIException
 
     /**
      * Prints information about the exception.
-     * @param Throwable $e The exception.
      */
     protected static function printExceptionInfo(Throwable $e): void
     {
@@ -64,10 +67,6 @@ class CLIException
 
     /**
      * Displays a formatted header box with a title and message.
-     *
-     * @param string $title The title of the header box.
-     * @param string $message The message to be displayed in the header box.
-     * @return void
      */
     protected static function displayHeaderBox(string $title, string $message): void
     {
@@ -80,9 +79,8 @@ class CLIException
 
     /**
      * Displays a snippet of relevant code for the exception.
-     * @param Throwable $e The exception.
      */
-    public static function snipCode(Throwable $e)
+    public static function snipCode(Throwable $e): void
     {
         $code = self::getCode($e);
         CLI::write($code);
@@ -90,9 +88,6 @@ class CLIException
 
     /**
      * Gets the relevant source code for the exception.
-     *
-     * @param Throwable $e The exception.
-     * @return string The source code.
      */
     public static function getCode(Throwable $e): string
     {
@@ -102,9 +97,6 @@ class CLIException
 
     /**
      * Gets the color associated with a PHP token ID.
-     *
-     * @param int $tokenId The PHP token ID.
-     * @return string The color associated with the token ID.
      */
     protected static function getTokenColor(int $tokenId): string
     {
@@ -114,6 +106,7 @@ class CLIException
             T_CLOSE_TAG => 'blue',
             T_STRING => 'blue',
             T_VARIABLE => 'light_cyan',
+           
             // Constants
             T_DIR => 'light_cyan',
             T_FILE => 'default',
@@ -125,6 +118,7 @@ class CLIException
             T_CLASS_C => 'light_cyan',
             T_FUNC_C => 'light_yellow',
             T_TRAIT_C => 'light_cyan',
+           
             // Comment
             T_COMMENT => 'light_green',
             T_DOC_COMMENT => 'dark_gray',
@@ -154,7 +148,6 @@ class CLIException
             T_ENDFOR => 'light_purple',
             T_ENDFOREACH => 'light_purple',
             T_ENDWHILE => 'light_purple',
-            T_THROW => 'light_purple',
             //
             T_DOLLAR_OPEN_CURLY_BRACES => 'light_purple',
 
@@ -177,11 +170,6 @@ class CLIException
 
     /**
      * Renders the relevant source code.
-     *
-     * @param string $file The file name.
-     * @param int $errorLine The line number with the error.
-     * @param int $maxLines The maximum number of lines to display.
-     * @return string The formatted source code.
      */
     protected static function renderSourceCode(string $file, int $errorLine, int $maxLines): string
     {
@@ -200,11 +188,6 @@ class CLIException
 
     /**
      * Calculates the line range to display.
-     *
-     * @param int $errorLine Error line number.
-     * @param int $lineCount Total number of lines.
-     * @param int $maxLines Maximum number of lines to display.
-     * @return array Line range to display (start and end).
      */
     protected static function calculateLineRange(int $errorLine, int $lineCount, int $maxLines): array
     {
@@ -219,13 +202,8 @@ class CLIException
 
     /**
      * Highlights the relevant lines of the source code.
-     *
-     * @param array $lines Array of code lines.
-     * @param array $lineRange Line range to display.
-     * @param int $errorLine Error line number.
-     * @return array Array of highlighted lines.
      */
-    protected static function highlightLines($lines, $lineRange, $errorLine)
+    protected static function highlightLines(array $lines, array $lineRange, int $errorLine): string
     {
         $highlightedLines = [];
 
@@ -250,12 +228,8 @@ class CLIException
         return implode('', $highlightedLines);
     }
 
-
     /**
      * Prepares the code for rendering by adding a PHP opening tag.
-     *
-     * @param array $code An array of code lines.
-     * @return string The prepared code with a PHP opening tag.
      */
     protected static function prepareCode(array $code): string
     {
@@ -266,9 +240,6 @@ class CLIException
 
     /**
      * Highlights the syntax of the provided code using ANSI colors.
-     *
-     * @param string $code The code to be highlighted.
-     * @return string The highlighted code with ANSI color codes.
      */
     protected static function highlightSyntax(string $code): string
     {
@@ -285,11 +256,6 @@ class CLIException
 
     /**
      * Formats and adds highlighted lines to create the final output.
-     *
-     * @param array $highlightedLines An array of highlighted code lines.
-     * @param int $lineBegin The starting line number.
-     * @param int $errorLine The line number with the error.
-     * @return string The formatted output with line numbers and ANSI colors.
      */
     protected static function addLines(array $highlightedLines, int $lineBegin, int $errorLine): string
     {
@@ -311,10 +277,7 @@ class CLIException
 
     /**
      * Clears unnecessary code elements from the provided code.
-     *
      * Removes PHP opening tags and other unwanted code elements.
-     * @param string $code The code to be cleaned.
-     * @return string The code with unnecessary elements removed.
      */
     protected static function clearCodeOutput(string $code): string
     {
@@ -324,9 +287,6 @@ class CLIException
 
     /**
      * Prints a formatted backtrace for display.
-     *
-     * @param array $backtrace An array containing the backtrace information.
-     * @return void
      */
     protected static function printBacktrace(array $backtrace): void
     {
@@ -341,10 +301,6 @@ class CLIException
 
     /**
      * Prints a formatted backtrace entry for display.
-     *
-     * @param int $i The index of the backtrace entry.
-     * @param array $error An array containing information about the backtrace entry.
-     * @return void
      */
     protected static function printStackTraceEntryInfo(int $i, array $error): void
     {
@@ -359,9 +315,6 @@ class CLIException
 
     /**
      * Formats information about a function or method for display.
-     *
-     * @param array $error An array containing information about the error.
-     * @return string The formatted string representation of the function or method information.
      */
     protected static function formatCallableInfo(array $error): string
     {
@@ -383,7 +336,6 @@ class CLIException
      * Formats a function argument for display.
      *
      * @param mixed $arg The argument to be formatted.
-     * @return string The formatted string representation of the argument.
      */
     protected static function formatArgument($arg): string
     {
@@ -400,9 +352,6 @@ class CLIException
 
     /**
      * Formats an associative array for display.
-     *
-     * @param array $array The associative array to be formatted.
-     * @return string The formatted string representation of the array.
      */
     protected static function formatArray(array $array): string
     {

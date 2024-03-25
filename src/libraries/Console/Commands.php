@@ -1,14 +1,17 @@
 <?php
 
-/**
- * This file is part of Axm 4 framework.
- *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
+declare(strict_types=1);
 
+/**
+ * Axm Framework PHP.
+ * 
+ * Class Commands 
+ * 
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
+ */
 namespace Console;
 
 use Console\CLI;
@@ -28,18 +31,17 @@ class Commands
      * The found commands.
      * @var array
      */
-    public $commands    = [];
+    public $commands = [];
     private $classCache = [];
     private $cachedCommands = [];
     const COMMAND_EXTENSION = 'php';
 
     /**
      * Constructor
-     * @param Logger|null $logger
      */
     public function __construct()
     {
-        return $this->discoverCommands();
+        $this->discoverCommands();
     }
 
     /**
@@ -58,7 +60,7 @@ class Commands
         // The file would have already been loaded during the
         // createCommandList function...
         $className = $this->commands[$command]['class'];
-        $class     = new $className();
+        $class = new $className();
 
         return $class->run($params);
     }
@@ -78,10 +80,12 @@ class Commands
      */
     protected function discoverCommands(): void
     {
-        if ($this->commands !== []) return;
+        if ($this->commands !== [])
+            return;
 
-        $commandsFolder = AXM_PATH;
+        $vendorCommandsFolder = VENDOR_PATH . DIRECTORY_SEPARATOR . 'axm' . DIRECTORY_SEPARATOR;
         $appCommandsFolder = config('paths.commandsPath') . DIRECTORY_SEPARATOR;
+
 
         // Caching
         if ($cachedCommands = $this->loadCachedCommands()) {
@@ -90,7 +94,7 @@ class Commands
         }
 
         // Create an array of directories to scan, including the vendor directory
-        $directoriesToScan = [$commandsFolder, $appCommandsFolder];
+        $directoriesToScan = [$vendorCommandsFolder, $appCommandsFolder];
         foreach ($directoriesToScan as $dir) {
             $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
 
@@ -113,11 +117,11 @@ class Commands
 
                     /** @var BaseCommand $class */
                     $class = new $className();
-                    if (isset($class->group)) {
+                    if (isset ($class->group)) {
                         $this->commands[$class->name] = [
-                            'class'       => $className,
-                            'file'        => $fileInfo->getPathname(),
-                            'group'       => $class->group,
+                            'class' => $className,
+                            'file' => $fileInfo->getPathname(),
+                            'group' => $class->group,
                             'description' => $class->description,
                         ];
                     }
@@ -136,13 +140,12 @@ class Commands
 
     /**
      * loadCachedCommands
-     * @return void
      */
     private function loadCachedCommands()
     {
         // Implement your caching logic to load from an array here
         // For example, if using a class property for caching:
-        if (isset($this->cachedCommands)) {
+        if (isset ($this->cachedCommands)) {
             return $this->cachedCommands;
         }
 
@@ -166,7 +169,7 @@ class Commands
     private function getClassnameFromFile(string $filePath, bool $includeNamespace = true)
     {
         // Check if the result is cached
-        if (isset($this->classCache[$filePath][$includeNamespace])) {
+        if (isset ($this->classCache[$filePath][$includeNamespace])) {
             return $this->classCache[$filePath][$includeNamespace];
         }
 
@@ -207,11 +210,10 @@ class Commands
      */
     public function verifyCommand(string $command, array $commands): bool
     {
-        if (isset($commands[$command])) {
+        if (isset ($commands[$command])) {
             return true;
         }
 
-        $command = $command;
         $message = "Command Not Found: [$command]";
 
         if ($alternatives = $this->getCommandAlternatives($command, $commands)) {

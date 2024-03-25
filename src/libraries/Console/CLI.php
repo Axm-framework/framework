@@ -1,13 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Console;
 
 use Exception;
 use Validation\Validator;
 
 /**
+ * Class CLI
+ *
  * Set of static methods useful for CLI request handling.
- */
+ * 
+ * This class provides specific functionality for the command line interface (CLI) 
+ * of the CodeIgniter framework 
+ * 
+ * Note: This class has been adapted and modified to meet the requirements of the Axm framework.
+ **/
 class CLI
 {
     /**
@@ -37,23 +46,23 @@ class CLI
      * @var array<string, string>
      */
     protected static $foreground_colors = [
-        'black'        => '0;30',
-        'dark_gray'    => '1;30',
-        'blue'         => '0;34',
-        'light_blue'   => '1;34',
-        'green'        => '0;32',
-        'light_green'  => '1;32',
-        'cyan'         => '0;36',
-        'light_cyan'   => '1;36',
-        'red'          => '0;31',
-        'light_red'    => '1;31',
-        'purple'       => '0;35',
+        'black' => '0;30',
+        'dark_gray' => '1;30',
+        'blue' => '0;34',
+        'light_blue' => '1;34',
+        'green' => '0;32',
+        'light_green' => '1;32',
+        'cyan' => '0;36',
+        'light_cyan' => '1;36',
+        'red' => '0;31',
+        'light_red' => '1;31',
+        'purple' => '0;35',
         'light_purple' => '1;35',
-        'yellow'       => '0;33',
+        'yellow' => '0;33',
         'light_yellow' => '1;33',
-        'light_gray'   => '0;37',
-        'white'        => '1;37',
-        'default'      => '1;37',
+        'light_gray' => '0;37',
+        'white' => '1;37',
+        'default' => '1;37',
     ];
 
     /**
@@ -62,13 +71,13 @@ class CLI
      * @var array<string, string>
      */
     protected static $background_colors = [
-        'black'      => '40',
-        'red'        => '41',
-        'green'      => '42',
-        'yellow'     => '43',
-        'blue'       => '44',
-        'magenta'    => '45',
-        'cyan'       => '46',
+        'black' => '40',
+        'red' => '41',
+        'green' => '42',
+        'yellow' => '43',
+        'blue' => '44',
+        'magenta' => '45',
+        'cyan' => '46',
         'light_gray' => '47',
     ];
 
@@ -127,7 +136,7 @@ class CLI
 
             // clear segments & options to keep testing clean
             static::$segments = [];
-            static::$options  = [];
+            static::$options = [];
 
             // Check our stream resource for color support
             static::$isColored = static::hasColorSupport(STDOUT);
@@ -183,7 +192,7 @@ class CLI
     public static function prompt(string $field, $options = null, $validation = null, string $color = 'yellow'): string
     {
         $extraOutput = '';
-        $default     = '';
+        $default = '';
 
         if ($validation && !is_array($validation) && !is_string($validation)) {
             throw new Exception('$rules can only be of type string|array');
@@ -191,25 +200,25 @@ class CLI
 
         if (is_string($options)) {
             $extraOutput = ' [' . static::color($options, 'green') . ']';
-            $default     = $options;
+            $default = $options;
         }
 
         if (is_array($options) && $options) {
-            $opts               = $options;
+            $opts = $options;
             $extraOutputDefault = static::color($opts[0], 'green');
 
             unset($opts[0]);
 
-            if (empty($opts)) {
+            if (empty ($opts)) {
                 $extraOutput = $extraOutputDefault;
             } else {
-                $extraOutput  = '[' . $extraOutputDefault . ', ' . implode(', ', $opts) . ']';
+                $extraOutput = '[' . $extraOutputDefault . ', ' . implode(', ', $opts) . ']';
             }
 
             $default = $options[0];
         }
 
-        static::fwrite(STDOUT,  static::color($field, $color)  . (trim($field) ? ' ' : '') . $extraOutput . ': ');
+        static::fwrite(STDOUT, static::color($field, $color) . (trim($field) ? ' ' : '') . $extraOutput . ': ');
 
         // Read the input from keyboard.
         $input = trim(static::input()) ?: $default;
@@ -252,8 +261,8 @@ class CLI
         $keyMaxLength = max(array_map('mb_strwidth', array_keys($options))) + 2;
 
         foreach ($options as $key => $description) {
-            $name = str_pad('  [' . $key . ']  ', $keyMaxLength + 4, ' ');
-            CLI::write(CLI::color($name, 'green') . CLI::wrap($description, 125, $keyMaxLength + 4));
+            $name = str_pad('  [' . $key . ']  ', (int) ($keyMaxLength + 4), ' ');
+            CLI::write(CLI::color($name, 'green') . CLI::wrap($description, 125, (int) ($keyMaxLength + 4)));
         }
 
         return static::prompt(PHP_EOL . array_shift($text), array_keys($options), $validation);
@@ -269,8 +278,8 @@ class CLI
      */
     protected static function validate(string $field, string $value, $rules): bool
     {
-        $rules     = ['input' => $rules];
-        $data      = ['input' => $value];
+        $rules = ['input' => $rules];
+        $data = ['input' => $value];
         $validator = Validator::make($rules, $data);
 
         if ($validator->fails()) {
@@ -307,7 +316,7 @@ class CLI
         }
 
         if (static::$lastWrite !== 'write') {
-            $text              = PHP_EOL . $text;
+            $text = PHP_EOL . $text;
             static::$lastWrite = 'write';
         }
 
@@ -320,7 +329,7 @@ class CLI
     public static function msg(string $text, string $foreground = 'light_red', ?string $background = null)
     {
         // Check color support for STDERR
-        $stdout            = static::$isColored;
+        $stdout = static::$isColored;
         static::$isColored = static::hasColorSupport(STDERR);
 
         if ($foreground || $background) {
@@ -434,7 +443,7 @@ class CLI
                 $coloredChar = static::color($loadingChars[$i], array_rand($colors)); // Aplicar el color al carácter actual
                 static::fwrite(STDOUT, $coloredChar . ' ');  // Imprimir el carácter coloreado
 
-                usleep($interval * 1000000);     // Esperar el intervalo de tiempo
+                usleep((int) ($interval * 1000000));     // Esperar el intervalo de tiempo
                 static::fwrite(STDOUT, "\r");   // Volver al principio de la línea para sobrescribir el carácter anterior
             }
         }
@@ -474,7 +483,7 @@ class CLI
             $estimatedRemainingTime = $remainingTime / ($progressPercentage == 0 ? 1 : $progressPercentage / 100);
 
             // Imprimir la barra de progreso y el porcentaje de avance
-            printf("\r%.1f%% %s Time Remaining: %.1f sec ",  $progressPercentage, $bar, $estimatedRemainingTime);
+            printf("\r%.1f%% %s Time Remaining: %.1f sec ", $progressPercentage, $bar, $estimatedRemainingTime);
 
             // Incrementar el progreso
             $progress++;
@@ -633,7 +642,7 @@ class CLI
     public static function hasColorSupport($resource): bool
     {
         // Follow https://no-color.org/
-        if (isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
+        if (isset ($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
             return false;
         }
 
@@ -643,7 +652,7 @@ class CLI
 
         if (static::isWindows()) {
             return static::streamSupports('sapi_windows_vt100_support', $resource)
-                || isset($_SERVER['ANSICON'])
+                || isset ($_SERVER['ANSICON'])
                 || getenv('ANSICON') !== false
                 || getenv('ConEmuANSI') === 'ON'
                 || getenv('TERM') === 'xterm';
@@ -687,7 +696,7 @@ class CLI
                 // when executing `mode CON`, so we use `tput` instead
                 if (getenv('TERM') || (($shell = getenv('SHELL')) && preg_match('/(?:bash|zsh)(?:\.exe)?$/', $shell))) {
                     static::$height = (int) exec('tput lines');
-                    static::$width  = (int) exec('tput cols');
+                    static::$width = (int) exec('tput cols');
                 } else {
                     $return = -1;
                     $output = [];
@@ -697,21 +706,21 @@ class CLI
                     // Searching for "Columns:" or "Lines:" will fail on non-English locales
                     if ($return === 0 && $output && preg_match('/:\s*(\d+)\n[^:]+:\s*(\d+)\n/', implode("\n", $output), $matches)) {
                         static::$height = (int) $matches[1];
-                        static::$width  = (int) $matches[2];
+                        static::$width = (int) $matches[2];
                     }
                 }
             } elseif (($size = exec('stty size')) && preg_match('/(\d+)\s+(\d+)/', $size, $matches)) {
                 static::$height = (int) $matches[1];
-                static::$width  = (int) $matches[2];
+                static::$width = (int) $matches[2];
             } else {
                 static::$height = (int) exec('tput lines');
-                static::$width  = (int) exec('tput cols');
+                static::$width = (int) exec('tput cols');
             }
         } catch (\Throwable $e) {
             // Reset the dimensions so that the default values will be returned later.
             // Then let the developer know of the error.
             static::$height = null;
-            static::$width  = null;
+            static::$width = null;
             error_log('error: ' . $e->getMessage());
         }
     }
@@ -734,11 +743,11 @@ class CLI
 
         if ($thisStep !== false) {
             // Don't allow div by zero or negative numbers....
-            $thisStep   = abs($thisStep);
+            $thisStep = abs($thisStep);
             $totalSteps = $totalSteps < 1 ? 1 : $totalSteps;
 
             $percent = (int) (($thisStep / $totalSteps) * 100);
-            $step    = (int) round($percent / 10);
+            $step = (int) round($percent / 10);
 
             // Write the progress bar
             static::fwrite(STDOUT, "[\033[32m" . str_repeat('#', $step) . str_repeat('.', 10 - $step) . "\033[0m]");
@@ -760,7 +769,7 @@ class CLI
      */
     public static function wrap(?string $string = null, int $max = 0, int $padLeft = 0): string
     {
-        if (empty($string)) {
+        if (empty ($string)) {
             return '';
         }
 
@@ -825,11 +834,11 @@ class CLI
                 continue;
             }
 
-            $arg   = ltrim($arg, '-');
+            $arg = ltrim($arg, '-');
             $value = null;
 
-            if (isset($args[$i + 1]) && mb_strpos($args[$i + 1], '-') !== 0) {
-                $value       = $args[$i + 1];
+            if (isset ($args[$i + 1]) && mb_strpos($args[$i + 1], '-') !== 0) {
+                $value = $args[$i + 1];
                 $optionValue = true;
             }
 
@@ -909,7 +918,7 @@ class CLI
      */
     public static function getOptionString(bool $useLongOpts = false, bool $trim = false): string
     {
-        if (empty(static::$options)) {
+        if (empty (static::$options)) {
             return '';
         }
 
@@ -948,7 +957,7 @@ class CLI
         $tableRows = [];
 
         // We need only indexes and not keys
-        if (!empty($thead)) {
+        if (!empty ($thead)) {
             $tableRows[] = array_values($thead);
         }
 
@@ -978,7 +987,7 @@ class CLI
                 // If the current column does not have a value among the larger ones
                 // or the value of this is greater than the existing one
                 // then, now, this assumes the maximum length
-                if (!isset($maxColsLengths[$column]) || $allColsLengths[$row][$column] > $maxColsLengths[$column]) {
+                if (!isset ($maxColsLengths[$column]) || $allColsLengths[$row][$column] > $maxColsLengths[$column]) {
                     $maxColsLengths[$column] = $allColsLengths[$row][$column];
                 }
 
@@ -1021,7 +1030,7 @@ class CLI
             $table .= '| ' . implode(' | ', $tableRows[$row]) . ' |' . PHP_EOL;
 
             // Set the thead and table borders-bottom
-            if (isset($cols) && (($row === 0 && !empty($thead)) || ($row + 1 === $totalRows))) {
+            if (isset ($cols) && (($row === 0 && !empty ($thead)) || ($row + 1 === $totalRows))) {
                 $table .= $cols . PHP_EOL;
             }
         }
@@ -1058,7 +1067,7 @@ class CLI
             return true;
         }
 
-        return !isset($_SERVER['REMOTE_ADDR']) && !isset($_SERVER['REQUEST_METHOD']);
+        return !isset ($_SERVER['REMOTE_ADDR']) && !isset ($_SERVER['REQUEST_METHOD']);
     }
 }
 

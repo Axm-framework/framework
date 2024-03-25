@@ -1,14 +1,17 @@
 <?php
 
-/**
- * This file is part of Axm framework.
- *
- * (c) Raxm Foundation <admin@Raxm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
+declare(strict_types=1);
 
+/**
+ * Axm Framework PHP.
+ *
+ * Class BaseCommand
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
+ */
 namespace Console;
 
 use Console\CLI;
@@ -120,25 +123,25 @@ abstract class BaseCommand
     {
         CLI::write('CLI help Usage: ', 'yellow');
 
-        if (!empty($this->usage)) {
+        if (!empty ($this->usage)) {
             $usage = $this->usage;
         } else {
             $usage = $this->name;
 
-            if (!empty($this->arguments)) {
+            if (!empty ($this->arguments)) {
                 $usage .= ' [arguments]';
             }
         }
 
         CLI::write($this->setPad($usage, 0, 0, 2));
 
-        if (!empty($this->description)) {
+        if (!empty ($this->description)) {
             CLI::newLine();
             CLI::write(self::ARROW_SYMBOL . 'CLI help Description: ', 'yellow');
             CLI::write($this->setPad($this->description, 0, 0, 2));
         }
 
-        if (!empty($this->arguments)) {
+        if (!empty ($this->arguments)) {
             CLI::newLine();
             CLI::write(self::ARROW_SYMBOL . 'CLI help Arguments: ', 'yellow');
 
@@ -149,7 +152,7 @@ abstract class BaseCommand
             }
         }
 
-        if (!empty($this->options)) {
+        if (!empty ($this->options)) {
             CLI::newLine();
             CLI::write(self::ARROW_SYMBOL . 'CLI help Options: ', 'yellow');
 
@@ -201,6 +204,6 @@ abstract class BaseCommand
      */
     public function __isset(string $key): bool
     {
-        return isset($this->{$key});
+        return isset ($this->{$key});
     }
 }

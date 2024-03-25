@@ -1,22 +1,23 @@
 <?php
 
-/**
- * This file is part of Axm framework.
- *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- */
+declare(strict_types=1);
 
 namespace Console;
 
 use Console\CLI;
 
 /**
+ * Axm Framework PHP.
+ *
  * GeneratorTrait contains a collection of methods
  * to build the commands that generates a file.
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
+
 trait GeneratorTrait
 {
     /**
@@ -127,7 +128,7 @@ trait GeneratorTrait
         $path = $this->buildPath($this->className ?? $class);
 
         // Check if path is empty.
-        if (empty($path)) {
+        if (empty ($path)) {
             return;
         }
 
@@ -136,7 +137,7 @@ trait GeneratorTrait
         // Overwriting files unknowingly is a serious annoyance, So we'll check if
         // we are duplicating things, If 'force' option is not supplied, we bail.
         if (!$this->getOption('force') && $isFile) {
-            CLI::error(self::ARROW_SYMBOL . 'File exist: ' . realpath($path) . ' ❌ ', 'light_gray', 'red');
+            CLI::error(self::ARROW_SYMBOL . 'File exist: ' . realpath($path) . ' ❌ ', 'light_gray');
             CLI::newLine();
             return;
         }
@@ -152,7 +153,7 @@ trait GeneratorTrait
         // Build the class based on the details we have, We'll be getting our file
         // contents from the template, and then we'll do the necessary replacements.
         if (!writeFile($path, $this->buildContent($class, $this->replace ?? [], $this->data ?? []))) {
-            CLI::error(self::ARROW_SYMBOL . 'File Error: ' . realpath($path) . ' ❌ ', 'light_gray', 'red');
+            CLI::error(self::ARROW_SYMBOL . 'File Error: ' . realpath($path) . ' ❌ ', 'light_gray');
             CLI::newLine();
             return;
         }
@@ -194,7 +195,7 @@ trait GeneratorTrait
 
         if ($class === null && $this->hasClassName) {
             $nameLang = $this->classNameLang ?: ' Class name ❓';
-            $class    = CLI::prompt($nameLang, null, 'required');
+            $class = CLI::prompt($nameLang, null, 'required');
             CLI::newLine();
         }
 
@@ -234,7 +235,7 @@ trait GeneratorTrait
      */
     protected function renderTemplate(array $data = []): string
     {
-        $templatePath = (is_file($this->template)) ?  $this->template :
+        $templatePath = (is_file($this->template)) ? $this->template :
             config('paths.consoleTemplatePath') . DIRECTORY_SEPARATOR . $this->template;
 
         $output = app()->view->file($templatePath, $data);
@@ -285,7 +286,7 @@ trait GeneratorTrait
      */
     protected function buildContent(string $class, array $replace = [], array $data = []): string
     {
-        $template = $this->prepare($class,  $replace, $data);
+        $template = $this->prepare($class, $replace, $data);
 
         if ($this->sortImports && preg_match('/(?P<imports>(?:^use [^;]+;$\n?)+)/m', $template, $match)) {
             $imports = explode(PHP_EOL, trim($match['imports']));
@@ -307,7 +308,7 @@ trait GeneratorTrait
         // Check if the namespace is actually defined and we are not just typing gibberish.
         $base = [$namespace];
         if (!$base = reset($base)) {
-            CLI::error(self::ARROW_SYMBOL . 'Namespace not defined: ' . $namespace . ' ❌ ', 'light_gray', 'red');
+            CLI::error(self::ARROW_SYMBOL . 'Namespace not defined: ' . $namespace . ' ❌ ', 'light_gray');
             CLI::newLine();
             return '';
         }
