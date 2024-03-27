@@ -59,16 +59,15 @@ class Controller
     public function __construct()
     {
         $app = app();
-        $this->request = $app->request;
+        $this->request  = $app->request;
         $this->response = $app->response;
-        $this->view = $app->view;
+        $this->view     = $app->view;
 
         $this->registerDefaultMiddleware();
     }
 
     /**
      * Execute the registered middlewares.
-     * @return void
      */
     private function registerDefaultMiddleware()
     {
@@ -82,9 +81,6 @@ class Controller
 
     /**
      * Set the layout for the current controller.
-     *
-     * @param string $layout
-     * @return void
      */
     public function setLayout(string $layout): void
     {
@@ -93,7 +89,6 @@ class Controller
 
     /**
      * Get the current layout.
-     * @return string
      */
     public function getLayout(): string
     {
@@ -102,9 +97,6 @@ class Controller
 
     /**
      * Set the path for the current view.
-     *
-     * @param string $path
-     * @return void
      */
     public function setPathView(string $path)
     {
@@ -113,9 +105,6 @@ class Controller
 
     /**
      * Add an action to the controller.
-     *
-     * @param string|null $action
-     * @return void
      */
     public function addAction(?string $action): void
     {
@@ -124,7 +113,6 @@ class Controller
 
     /**
      * Get the current controller action.
-     * @return string
      */
     public function getAction(): string
     {
@@ -133,12 +121,6 @@ class Controller
 
     /**
      * Render the view.
-     *
-     * @param string $view
-     * @param array|null $params
-     * @param bool $buffer
-     * @param string $ext
-     * @return string|null
      */
     public function renderView(string $view, string|array $params = null, bool $withLayout = true, string $ext = '.php'): ?string
     {
@@ -147,7 +129,6 @@ class Controller
 
     /**
      * Get the view object associated with this controller.
-     * @return View|null.
      */
     public function view(): ?View
     {
@@ -156,9 +137,6 @@ class Controller
 
     /**
      * Register a middleware in the controller.
-     *
-     * @param BaseMiddleware $middleware
-     * @return void
      */
     public function registerMiddleware(BaseMiddleware $middleware): void
     {
@@ -175,12 +153,8 @@ class Controller
 
     /**
      * Register and execute the AuthMiddleware for access control to the specified actions.
-     *
-     * @param array $actions Actions requiring authorization.
-     * @param bool $allowedAction Indicates whether access to other actions than those specified is allowed.
-     * @return void
      */
-    public function accessControl(array $actions, bool $allowedAction = false)
+    public function accessControl(array $actions, bool $allowedAction = false): void
     {
         $middleware = new AuthMiddleware($actions, $allowedAction);
         $this->registerMiddleware($middleware);
@@ -204,14 +178,13 @@ class Controller
 
     /**
      * Handle calls to methods that do not exist.
-     *
-     * @param string $name
-     * @param array $arguments
-     * @throws RuntimeException
-     * @return void
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $params)
     {
-        throw new \RuntimeException(sprintf('Method [  %s ] does not exist', $name));
+        if (method_exists($this, $name)) {
+            return $this->$name(...$params);
+        }
+
+        throw new BadMethodCallException(sprintf('Method [%s] does not exist', $name));
     }
 }
