@@ -1,9 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * Class Container
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Framework
+ */
 class Container
 {
-    private $storage = [];
-    private $instances = [];
+    private array $storage = [];
+    private ?Container $instances = [];
 
     public static function getInstance()
     {
@@ -85,12 +95,12 @@ class Container
         return $this->storage;
     }
 
-    public function remove(string $key)
+    public function remove(string $key): void
     {
         unset($this->storage[$this->key($key)]);
     }
 
-    public function clear()
+    public function clear(): void
     {
         $this->storage = [];
     }
@@ -98,27 +108,27 @@ class Container
     /**
      * Array Access
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): bool|object
     {
         return $this->get($offset);
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->remove($offset);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->storage);
     }
@@ -128,22 +138,22 @@ class Container
         return new \ArrayIterator($this->storage);
     }
 
-    public function __get(string $key)
+    public function __get(string $key): bool|object
     {
         return $this->get($key);
     }
 
-    public function __set(string $key, $value)
+    public function __set(string $key, $value): void
     {
         $this->set($key, $value);
     }
 
-    public function __isset(string $key)
+    public function __isset(string $key): bool
     {
         return $this->has($key);
     }
 
-    public function __unset(string $key)
+    public function __unset(string $key): void
     {
         $this->remove($key);
     }

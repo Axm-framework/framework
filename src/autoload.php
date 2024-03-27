@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Framework
+ * 
+----------------------------------------------------------------------
+                        AXM AUTOLOAD                        
+----------------------------------------------------------------------*/
+
 function axm_autoloader(string $class)
 {
     static $classMap;

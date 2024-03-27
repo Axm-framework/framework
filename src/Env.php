@@ -3,20 +3,23 @@
 declare(strict_types=1);
 
 /**
+ * Class Env
+ *
  * Class for handling environment variables
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Axm
  */
 class Env
 {
     /**
      * Stores environment variables
-     * @var array
      */
-    protected static $data = [];
+    protected static array $data = [];
 
     /**
      * Load environment variables from a file
-     * @param string $file Environment variables file path
-     * @return void
      */
     public static function load(string $file): void
     {
@@ -32,18 +35,14 @@ class Env
 
     /**
      * Get the value of an environment variable
-     * 
-     * @param mixed $default Default value if the variable is not defined
-     * @return mixed Value of the environment variable or default value
      */
-    public static function get(string $name = null, $default = null)
+    public static function get(string $name = null, $default = null): mixed
     {
         return self::$data[$name] ?? $default;
     }
 
     /**
      * Set the value of an environment variable
-     * @param mixed $value Value of the environment variable
      */
     public static function set(string $name, $value): void
     {
@@ -59,8 +58,8 @@ class Env
     }
 
     /**
-     * Expand variables in a string value, replacing placeholders with their corresponding values.
-     * @return string The string value with variables replaced.
+     * Expand variables in a string value, 
+     * replacing placeholders with their corresponding values.
      */
     protected static function expandValue(string $value): string
     {

@@ -1,7 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
+
+/**
+ * HandlerErrors
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Axm
+ */
 
 // Error handler
 set_error_handler(static function ($errno, $errstr, $errfile, $errline) {

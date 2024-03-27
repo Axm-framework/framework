@@ -1,26 +1,32 @@
 <?php
 
+declare(strict_types=1);
 
+/**
+ * Class Config
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Axm
+ */
 class Config
 {
     /**
      * Contain all the config
-     * @var array<array-key,mixed>
      */
     protected static $config = [];
 
     /**
-     * default config path 
+     * Default config path 
      */
     private const DEFAULT_DIR = APP_PATH . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR;
 
     /**
      * Get config
-     * 
      * @throws Exception
-     * @return mixed
      */
-    public static function get(string $var)
+    public static function get(string $var): mixed
     {
         $sections = explode('.', $var);
         self::$config[$sections[0]] ??= self::load($sections[0]);
@@ -35,20 +41,17 @@ class Config
 
     /**
      * Get all configs
-     * @return array<array-key,mixed>
      */
-    public static function getAll()
+    public static function getAll(): array
     {
         return self::$config;
     }
 
     /**
      * Set variable in config
-     * 
      * @throws Exception
-     * @return void
      */
-    public static function set(string $var, $value)
+    public static function set(string $var, $value): void
     {
         $sections = explode('.', $var);
         match (count($sections)) {
@@ -61,9 +64,8 @@ class Config
 
     /**
      * Read config file
-     * @return array<array-key,mixed>
      */
-    public function read(string $file, string $path = null, bool $force = false)
+    public function read(string $file, string $path = null, bool $force = false): array
     {
         if ($force) {
             return self::$config[$file] = self::load($file, $path);
@@ -74,7 +76,6 @@ class Config
 
     /**
      * Load config file
-     * @return array<array-key,mixed>
      */
     public static function load(string $name, string $path = null): array
     {

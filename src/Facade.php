@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 abstract class Facade
 {
-    protected static $providers = [];
+    protected static array $providers = [];
 
     /**
      * Set the providers.
-     *
-     * @param array $p key/value array with providers
      */
-    public static function providers(array $p)
+    public static function providers(array $p): void
     {
         self::$providers = $p;
     }
 
-    public static function getProviders()
+    public static function getProviders(): array
     {
         return self::$providers;
     }
@@ -27,20 +27,15 @@ abstract class Facade
         throw new \RuntimeException('Not implemented');
     }
 
-    protected static function getInstance($name)
+    protected static function getInstance(string $name)
     {
         return isset(self::$providers[$name]) ? self::$providers[$name] : null;
     }
 
     /**
      * Handle dynamic, static calls to the object.
-     *
-     * @param string $method
-     * @param array  $args
-     * @return mixed
-     * @throws \RuntimeException
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic(string  $method, array $args): mixed
     {
         $instance = self::getInstance(static::getAlias());
         if (!$instance) {

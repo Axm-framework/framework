@@ -8,7 +8,7 @@ use Model\Model;
  * @author Juan Cristobal <juancristobalgd1@gmail.com>
  * @link http://www.axm.com/
  * @license http://www.axm.com/license/
- * @package Axm
+ * @package Framework
  * 
  * BaseModel provides a convenient place for loading components
  * and performing functions that are needed by all your Models.
