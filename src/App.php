@@ -56,9 +56,8 @@ final class App extends Container
 
     /**
      * Configure error reporting and display settings based on the environment.
-     * @return void
      */
-    private function configureEnvironment()
+    private function configureEnvironment(): void
     {
         static $initialized = false;
         if (!$initialized) {
@@ -86,7 +85,7 @@ final class App extends Container
     public function registerComponents()
     {
         $pathConfig = config('paths.providersPath') . DIRECTORY_SEPARATOR;
-        $providers  = include $pathConfig . 'providers.php';
+        $providers = include $pathConfig . 'providers.php';
         $this->components($providers);
     }
 
@@ -103,7 +102,6 @@ final class App extends Container
 
     /**
      * Check if the application is in production mode.
-     * @return bool True if the application is in production mode, false otherwise.
      */
     public function isProduction(): bool
     {
@@ -123,7 +121,7 @@ final class App extends Container
      */
     public function isLogged(): bool
     {
-        return !empty ($this->user);
+        return !empty($this->user);
     }
 
     /**
@@ -163,7 +161,6 @@ final class App extends Container
 
     /**
      * Log out the user.
-     * @param string $path The optional path to redirect after logout.
      */
     public function logout(string $path = '/'): void
     {
@@ -198,7 +195,7 @@ final class App extends Container
             throw new \Exception('The "Intl" extension is not enabled on this server');
 
         $http = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '');
-        $locale = !empty ($http) ? $http : 'en_US';
+        $locale = !empty($http) ? $http : 'en_US';
 
         return $locale;
     }
@@ -222,12 +219,12 @@ final class App extends Container
     }
 
     /**
-     * Get the CSRF token. If the token is not present in the cookie, generate and set a new one.
-     * @return string The generated or existing CSRF token.
+     * Get the CSRF token. If the token is not present in the cookie,
+     * generate and set a new one.
      */
     public function getCsrfToken(): string
     {
-        return isset ($_COOKIE['csrfToken']) ? $_COOKIE['csrfToken'] : $this->generateAndSetCsrfToken();
+        return isset($_COOKIE['csrfToken']) ? $_COOKIE['csrfToken'] : $this->generateAndSetCsrfToken();
     }
 
     /**
@@ -272,18 +269,16 @@ final class App extends Container
 
     /**
      * Remove a service identified by its alias from the container.
-     * @param string $alias
      */
-    public function removeService(string $alias)
+    public function removeService(string $alias): void
     {
         return $this->remove($alias);
     }
 
     /**
      * Magic method to dynamically retrieve properties.
-     * @return mixed The value of the retrieved property.
      */
-    public function __get(string $name)
+    public function get(string $name): object|false
     {
         if ($name == 'config') {
             return config($name);
