@@ -13,7 +13,7 @@ declare(strict_types=1);
 class Container
 {
     private array $storage = [];
-    private ?Container $instances = [];
+    private $instances = [];
 
     public static function getInstance()
     {

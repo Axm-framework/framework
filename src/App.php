@@ -272,7 +272,7 @@ final class App extends Container
      */
     public function removeService(string $alias): void
     {
-        return $this->remove($alias);
+        $this->remove($alias);
     }
 
     /**
