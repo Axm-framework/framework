@@ -65,7 +65,7 @@ class Container
         return $this->has($key);
     }
 
-    public function get(string $key): object|false
+    public function get(string $key): mixed
     {
         if ($this->has($key)) {
             $class = $this->storage[$key] ?? null;
@@ -138,7 +138,7 @@ class Container
         return new \ArrayIterator($this->storage);
     }
 
-    public function __get(string $key): bool|object
+    public function __get(string $key): mixed
     {
         return $this->get($key);
     }
