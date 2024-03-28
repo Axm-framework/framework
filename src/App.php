@@ -278,7 +278,7 @@ final class App extends Container
     /**
      * Magic method to dynamically retrieve properties.
      */
-    public function get(string $name): mixed
+    public function __get(string $name): mixed
     {
         if ($name == 'config') {
             return config($name);
