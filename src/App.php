@@ -17,12 +17,11 @@ final class App extends Container
     /**
      * Constructor for the Application class.
      */
-    private function __construct()
+    public function __construct()
     {
         $this->loadEnv();
         $this->configureEnvironment();
         $this->registerComponents();
-        // $this->setApp();
         $this->bootServices();
     }
 
@@ -36,14 +35,6 @@ final class App extends Container
         }
 
         return self::$instance;
-    }
-
-    /**
-     * Set instance app
-     */
-    private function setApp()
-    {
-        $this->singleton('app', $this);
     }
 
     /**

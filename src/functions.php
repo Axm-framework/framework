@@ -38,7 +38,8 @@ if (!function_exists('app')) {
      */
     function app(?string $alias = null, $value = null): object
     {
-        $instance = App::getInstance();
+        static $instance;
+        $instance ??= new App;
 
         if (is_null($alias)) {
             return $instance;
