@@ -11,18 +11,14 @@ use Illuminate\Support\Carbon;
 if (!function_exists('config')) {
     /**
      * Get the configuration value for a given key.
-     *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
-    function config(string $key = null, string $value = null)
+    function config(string $key = null, mixed $value = null)
     {
-        if (is_null($key)) {
+        if(null === $key) {
             return new Config;
         }
 
-        if (!is_null($key) && !is_null($value)) {
+        if(null !== $value) {
             Config::set($key, $value);
             return;
         }
