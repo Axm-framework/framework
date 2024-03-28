@@ -14,11 +14,11 @@ if (!function_exists('config')) {
      */
     function config(string $key = null, mixed $value = null)
     {
-        if(null === $key) {
+        if (null === $key) {
             return new Config;
         }
 
-        if(null !== $value) {
+        if (null !== $value) {
             Config::set($key, $value);
             return;
         }
@@ -37,11 +37,11 @@ if (!function_exists('app')) {
         static $instance;
         $instance ??= new App;
 
-        if(null === $alias) {
+        if (null === $alias) {
             return $instance;
         }
 
-        if(null !== $value) {
+        if (null !== $value) {
             return $instance->$alias = $value;
         }
 
@@ -70,8 +70,6 @@ if (!function_exists('extend')) {
 
     /**
      * Extend the current View template with a layout.
-     *
-     * @param string $layout The name of the layout template to extend with.
      * @return void
      */
     function extend(string $layout)
@@ -80,41 +78,12 @@ if (!function_exists('extend')) {
     }
 }
 
-if (!function_exists('memoize')) {
-
-    /**
-     * Memoize the result of a callable function.
-     *
-     * @param callable $fn The callable function to memoize.
-     * @return callable A memoized version of the original callable function.
-     */
-    function memoize(callable $fn): callable
-    {
-        $cache = [];
-
-        // Return a new callable function that handles memoization.
-        return function (...$args) use ($fn, &$cache) {
-            // Generate a unique key based on the serialized arguments.
-            $key = sha1(serialize($args));
-
-            // Check if the result is already cached; if not, compute and cache it.
-            return $cache[$key] ?? ($cache[$key] = $fn(...$args));
-        };
-    }
-}
-
 if (!function_exists('view')) {
 
     /**
      * Render and display a View template.
-     *
-     * @param string $view    The name of the View template to render.
-     * @param mixed  $params  Optional data to pass to the View template (default is null).
-     * @param bool   $buffer  If true, the output is buffered; if false, it's immediately displayed (default is true).
-     * @param string $ext     The file extension of the View template (default is '.php').
-     * @return void
      */
-    function view(string $view, string|array $params = null, bool $show = false, bool $withLayout = false, string $ext = '.php')
+    function view(string $view, string|array $params = null, bool $show = false, bool $withLayout = false, string $ext = '.php'): ?string
     {
         return app('view', new View)
             ->render($view, $ext)
@@ -128,13 +97,10 @@ if (!function_exists('section')) {
 
     /**
      * Begin a new named section in a View template.
-     *
-     * @param string $name The name of the section being started.
-     * @return void
      */
-    function section(string $name)
+    function section(string $name): void
     {
-        return Views\View::section($name);
+        Views\View::section($name);
     }
 }
 
@@ -142,11 +108,10 @@ if (!function_exists('endSection')) {
 
     /**
      * End the current section in a View.
-     * @return void
      */
-    function endSection()
+    function endSection(): void
     {
-        return Views\View::endSection();
+        Views\View::endSection();
     }
 }
 
@@ -166,11 +131,8 @@ if (!function_exists('cleanInput')) {
 
     /**
      * Sanitizes and cleans input data to prevent XSS attacks.
-     *
-     * @param mixed $data The data to be cleaned.
-     * @return mixed The cleaned data.
      */
-    function cleanInput($data)
+    function cleanInput(mixed $data): mixed
     {
         return match (true) {
             is_array($data) => array_map('cleanInput', $data),
@@ -193,11 +155,8 @@ if (!function_exists('is_email')) {
 
     /**
      * Check if a string is a valid email address.
-     *
-     * @param string $email The email address to be checked.
-     * @return bool True if it's a valid email address, false otherwise.
      */
-    function is_email($email): bool
+    function is_email(string $email): bool
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
@@ -207,11 +166,8 @@ if (!function_exists('is_url')) {
 
     /**
      * Check if a string is a valid URL.
-     *
-     * @param string $url The URL to be checked.
-     * @return bool True if it's a valid URL, false otherwise.
      */
-    function is_url($url): bool
+    function is_url(string $url): bool
     {
         return filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
@@ -221,11 +177,8 @@ if (!function_exists('is_ip')) {
 
     /**
      * Check if a string is a valid IP address.
-     *
-     * @param string $ip The IP address to be checked.
-     * @return bool True if it's a valid IP address, false otherwise.
      */
-    function is_ip($ip): bool
+    function is_ip(string $ip): bool
     {
         return filter_var($ip, FILTER_VALIDATE_IP) !== false;
     }
@@ -235,12 +188,8 @@ if (!function_exists('show')) {
 
     /**
      * Display or return data.
-     *
-     * @param mixed  $data   The data to be displayed or returned (default is null).
-     * @param bool   $return If true, the data is returned as a string; if false, it's echoed (default is false).
-     * @return mixed If $return is true, the data is returned as a string; otherwise, it's echoed.
      */
-    function show($data = null, bool $return = false): string
+    function show(mixed $data = null, bool $return = false): string
     {
         $output = $data ?? '';
         if ($return)
@@ -256,11 +205,8 @@ if (!function_exists('cVar')) {
     /**
      * Copies the value of an original variable, removes the original variable, 
      * and returns the copied value.
-     *
-     * @param mixed $var The variable whose value you want to copy and remove.
-     * @return mixed The copied value of the original variable.
      */
-    function cVar($var)
+    function cVar(mixed $var): mixed
     {
         $result = $var;
 
@@ -273,11 +219,8 @@ if (!function_exists('randomId')) {
 
     /**
      * Checks if the 'randomId' function exists and defines it if not.
-     *
-     * @param int $size The size of the random identifier (default is 50).
-     * @return int A randomly generated identifier based on CRC32 hashing.
      */
-    function randomId($size = 50)
+    function randomId(int $size = 50): int
     {
         $randomBytesHex = bin2hex(random_bytes($size));
         return crc32($randomBytesHex);
@@ -288,11 +231,8 @@ if (!function_exists('lang')) {
 
     /**
      * Checks if the 'lang' function exists and defines it if not.
-     *
-     * @param string $key The key representing the message to be translated.
-     * @return string The translated message, with optional placeholders replaced.
      */
-    function lang(string $key, array $args = [])
+    function lang(string $key, array $args = []): string
     {
         // Get an instance of Lang
         $lang = Lang::make();
@@ -307,16 +247,11 @@ if (!function_exists('lang')) {
 if (!function_exists('setFlash')) {
 
     /**
-     * Checks if the 'setFlash' function exists and defines it if not.
-     *
      * This function is used to set flash messages in an application.
-     * @param string $type    The type of flash message (e.g., 'success', 'error', 'info', etc.).
-     * @param string $message The message to be displayed as a flash message.
-     * @return void
      */
-    function setFlash(string $type, string $message)
+    function setFlash(string $type, string $message): void
     {
-        return app()
+        app()
             ->session
             ->setFlash($type, $message);
     }
@@ -330,12 +265,10 @@ if (!function_exists('generateUrl')) {
     function generateUrl(string $dir = ''): string
     {
         $url = baseUrl($dir);
-        // If the URL is not valid, throw an exception
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new RuntimeException(sprintf('Invalid URL: %s', $url));
         }
 
-        // Return the generated URL
         return $url;
     }
 }
@@ -355,10 +288,6 @@ if (!function_exists('asset')) {
 
     /**
      * Generate the URL for an asset.
-     *
-     * @param string $path The relative path to the asset.
-     * @param string|null $basePath The base URL of the application (optional). If not provided, it uses '/resources/assets/' as the default.
-     * @return string The full URL to the asset.
      */
     function asset(string $path, ?string $basePath = null): string
     {
@@ -450,9 +379,8 @@ if (!function_exists('isLogged')) {
 
     /**
      * Check if a user is logged in.
-     * @return bool True if a user is logged in; false otherwise.
      */
-    function isLogged()
+    function isLogged(): bool
     {
         return app()->isLogged();
     }
@@ -464,7 +392,7 @@ if (!function_exists('old')) {
      *  Used to show again if the data sent in 
      *  html elements (input, select, textarea, etc) sent by the POST method exist. 
      * e.g.: old('name); **/
-    function old(string $value)
+    function old(string $value): string
     {
         $input = app()->request->post();
         return (isset($input[$value]) && !empty($input[$value])) ? $input[$value] : '';
@@ -486,9 +414,6 @@ if (!function_exists('getInfoUser')) {
 
     /**
      * Returns any user specific info, the name of the class from the ConfigApp 
-     * 
-     * @param string $user
-     * @param string $value
      */
     function getInfoUser(string $user, string $value)
     {
@@ -521,37 +446,13 @@ if (!function_exists('now')) {
     }
 }
 
-if (!function_exists('once')) {
-
-    /**
-     * Call a function only once.
-     *
-     * @param callable $fn The function to be executed.
-     * @return callable A closure that wraps the provided function and ensures it is executed only once.
-     */
-    function once($fn)
-    {
-        $hasRun = false;
-        return function (...$params) use ($fn, &$hasRun) {
-            if ($hasRun)
-                return;
-
-            $hasRun = true;
-
-            return $fn(...$params);
-        };
-    }
-}
-
 if (!function_exists('str')) {
 
     /**
      * Create a new string helper instance or operate on a string.
-     *
-     * @param string|null $string (Optional) The input string to operate on.
      * @return Stringable|object Returns a Stringable instance if a string argument is provided.
      */
-    function str($string = null)
+    function str(?string $string = null)
     {
         if (is_null($string)) {
             // Return a new class instance for chaining string methods
@@ -576,7 +477,6 @@ if (!function_exists('__')) {
      * This function is used to create a Fluent instance, allowing for method chaining
      * on the provided object. It enhances the readability and expressiveness of code by enabling
      * a sequence of method calls on the object.
-     * @param object $obj The object on which method chaining is desired.
      * @return Axm\Fluent\Fluent An instance of the Fluent class for method chaining.
      */
     function __($obj)
@@ -589,11 +489,8 @@ if (!function_exists('to_object')) {
 
     /**
      * Converts the element into an object
-     *
-     * @param [type] $array
-     * @return void
      */
-    function to_object($array)
+    function to_object(array &$array): stdClass
     {
         return json_decode(json_encode($array));
     }
@@ -603,13 +500,8 @@ if (!function_exists('helpers')) {
 
     /**
      * Load one or multiple helpers.
-     *
-     * @param string|array $helpers Names of the helpers to load, separated by spaces, commas, dots or an array.
-     * @param string|null $customPath The path to custom helper files. If not provided, custom helpers are not loaded.
-     * @return bool True if all helpers were loaded successfully, false otherwise.
-     * @throws Exception If a specified helper file does not exist in the given paths.
      */
-    function helpers($helpers, string $customPath = null, string $separator = '_')
+    function helpers(string|array $helpers, ?string $customPath = null, string $separator = '_'): bool
     {
         // Convert $helpers to an array if it's a string and split by spaces, commas, or dots
         if (is_string($helpers)) {
@@ -667,11 +559,9 @@ if (!function_exists('getRouteParams')) {
 
     /**
      * Get the route parameters from the current request.
-     *
      * This function retrieves the route parameters from the current HTTP request. 
-     * @return array An associative array containing the route parameters.
      */
-    function getRouteParams()
+    function getRouteParams(): array
     {
         return app()
             ->request
@@ -683,9 +573,8 @@ if (!function_exists('getUri')) {
 
     /**
      * Get the URI (Uniform Resource Identifier) of the current request.
-     * @return string The URI of the current request as a string.
      */
-    function getUri()
+    function getUri(): string
     {
         return app()
             ->request
@@ -699,10 +588,8 @@ if (!function_exists('class_basename')) {
      * Class Basename
      *
      * Returns the base name of a class, effectively stripping the namespace.
-     * @param  mixed $class Either an object or a string with the class name.
-     * @return string
      */
-    function class_basename($class)
+    function class_basename($class): string
     {
         return is_object($class)
             ? basename(str_replace('\\', '/', get_class($class)))
@@ -714,11 +601,8 @@ if (!function_exists('camelCase')) {
 
     /**
      * Converts a string in "date_format" style to camelCase format.
-     *
-     * @param string $str The input string in "date_format" style.
-     * @return string The input string converted to camelCase format.
      */
-    function camelCase($str)
+    function camelCase(string $str): string
     {
         $words = explode('_', $str);
 
@@ -736,9 +620,6 @@ if (!function_exists('camelCase')) {
 if (!function_exists('esc')) {
     /**
      * Escapes and formats a text string for safe display in HTML.
-     *
-     * @param string $text The input text to be escaped and formatted.
-     * @return string The escaped and formatted text.
      */
     function esc(string $text): string
     {
