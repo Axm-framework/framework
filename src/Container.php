@@ -24,7 +24,7 @@ class Container
         return static::$instances;
     }
 
-    public function bind(string $key, $value)
+    public function bind(string $key, mixed $value): mixed
     {
         $this->storage[$key] = $value;
         return $value;
@@ -68,19 +68,19 @@ class Container
     public function get(string $key): mixed
     {
         if ($this->has($key)) {
-            $class = $this->storage[$key] ?? null;
-
+            $class = $this->storage[$key];
             $instance = is_object($class)
                 ? $class
-                : $this->storage[$key] = new $class();
+                : new $class();
 
+            $this->storage[$key] = $instance;
             return $instance;
         }
 
         return false;
     }
 
-    public function set(string $key, $value): void
+    public function set(string $key, mixed $value): void
     {
         $this->storage[$this->key($key)] = $value;
     }
@@ -108,22 +108,22 @@ class Container
     /**
      * Array Access
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(string $offset): bool
     {
         return $this->has($offset);
     }
 
-    public function offsetGet($offset): bool|object
+    public function offsetGet(string $offset): bool|object
     {
         return $this->get($offset);
     }
 
-    public function offsetSet($offset, $value): void
+    public function offsetSet(string $offset, mixed $value): void
     {
         $this->set($offset, $value);
     }
 
-    public function offsetUnset($offset): void
+    public function offsetUnset(string $offset): void
     {
         $this->remove($offset);
     }
@@ -143,7 +143,7 @@ class Container
         return $this->get($key);
     }
 
-    public function __set(string $key, $value): void
+    public function __set(string $key, mixed $value): void
     {
         $this->set($key, $value);
     }
