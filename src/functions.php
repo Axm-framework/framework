@@ -41,11 +41,11 @@ if (!function_exists('app')) {
         static $instance;
         $instance ??= new App;
 
-        if (is_null($alias)) {
+        if(null === $alias) {
             return $instance;
         }
 
-        if (!is_null($value)) {
+        if(null !== $value) {
             return $instance->$alias = $value;
         }
 
