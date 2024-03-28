@@ -61,8 +61,8 @@ final class App extends Container
     {
         static $initialized = false;
         if (!$initialized) {
+           
             $environment = env('APP_ENVIRONMENT', 'production');
-
             if ($environment === 'debug') {
                 ini_set('display_errors', 1);
                 error_reporting(E_ALL);
