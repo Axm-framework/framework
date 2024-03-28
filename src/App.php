@@ -17,7 +17,7 @@ final class App extends Container
     /**
      * Constructor for the Application class.
      */
-    public function __construct()
+    private function __construct()
     {
         $this->loadEnv();
         $this->configureEnvironment();

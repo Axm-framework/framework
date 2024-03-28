@@ -38,22 +38,17 @@ if (!function_exists('app')) {
      */
     function app(?string $alias = null, $value = null): object
     {
-        static $instance;
-        $instance ??= new App;
+        $instance = App::getInstance();
 
-        if ($alias === null) {
+        if (is_null($alias)) {
             return $instance;
         }
 
-        if ($alias !== null && $value === null) {
-            return $instance->$alias;
-        }
-
-        if ($alias !== null && $value !== null) {
+        if (!is_null($value)) {
             return $instance->$alias = $value;
         }
 
-        return $instance;
+        return $instance->$alias;
     }
 }
 
@@ -67,7 +62,8 @@ if (!function_exists('is_cli')) {
 
     function is_cli(): bool
     {
-        if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) return true;
+        if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true))
+            return true;
 
         return !isset($_SERVER['REMOTE_ADDR']) && !isset($_SERVER['REQUEST_METHOD']);
     }
@@ -159,7 +155,7 @@ if (!function_exists('endSection')) {
 
 if (!function_exists('partials')) {
 
-    function partials(string $partial_name,  array $data = [])
+    function partials(string $partial_name, array $data = [])
     {
         $partialsPath = config('paths.partialsPath'); // Make sure we have our paths set up!
 
@@ -180,16 +176,16 @@ if (!function_exists('cleanInput')) {
     function cleanInput($data)
     {
         return match (true) {
-            is_array($data)  => array_map('cleanInput', $data),
+            is_array($data) => array_map('cleanInput', $data),
             is_object($data) => cleanInput((array) $data),
-            is_email($data)  => filter_var($data, FILTER_SANITIZE_EMAIL),
-            is_url($data)    => filter_var($data, FILTER_SANITIZE_URL),
-            is_ip($data)     => filter_var($data, FILTER_VALIDATE_IP),
+            is_email($data) => filter_var($data, FILTER_SANITIZE_EMAIL),
+            is_url($data) => filter_var($data, FILTER_SANITIZE_URL),
+            is_ip($data) => filter_var($data, FILTER_VALIDATE_IP),
             is_string($data) => preg_replace('/[\x00-\x1F\x7F]/u', '', filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES)),
-            is_int($data)    => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
-            is_float($data)  => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-            is_bool($data)   => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-            is_null($data)   => settype($data, 'NULL'),
+            is_int($data) => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
+            is_float($data) => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+            is_bool($data) => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            is_null($data) => settype($data, 'NULL'),
 
             default => filter_var($data, FILTER_SANITIZE_SPECIAL_CHARS),
         };
@@ -250,7 +246,8 @@ if (!function_exists('show')) {
     function show($data = null, bool $return = false): string
     {
         $output = $data ?? '';
-        if ($return) return $output;
+        if ($return)
+            return $output;
 
         echo $output . PHP_EOL;
         return '';
@@ -368,7 +365,7 @@ if (!function_exists('asset')) {
      */
     function asset(string $path, ?string $basePath = null): string
     {
-        $basePath  = $basePath ?? 'app/resources/assets/';
+        $basePath = $basePath ?? 'app/resources/assets/';
         $base = rtrim($basePath, '/') . '/' . ltrim($path, '/');
 
         return baseUrl($base);
@@ -441,7 +438,8 @@ if (!function_exists('post')) {
      **/
     function post($key = null)
     {
-        if (!($post = app()->request->post())) return false;
+        if (!($post = app()->request->post()))
+            return false;
 
         if ($key !== null) {
             return htmlspecialchars($post[$key], ENT_QUOTES, 'UTF-8');
@@ -538,7 +536,8 @@ if (!function_exists('once')) {
     {
         $hasRun = false;
         return function (...$params) use ($fn, &$hasRun) {
-            if ($hasRun) return;
+            if ($hasRun)
+                return;
 
             $hasRun = true;
 
@@ -559,8 +558,7 @@ if (!function_exists('str')) {
     {
         if (is_null($string)) {
             // Return a new class instance for chaining string methods
-            return new class
-            {
+            return new class {
                 public function __call($method, $params)
                 {
                     // Delegate method calls to the Str class
@@ -641,7 +639,7 @@ if (!function_exists('helpers')) {
             if ($customPath) {
                 $customHelperFile = $customPath . DIRECTORY_SEPARATOR . $helper;
                 if (is_file($customHelperFile)) {
-                    require_once($customHelperFile);
+                    require_once ($customHelperFile);
                     continue;
                 }
             }
@@ -649,14 +647,14 @@ if (!function_exists('helpers')) {
             // Try to load the helper from the default application path
             $appHelperFile = $appPath . DIRECTORY_SEPARATOR . $helper;
             if (is_file($appHelperFile)) {
-                require_once($appHelperFile);
+                require_once ($appHelperFile);
                 continue;
             }
 
             // Try to load the helper from the Axm system path
             $axmHelperFile = $axmHelpersPath . DIRECTORY_SEPARATOR . $helper;
             if (is_file($axmHelperFile)) {
-                require_once($axmHelperFile);
+                require_once ($axmHelperFile);
                 continue;
             }
 
