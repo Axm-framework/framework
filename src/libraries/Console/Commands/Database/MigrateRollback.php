@@ -104,6 +104,8 @@ class MigrateRollback extends BaseCommand
             $this->messageSuccess();
             return 0;
         }
+
+        return 1;
     }
 
     /**
