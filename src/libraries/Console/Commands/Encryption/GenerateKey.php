@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Encryption;
@@ -22,38 +22,28 @@ class GenerateKey extends BaseCommand
 {
     /**
      * The Command's group.
-     *
-     * @var string
      */
-    protected $group = 'Encryption';
+    protected string $group = 'Encryption';
 
     /**
      * The Command's name.
-     *
-     * @var string
      */
-    protected $name = 'key:generate';
+    protected string $name = 'key:generate';
 
     /**
      * The Command's usage.
-     *
-     * @var string
      */
-    protected $usage = 'key:generate [options]';
+    protected string $usage = 'key:generate [options]';
 
     /**
      * The Command's short description.
-     *
-     * @var string
      */
-    protected $description = 'Generates a new encryption key and writes it in an `.env` file.';
+    protected string $description = 'Generates a new encryption key and writes it in an `.env` file.';
 
     /**
      * The command's options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '--force'  => 'Force overwrite existing key in `.env` file.',
         '--length' => 'The length of the random string that should be returned in bytes. Defaults to 32.',
         '--prefix' => 'Prefix to prepend to encoded key (either hex2bin or base64). Defaults to hex2bin.',
@@ -117,7 +107,6 @@ class GenerateKey extends BaseCommand
     protected function setNewEncryptionKey(string $key, array $params): bool
     {
         $currentKey = env('APP_KEY', '');
-
         if ($currentKey !== '' && !$this->confirmOverwrite($params)) {
             return false;
         }
@@ -169,7 +158,6 @@ class GenerateKey extends BaseCommand
     protected function keyPattern(string $oldKey): string
     {
         $escaped = preg_quote($oldKey, '/');
-
         if ($escaped !== '') {
             $escaped = "[{$escaped}]*";
         }

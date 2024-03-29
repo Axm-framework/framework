@@ -1,20 +1,20 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
- namespace Console\Commands\Generators;
+namespace Console\Commands\Generators;
 
- use Console\BaseCommand;
- use Console\CLI;
- use Console\GeneratorTrait;
- 
+use Console\BaseCommand;
+use Console\CLI;
+use Console\GeneratorTrait;
+
 /**
  * Generates a complete set of scaffold files.
  */
@@ -24,47 +24,35 @@ class ScaffoldGenerator extends BaseCommand
 
     /**
      * The Command's Group
-     *
-     * @var string
      */
-    protected $group = 'Generators';
+    protected string $group = 'Generators';
 
     /**
      * The Command's Name
-     *
-     * @var string
      */
-    protected $name = 'make:scaffold';
+    protected string $name = 'make:scaffold';
 
     /**
      * The Command's Description
-     *
-     * @var string
      */
-    protected $description = 'Generates a complete set of scaffold files.';
+    protected string $description = 'Generates a complete set of scaffold files.';
 
     /**
      * The Command's Usage
-     *
-     * @var string
      */
-    protected $usage = 'make:scaffold <name> [options]';
+    protected string $usage = 'make:scaffold <name> [options]';
 
     /**
      * The Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'The class name',
     ];
 
     /**
      * The Command's Options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '--bare'      => 'Add the "--bare" option to controller component.',
         '--restful'   => 'Add the "--restful" option to controller component.',
         '--table'     => 'Add the "--table" option to the model component.',
@@ -105,9 +93,9 @@ class ScaffoldGenerator extends BaseCommand
         }
 
         $modelOpts = [
-            'table'   => $this->getOption('table'),
+            'table' => $this->getOption('table'),
             'dbgroup' => $this->getOption('dbgroup'),
-            'return'  => $this->getOption('return'),
+            'return' => $this->getOption('return'),
         ];
 
         $class = $params[0] ?? CLI::getSegment(2);

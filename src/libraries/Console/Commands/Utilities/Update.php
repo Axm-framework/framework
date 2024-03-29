@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -17,12 +17,12 @@ use Exception;
 
 class Update extends BaseCommand
 {
-    protected $group = 'Utilities';
-    protected $name = 'update';
-    protected $description = 'Updates all application dependencies to their latest version.';
-    protected $usage = 'update';
-    protected $arguments = [];
-    protected $options = [];
+    protected string $group = 'Utilities';
+    protected string $name = 'update';
+    protected string $description = 'Updates all application dependencies to their latest version.';
+    protected string $usage = 'update';
+    protected array $arguments = [];
+    protected array $options = [];
     private const COMPOSER_JSON_PATH = 'composer.json';
     private const SEARCH_STRING = 'axm/app';
 

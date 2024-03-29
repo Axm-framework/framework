@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Generators;
@@ -23,58 +23,49 @@ class ModelGenerator extends BaseCommand
 
     /**
      * The Command's Group
-     * @var string
      */
-    protected $group = 'Generators';
+    protected string $group = 'Generators';
 
     /**
      * The Command's Name
-     * @var string
      */
-    protected $name = 'make:model';
+    protected string $name = 'make:model';
 
     /**
      * The Command's Description
-     * @var string
      */
-    protected $description = 'Generates a new model file.';
+    protected string $description = 'Generates a new model file.';
 
     /**
      * The Command's Usage
-     * @var string
      */
-    protected $usage = 'make:model <name> [options]';
+    protected string $usage = 'make:model <name> [options]';
 
     /**
      * The Command's Arguments
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'The model class name.',
     ];
 
     /**
      * The Command's Options
-     * @var array
      */
-    protected $options = [
-        '--table'     => 'Supply a table name. Default: "the lowercased plural of the class name".',
+    protected array $options = [
+        '--table' => 'Supply a table name. Default: "the lowercased plural of the class name".',
         '--namespace' => 'Set root namespace. Default: "APP_NAMESPACE".',
-        '--suffix'    => 'Append the component title to the class name (e.g. User => UserModel).',
-        '--force'     => 'Force overwrite existing file.',
+        '--suffix' => 'Append the component title to the class name (e.g. User => UserModel).',
+        '--force' => 'Force overwrite existing file.',
     ];
 
     /**
      * Actually execute a command.
-     *
-     * @param array $params
-     * @return void
      */
     public function run(array $params)
     {
         $this->component = 'Model';
         $this->directory = 'Models';
-        $this->template  = 'model.tpl.php';
+        $this->template = 'model.tpl.php';
 
         $this->classNameLang = 'Class name model';
         $this->execute($params);
@@ -82,13 +73,10 @@ class ModelGenerator extends BaseCommand
 
     /**
      * Prepare options and do the necessary replacements.
-     * 
-     * @param string $class
-     * @return string
      */
     protected function prepare(string $class): string
     {
-        $table   = $this->getOption('table');
+        $table = $this->getOption('table');
         $baseClass = class_basename($class);
         if (preg_match('/^(\S+)Model$/i', $baseClass, $match) === 1) {
             $baseClass = $match[1];

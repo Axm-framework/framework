@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm 4 framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands;
@@ -24,47 +24,35 @@ class Help extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'help';
+    protected string $name = 'help';
 
     /**
      * the Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Displays basic usage information.';
+    protected string $description = 'Displays basic usage information.';
 
     /**
      * the Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'help command_name';
+    protected string $usage = 'help command_name';
 
     /**
      * the Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         'command_name' => 'The command name [default: "help"]',
     ];
 
     /**
      * the Command's Options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Displays the help for spark commands.
@@ -75,7 +63,7 @@ class Help extends BaseCommand
 
         array_shift($params);
 
-        $command  = $params[0] ?? 'help';
+        $command = $params[0] ?? 'help';
         $commands = $this->commands->getCommands();
 
         if (!$this->commands->verifyCommand($command, $commands)) {

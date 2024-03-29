@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -19,51 +19,38 @@ class Test extends BaseCommand
 {
     /**
      * The Command's Group
-     *
-     * @var string
      */
-    protected $group = 'Utilities';
+    protected string $group = 'Utilities';
 
     /**
      * The Command's Name
-     *
-     * @var string
      */
-    protected $name = 'test';
+    protected string $name = 'test';
 
     /**
      * The Command's Description
-     *
-     * @var string
      */
-    protected $description = 'This command executes the unit tests';
+    protected string $description = 'This command executes the unit tests';
 
     /**
      * The Command's Usage
-     *
-     * @var string
      */
-    protected $usage = 'test';
+    protected string $usage = 'test';
 
     /**
      * The Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * The Command's Options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Allowed test 
-     * @var array<int, string>
      */
-    private static $testTypes = [
+    private static array $testTypes = [
         'phpunit',
         'pestphp',
     ];
@@ -82,7 +69,7 @@ class Test extends BaseCommand
             $testEngine = strtolower(array_shift($params));
 
             if (!in_array($testEngine, self::$testTypes)) {
-                CLI::error(self::ARROW_SYMBOL .'Invalid test engine. Please use "phpunit" or "pestphp".', 'light_gray', 'red');
+                CLI::error(self::ARROW_SYMBOL . 'Invalid test engine. Please use "phpunit" or "pestphp".', 'light_gray', 'red');
                 CLI::newLine();
                 return;
             }

@@ -14,50 +14,36 @@ class {class} extends BaseCommand
 <?php endif ?>
     /**
      * The Command's Group
-     *
-     * @var string
      */
-    protected $group = '{group}';
+    protected string $group = '{group}';
 
     /**
      * The Command's Name
-     *
-     * @var string
      */
-    protected $name = '{command}';
+    protected string $name = '{command}';
 
     /**
      * The Command's Description
-     *
-     * @var string
      */
-    protected $description = '';
+    protected string $description = '';
 
     /**
      * The Command's Usage
-     *
-     * @var string
      */
-    protected $usage = '{command} [arguments] [options]';
+    protected string $usage = '{command} [arguments] [options]';
 
     /**
      * The Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * The Command's Options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Actually execute a command.
-     *
-     * @param array $params
      */
     public function run(array $params)
     {

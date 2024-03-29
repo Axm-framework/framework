@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -24,51 +24,40 @@ class CreateDatabase extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     * @var string
      */
-    protected $name = 'db:create';
+    protected string $name = 'db:create';
 
     /**
      * The Command's short description
-     * @var string
      */
-    protected $description = 'Create new database.';
+    protected string $description = 'Create new database.';
 
     /**
      * The Command's usage
-     * @var string
      */
-    protected $usage = 'db:create <db_name> [options]';
+    protected string $usage = 'db:create <db_name> [options]';
 
     /**
      * The Command's arguments
-     * @var array<string, string>
      */
-    protected $arguments = [
+    protected array $arguments = [
         'db_name' => 'The database name to use',
     ];
 
     /**
      * The Command's options
-     * @var array<string, string>
      */
-    protected $options = [];
+    protected array $options = [];
 
-    /**
-     * @var string
-     */
-    protected $driver = null;
+    protected ?string $driver = null;
 
     /**
      * Creates a new database.
-     * @param array $params
      */
     public function run(array $params)
     {
@@ -86,9 +75,6 @@ class CreateDatabase extends BaseCommand
 
     /**
      * Create a new database with the given name.
-     *
-     * @param string $name The name of the database to create.
-     * @throws Exception If there is an error creating the database.
      */
     protected function createDatabase(string $name)
     {
@@ -103,7 +89,6 @@ class CreateDatabase extends BaseCommand
 
     /**
      * Get the database connection information from the environment.
-     * @return array The database connection information.
      */
     public function getData(): array
     {

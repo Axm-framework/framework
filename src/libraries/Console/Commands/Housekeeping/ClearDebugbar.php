@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Housekeeping;
@@ -22,31 +22,23 @@ class ClearDebugbar extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Housekeeping';
+    protected string $group = 'Housekeeping';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'clear:debugbar';
+    protected string $name = 'clear:debugbar';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'clear:debugbar';
+    protected string $usage = 'clear:debugbar';
 
     /**
      * The Command's short description.
-     *
-     * @var string
      */
-    protected $description = 'Clears all debugbar JSON files.';
+    protected string $description = 'Clears all debugbar JSON files.';
 
     /**
      * Actually runs the command.
@@ -54,8 +46,10 @@ class ClearDebugbar extends BaseCommand
     public function run(array $params)
     {
         helpers('filesystem');
-        if (!deleteFiles(STORAGE_PATH . DIRECTORY_SEPARATOR . 'framework'
-            . DIRECTORY_SEPARATOR . 'debugbar')) {
+        if (
+            !deleteFiles(STORAGE_PATH . DIRECTORY_SEPARATOR . 'framework'
+                . DIRECTORY_SEPARATOR . 'debugbar')
+        ) {
 
             CLI::error(self::ARROW_SYMBOL . 'Error deleting the debugbar JSON files.');
             CLI::newLine();

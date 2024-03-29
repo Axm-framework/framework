@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Generators;
@@ -24,47 +24,35 @@ class MigrationGenerator extends BaseCommand
 
     /**
      * The Command's Group
-     *
-     * @var string
      */
-    protected $group = 'Generators';
+    protected string $group = 'Generators';
 
     /**
      * The Command's Name
-     *
-     * @var string
      */
-    protected $name = 'make:migration';
+    protected string $name = 'make:migration';
 
     /**
      * The Command's Description
-     *
-     * @var string
      */
-    protected $description = 'Generates a new migration file.';
+    protected string $description = 'Generates a new migration file.';
 
     /**
      * The Command's Usage
-     *
-     * @var string
      */
-    protected $usage = 'make:migration <name> [options]';
+    protected string $usage = 'make:migration <name> [options]';
 
     /**
      * The Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'The migration class name.',
     ];
 
     /**
      * The Command's Options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '--table'     => 'Table name to use for database sessions.',
         '--namespace' => 'Set root namespace. Default: "APP_NAMESPACE".',
         '--suffix'    => 'Append the component title to the class name (e.g. User => UserMigration).',
@@ -110,10 +98,8 @@ class MigrationGenerator extends BaseCommand
      * - Removes any characters that are not letters, numbers, or underscores.
      * - Ensures the first character is a letter or underscore.
      * - Converts the name to CamelCase format.
-     * @param string $className The name of the class to be formatted.
-     * @return string The formatted and valid PHP class name.
      */
-    function formatClassName($className)
+    function formatClassName(string $className): string
     {
         // Remove characters that are not letters, numbers, or underscores
         $filteredName = preg_replace('/[^\p{L}\p{N}_]/u', '', $className);

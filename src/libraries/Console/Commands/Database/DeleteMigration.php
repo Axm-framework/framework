@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -22,47 +22,37 @@ class DeleteMigration extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     * @var string
      */
-    protected $name = 'd:migration';
+    protected string $name = 'd:migration';
 
     /**
      * The Command's short description
-     * @var string
      */
-    protected $description = 'Delete a migration';
+    protected string $description = 'Delete a migration';
 
     /**
      * The Command's usage
-     * @var string
      */
-    protected $usage = 'd:migration <migration_name>';
+    protected string $usage = 'd:migration <migration_name>';
 
     /**
      * The Command's arguments
-     * @var array<string, string>
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * The Command's options
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
 
     /**
      * Runs the migration deletion process based on the provided file name.
-     *
-     * @param array $params An array of parameters, with the file name at index 1.
-     * @return int Returns 0 on success, 1 on failure.
      */
     public function run(array $params): int
     {
@@ -91,9 +81,6 @@ class DeleteMigration extends BaseCommand
 
     /**
      * Deletes a migration file.
-     *
-     * @param string $filePath The path to the migration file.
-     * @return void
      */
     private function deleteMigrationFile(string $filePath): void
     {

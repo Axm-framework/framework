@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm 4 framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands;
@@ -25,45 +25,33 @@ class ListCommands extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'list';
+    protected string $name = 'list';
 
     /**
      * the Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Lists the available commands.';
+    protected string $description = 'Lists the available commands.';
 
     /**
      * the Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'list';
+    protected string $usage = 'list';
 
     /**
      * the Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * the Command's Options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '--simple' => 'Prints a list of the commands with no other info',
     ];
 
@@ -73,7 +61,7 @@ class ListCommands extends BaseCommand
     public function run(array $params)
     {
         $this->commands();
-        
+
         $commands = $this->commands->getCommands();
         ksort($commands);
 
@@ -106,7 +94,7 @@ class ListCommands extends BaseCommand
             CLI::write($group, 'yellow');
 
             foreach ($commands as $name => $command) {
-                $name   = $this->setPad($name, $length, 2, 2);
+                $name = $this->setPad($name, $length, 2, 2);
                 $output = CLI::color($name, 'green');
 
                 if (isset($command['description'])) {

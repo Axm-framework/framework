@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -20,54 +20,41 @@ class RollbackDatabase extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'db:rollback';
+    protected string $name = 'db:rollback';
 
     /**
      * The Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Rollback all database migrations. (Don\'t use -s and -f together)';
+    protected string $description = 'Rollback all database migrations. (Don\'t use -s and -f together)';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'db:rollback [options]';
+    protected string $usage = 'db:rollback [options]';
 
     /**
      * The Command's arguments
-     *
-     * @var array<string, string>
      */
-    protected $arguments = [
+    protected array $arguments = [
         '-f ' => 'Rollback a particular file. (optional)',
         '-s ' => 'The batch to rollback. (optional)'
     ];
 
     /**
      * The Command's options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * The space name of the migration classes in the app
-     * @var string
      */
-    private $nameSpaceMirations = 'App\\Database\\Migrations\\';
+    private string $nameSpaceMirations = 'App\\Database\\Migrations\\';
 
     /**
      * @var int
@@ -76,11 +63,9 @@ class RollbackDatabase extends BaseCommand
 
 
     /**
-     * @param array $params
-     * 
-     * @return int
+     * Actually execute the command.
      */
-    public function run(array $params)
+    public function run(array $params): int
     {
         try {
 
@@ -105,10 +90,6 @@ class RollbackDatabase extends BaseCommand
     }
 
     /**
-     * @param mixed $file
-     * @param mixed $migration
-     * @param mixed $fileToRollback
-     * @param mixed $migrations
      */
     protected function handleMigration($file, $migration, $fileToRollback, $migrations)
     {
@@ -129,10 +110,8 @@ class RollbackDatabase extends BaseCommand
 
     /**
      * Get all migration files.
-     *
-     * @return array
      */
-    protected function getMigrationFiles()
+    protected function getMigrationFiles(): array|bool
     {
         $ext = '.php';
         $migrationsPath = config('paths.migrationsPath') . DIRECTORY_SEPARATOR;
@@ -173,7 +152,6 @@ class RollbackDatabase extends BaseCommand
 
     /**
      * @param mixed $fileToRollback
-     * @return CLI
      */
     protected function rollbackSpecificFile($fileToRollback)
     {

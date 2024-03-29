@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -26,47 +26,35 @@ class Publish extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'publish';
+    protected string $name = 'publish';
 
     /**
      * The Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Discovers and executes all predefined Publisher classes.';
+    protected string $description = 'Discovers and executes all predefined Publisher classes.';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'publish [<directory>]';
+    protected string $usage = 'publish [<directory>]';
 
     /**
      * The Command's arguments
-     *
-     * @var array<string, string>
      */
-    protected $arguments = [
+    protected array $arguments = [
         'directory' => '[Optional] The directory to scan within each namespace. Default: "Publishers".',
     ];
 
     /**
      * the Command's Options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Displays the help for the axm cli script itself.

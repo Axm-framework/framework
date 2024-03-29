@@ -39,37 +39,37 @@ abstract class BaseCommand
      * when listing commands.
      * @var string
      */
-    protected $group;
+    protected string $group;
 
     /**
      * The Command's name
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * the Command's usage description
      * @var string
      */
-    protected $usage;
+    protected string $usage;
 
     /**
      * the Command's short description
      * @var string
      */
-    protected $description;
+    protected string $description;
 
     /**
      * the Command's options description
      * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * the Command's Arguments description
      * @var array
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * Instance of Commands so
@@ -81,7 +81,7 @@ abstract class BaseCommand
     /**
      * @var array
      */
-    private $params = [];
+    private array $params = [];
 
     protected const ARROW_SYMBOL = '➜ ';
 

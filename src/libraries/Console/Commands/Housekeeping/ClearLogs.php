@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Housekeeping;
@@ -22,38 +22,28 @@ class ClearLogs extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Housekeeping';
+    protected string $group = 'Housekeeping';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'clear:logs';
+    protected string $name = 'clear:logs';
 
     /**
      * The Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Clears all log files.';
+    protected string $description = 'Clears all log files.';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'clear:logs [option]';
+    protected string $usage = 'clear:logs [option]';
 
     /**
      * The Command's options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '--force' => 'Force delete of all logs files without prompting.',
     ];
 

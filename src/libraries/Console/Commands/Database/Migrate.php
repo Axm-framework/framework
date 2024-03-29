@@ -1,13 +1,14 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
+
 namespace Console\Commands\Database;
 
 use Console\BaseCommand;
@@ -24,34 +25,28 @@ class Migrate extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     * @var string
      */
-    protected $name = 'db:migrate';
+    protected string $name = 'db:migrate';
 
     /**
      * The Command's short description
-     * @var string
      */
-    protected $description = 'Run the database migrations.';
+    protected string $description = 'Run the database migrations.';
 
     /**
      * The Command's usage
-     * @var string
      */
-    protected $usage = 'migrate [options]';
+    protected string $usage = 'migrate [options]';
 
     /**
      * The Command's Options
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '-f'    => 'Rollback a particular file. (optional)',
         '-s'    => 'Run seeds after migration',
     ];
@@ -59,18 +54,15 @@ class Migrate extends BaseCommand
     /**
      * The number of values to display before the file name in the migration list.
      * This is used for better formatting of the output.
-     * @var int
      */
     private int $numberOfValuesBeforeFileName = 20;
 
 
     /**
      * The main method that runs the migration process.
-     *
-     * @param array $params The command line parameters.
      * @return int 0 if the migration is successful, or an error code if not.
      */
-    public function run(array $params)
+    public function run(array $params): int
     {
         $seeds    = $params['s'] ?? CLI::getOption('s') ?? false;
         $rollback = $params['f'] ?? CLI::getOption('f') ?? false;
@@ -92,9 +84,8 @@ class Migrate extends BaseCommand
 
     /**
      * Get the list of migration files.
-     * @return array The list of migration files.
      */
-    protected function getMigrationFiles(): array|false
+    protected function getMigrationFiles(): array|bool
     {
         $migrationsPath = config('paths.migrationsPath') . DIRECTORY_SEPARATOR;
         return glob($migrationsPath . "*.php");
@@ -102,10 +93,6 @@ class Migrate extends BaseCommand
 
     /**
      * Process a migration file.
-     *
-     * @param string $migrationFile The path to the migration file.
-     * @param bool $seeds Run the seeds command after the migration.
-     * @param bool $rollback Rollback the migration.
      */
     protected function processMigration(string $migrationFile, bool $seeds, bool $rollback): void
     {
@@ -125,21 +112,16 @@ class Migrate extends BaseCommand
 
     /**
      * Check if a migration should be rolled back.
-     *
-     * @param string $migrationFile
-     * @param mixed $rollback
-     * @return bool
      */
-    protected function shouldRollback($migrationFile, $rollback)
+    protected function shouldRollback(string $migrationFile, $rollback): bool
     {
         return str_contains($migrationFile, Str::snake("_create_$rollback.php"));
     }
 
     /**
      * Migrates a given migration file.
-     * @param string $filename The name of the migration file.
      */
-    protected function migrate($filename)
+    protected function migrate(string $filename)
     {
         try {
 
@@ -153,11 +135,6 @@ class Migrate extends BaseCommand
 
     /**
      * Display information about the migration that was just run
-     *
-     * @param string $migrationFile The name of the migration file
-     * @param bool $seeds Whether or not seeds were run
-     * @param string $filename The name of the seed file (if seeds were run)
-     * @param string $status The status of the migration
      */
     private function displayMigrationInfo(string $migrationFile, bool $seeds, string $filename, string $status): void
     {
@@ -169,11 +146,8 @@ class Migrate extends BaseCommand
 
     /**
      * This method is used to display a success message when a seeding process is completed
-     *
-     * @param array $seeds An array of seeders that were run
-     * @param string $filename The name of the migration file
      */
-    protected function messageInfo($seeds, string $filename)
+    protected function messageInfo(bool $seeds, string $filename)
     {
         if ($seeds) {
             $seederClass = str_replace('Create', '', Str::studly(substr($filename, $this->numberOfValuesBeforeFileName)));

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -20,50 +20,40 @@ class ResetDatabase extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'db:reset';
+    protected string $name = 'db:reset';
 
     /**
      * The Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Rollback, migrate and seed database.';
+    protected string $description = 'Rollback, migrate and seed database.';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'db:reset [options]';
+    protected string $usage = 'db:reset [options]';
 
     /**
      * The Command's arguments
-     *
-     * @var array<string, string>
      */
-    protected $arguments = [
+    protected array $arguments = [
         'environment' => '[Optional] The new environment to set. If none is provided, 
         this will print the current environment.',
     ];
 
     /**
      * The Command's options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
-
+    /**
+     * Actually execute the command.
+     */
     public function run(array $params)
     {
         $this->rollback();
@@ -123,7 +113,7 @@ class ResetDatabase extends BaseCommand
             $file = pathinfo($migration);
             $filename = $file['filename'];
 
-            if ($filename !== 'Schema') :
+            if ($filename !== 'Schema'):
                 $className = Str::studly(\substr($filename, 17));
 
                 $this->migrate($className, $filename);

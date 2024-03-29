@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/**
+ * Axm Framework PHP.
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
+ */
+
 namespace Console\Commands\Server;
 
 use Console\BaseCommand;
@@ -18,53 +27,45 @@ class Serve extends BaseCommand
 {
     /**
      * Group
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * Name
-     * @var string
      */
-    protected $name = 'serve';
+    protected string $name = 'serve';
 
     /**
      * Description
-     * @var string
      */
-    protected $description = 'Launches the Axm PHP Development Server';
+    protected string $description = 'Launches the Axm PHP Development Server';
 
     /**
      * Usage
-     * @var string
      */
-    protected $usage = 'serve [--host] [--port]';
+    protected string $usage = 'serve [--host] [--port]';
 
     /**
      * Options
-     * @var array
      */
-    protected $options = [
-        '--php'  => 'The PHP Binary [default: "PHP_BINARY"]',
+    protected array $options = [
+        '--php' => 'The PHP Binary [default: "PHP_BINARY"]',
         '--host' => 'The HTTP Host [default: "localhost"]',
         '--port' => 'The HTTP Host Port [default: "8080"]',
     ];
 
     /**
      * The current port offset.
-     * @var int
      */
-    protected $portOffset = 0;
+    protected int $portOffset = 0;
 
     /**
      * The max number of ports to attempt to serve from
-     * @var int
      */
-    protected $maxTries = 10;
+    protected int $maxTries = 10;
 
     /**
      * Default port number
-     * @var int
      */
     protected int $defaultPort = 8080;
 
@@ -79,7 +80,7 @@ class Serve extends BaseCommand
     public function run(array $params)
     {
         // Collect any user-supplied options and apply them.
-        $php  = CLI::getOption('php', PHP_BINARY);
+        $php = CLI::getOption('php', PHP_BINARY);
         $host = CLI::getOption('host', 'localhost');
         $port = (int) CLI::getOption('port', $this->defaultPort);
 
@@ -110,12 +111,18 @@ class Serve extends BaseCommand
         return null;
     }
 
+    /**
+     * Check if a port is available by attempting to connect to it.
+     */
     protected function checkPort(string $host, int $port): bool
     {
-        $url = "http://$host:$port";
-        $headers = @get_headers($url);
-
-        return !empty($headers);
+        try {
+            $url = "http://$host:$port";
+            $headers = @get_headers($url);
+            return !empty($headers);
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     /**

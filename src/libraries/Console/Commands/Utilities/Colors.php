@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -14,54 +14,44 @@ namespace Console\Commands\Utilities;
 use Console\BaseCommand;
 use Console\CLI;
 
-/**
- * [Description Colors]
- */
 class Colors extends BaseCommand
 {
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
-     */
-    protected $group = 'Utilities';
+      */
+    protected string $group = 'Utilities';
 
     /**
      * The Command's name
-     * @var string
-     */
-    protected $name = 'colors';
+      */
+    protected string $name = 'colors';
 
     /**
      * the Command's short description
-     * @var string
-     */
-    protected $description = 'Displays the colors supported by the console.';
+      */
+    protected string $description = 'Displays the colors supported by the console.';
 
     /**
      * the Command's usage
-     * @var string
-     */
-    protected $usage = 'colors [options]';
+      */
+    protected string $usage = 'colors [options]';
 
     /**
      * The Command's arguments
-     * @var array<string, string>
-     */
-    protected $options = [
+      */
+    protected array $options = [
         '--256' => 'Displays 256 colors if supported, otherwise it will display the console default colors.',
     ];
 
     /**
-     * @var string
+     * The Command's arguments
      */
-    protected $driver = null;
-
+    protected array $arguments = [
+    ];
+  
     /**
-     * Creates a new database.
-     *   
-     * @param array $params
+     * Actually execute a command.
      */
     public function run(array $params)
     {

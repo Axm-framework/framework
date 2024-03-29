@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Generators;
@@ -24,47 +24,35 @@ class ControllerGenerator extends BaseCommand
 
     /**
      * The Command's Group
-     *
-     * @var string
      */
-    protected $group = 'Generators';
+    protected string $group = 'Generators';
 
     /**
      * The Command's Name
-     *
-     * @var string
      */
-    protected $name = 'make:controller';
+    protected string $name = 'make:controller';
 
     /**
      * The Command's Description
-     *
-     * @var string
      */
-    protected $description = 'Generates a new controller file.';
+    protected string $description = 'Generates a new controller file.';
 
     /**
      * The Command's Usage
-     *
-     * @var string
      */
-    protected $usage = 'make:controller <name> [options]';
+    protected string $usage = 'make:controller <name> [options]';
 
     /**
      * The Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'The controller class name.',
     ];
 
     /**
      * The Command's Options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '--bare'      => 'Extends from Controller instead of BaseController.',
         '--namespace' => 'Set root namespace. Default: "APP_NAMESPACE".',
         '--suffix'    => 'Append the component title to the class name (e.g. User => UserController).',

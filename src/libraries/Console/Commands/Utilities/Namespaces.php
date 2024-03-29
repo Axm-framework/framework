@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -25,45 +25,33 @@ class Namespaces extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'namespaces';
+    protected string $name = 'namespaces';
 
     /**
      * the Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Verifies your namespaces are setup correctly.';
+    protected string $description = 'Verifies your namespaces are setup correctly.';
 
     /**
      * the Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'namespaces';
+    protected string $usage = 'namespaces';
 
     /**
      * the Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * the Command's Options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Displays the help for the spark cli script itself.

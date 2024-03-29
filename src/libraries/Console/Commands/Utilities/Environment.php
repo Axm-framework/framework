@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -24,62 +24,48 @@ final class Environment extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'env';
+    protected string $name = 'env';
 
     /**
      * The Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Retrieves the current environment, or set a new one.';
+    protected string $description = 'Retrieves the current environment, or set a new one.';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'env [<environment>]';
+    protected string $usage = 'env [<environment>]';
 
     /**
      * The Command's arguments
-     *
-     * @var array<string, string>
      */
-    protected $arguments = [
+    protected array $arguments = [
         'environment' => '[Optional] The new environment to set. If none is provided, 
         this will print the current environment.',
     ];
 
     /**
      * The Command's options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Allowed values for environment. `testing` is excluded
      * since spark won't work on it.
-     *
-     * @var array<int, string>
      */
-    private static $knownTypes = [
+    private static array $knownTypes = [
         'production',
         'debug',
     ];
 
     /**
-     * {@inheritDoc}
+     * Actually execute a command.
      */
     public function run(array $params)
     {

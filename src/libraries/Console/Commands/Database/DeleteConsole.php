@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -19,47 +19,36 @@ class DeleteConsole extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     * @var string
      */
-    protected $name = 'd:command';
+    protected string $name = 'd:command';
 
     /**
      * The Command's short description
-     * @var string
      */
-    protected $description = 'Delete a console command';
+    protected string $description = 'Delete a console command';
 
     /**
      * The Command's usage
-     * @var string
      */
-    protected $usage = 'd:command <command_name>';
+    protected string $usage = 'd:command <command_name>';
 
     /**
      * The Command's arguments
-     * @var array<string, string>
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * The Command's options
-     * @var array
      */
-    protected $options = [];
-
+    protected array $options = [];
 
     /**
      * Runs the command based on the provided parameters.
-     *
-     * @param array $params An array of command parameters.
-     * @return int Returns 0 on success, 1 on failure.
      */
     public function run(array $params): int
     {
@@ -80,9 +69,6 @@ class DeleteConsole extends BaseCommand
 
     /**
      * Gets the file path for the specified command.
-     *
-     * @param string $command The name of the command.
-     * @return string The file path for the command.
      */
     private function getCommandFilePath(string $command): string
     {
@@ -91,10 +77,6 @@ class DeleteConsole extends BaseCommand
 
     /**
      * Deletes the file associated with the specified command.
-     *
-     * @param string $commandFile The file path for the command.
-     * @param string $command     The name of the command.
-     * @return bool Returns true on successful deletion, false otherwise.
      */
     private function deleteCommandFile(string $commandFile, string $command): bool
     {
@@ -113,9 +95,6 @@ class DeleteConsole extends BaseCommand
 
     /**
      * Prints a success message for the deleted command.
-     *
-     * @param string $command The name of the deleted command.
-     * @return void
      */
     private function printSuccessMessage(string $command): void
     {

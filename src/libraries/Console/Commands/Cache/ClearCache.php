@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Cache;
@@ -23,38 +23,28 @@ class ClearCache extends BaseCommand
 {
     /**
      * Command grouping.
-     *
-     * @var string
      */
-    protected $group = 'Cache';
+    protected string $group = 'Cache';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'clear:cache';
+    protected string $name = 'clear:cache';
 
     /**
      * the Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Clears the current system caches.';
+    protected string $description = 'Clears the current system caches.';
 
     /**
      * the Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'clear:cache [driver]';
+    protected string $usage = 'clear:cache [driver]';
 
     /**
      * the Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         'driver' => 'The cache driver to use',
     ];
 

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -20,40 +20,33 @@ class VendorPublish extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     * @var string
      */
-    protected $name = 'vendor:publish';
+    protected string $name = 'vendor:publish';
 
     /**
      * The Command's short description
-     * @var string
      */
-    protected $description = 'Publish any publishable assets from vendor packages.';
+    protected string $description = 'Publish any publishable assets from vendor packages.';
 
     /**
      * The Command's usage
-     * @var string
      */
-    protected $usage = 'vendor:publish [options]';
+    protected string $usage = 'vendor:publish [options]';
 
     /**
      * The Command's Arguments
-     * @var array
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * The Command's Options
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
 
     public function run($params)

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Cache;
@@ -22,31 +22,23 @@ class InfoCache extends BaseCommand
 {
     /**
      * Command grouping.
-     *
-     * @var string
      */
-    protected $group = 'Cache';
+    protected string $group = 'Cache';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'info:cache';
+    protected string $name = 'info:cache';
 
     /**
      * the Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Shows file cache information in the current system.';
+    protected string $description = 'Shows file cache information in the current system.';
 
     /**
      * the Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'info:cache';
+    protected string $usage = 'info:cache';
 
     /**
      * Clears the cache

@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Axm Framework PHP.
+ *
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
+ */
+
 namespace Console\Commands\Utilities;
 
 use Console\BaseCommand;
@@ -10,33 +19,28 @@ class AddProvider extends BaseCommand
 {
     /**
      * The Command's Group
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's Name
-     * @var string
      */
-    protected $name = 'add:provider';
+    protected string $name = 'add:provider';
 
     /**
      * The Command's Description
-     * @var string
      */
-    protected $description = '';
+    protected string $description = '';
 
     /**
      * The Command's Usage
-     * @var string
      */
-    protected $usage = 'add:provider [options]';
+    protected string $usage = 'add:provider [options]';
 
     /**
      * The Command's Arguments
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         '--alias' => 'service alias',
         '--class' => 'FQN of the service provider class.',
         '--description' => 'Library description. (Opcional)',
@@ -45,30 +49,24 @@ class AddProvider extends BaseCommand
 
     /**
      * The Command's Options
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
      * Actually execute a command.
-     * @param array $params
      */
     public function run(array $params)
     {
-        $serviceName  = $params[1] ?? CLI::getOption('alias') ?? $params['alias'] ?? CLI::prompt(self::ARROW_SYMBOL . 'Add alias: ', null, 'required|text');
+        $serviceName = $params[1] ?? CLI::getOption('alias') ?? $params['alias'] ?? CLI::prompt(self::ARROW_SYMBOL . 'Add alias: ', null, 'required|text');
         $serviceClass = $params[2] ?? CLI::getOption('class') ?? $params['class'] ?? CLI::prompt(self::ARROW_SYMBOL . 'Class Name (note: with namespace): ', null, 'required|text');
-        $description  = $params[3] ?? CLI::getOption('description') ?? $params['description'] ?? CLI::prompt(self::ARROW_SYMBOL . 'Description (optional): ', null, 'text') ?? [];
-        $configFile   = config('paths.providersPath') . DIRECTORY_SEPARATOR . 'providers.php';
+        $description = $params[3] ?? CLI::getOption('description') ?? $params['description'] ?? CLI::prompt(self::ARROW_SYMBOL . 'Description (optional): ', null, 'text') ?? [];
+        $configFile = config('paths.providersPath') . DIRECTORY_SEPARATOR . 'providers.php';
 
         $this->addService($serviceName, $serviceClass, $description, $configFile);
     }
 
     /**
      * Add a new service to the configuration file if it doesn't already exist.
-     *
-     * @param string $serviceName   The name of the service to add.
-     * @param string $serviceClass  The class of the service to add.
-     * @param string $configFile    The path to the configuration file.
      */
     public function addService(string $serviceName, string $serviceClass, string $description = null, string $configFile)
     {
@@ -95,12 +93,8 @@ class AddProvider extends BaseCommand
 
     /**
      * Check if a service already exists in the configuration file.
-     *
-     * @param string $serviceName   The name of the service to check.
-     * @param string $configFile    The path to the configuration file.
-     * @return bool True if the service already exists, false otherwise.
      */
-    public function serviceExists(string $serviceName, string $configFile)
+    public function serviceExists(string $serviceName, string $configFile): bool
     {
         $currentConfig = file_get_contents($configFile);
         return strpos($currentConfig, "'{$serviceName}'") !== false;
@@ -108,10 +102,6 @@ class AddProvider extends BaseCommand
 
     /**
      * Render a service provider array for the given service name and class.
-     *
-     * @param string $serviceName
-     * @param string $serviceClass
-     * @return string
      */
     public function renderProvider(string $serviceName, string $serviceClass, string $description = null): string
     {
@@ -134,10 +124,6 @@ class AddProvider extends BaseCommand
 
     /**
      * addComment into lines with a specified line length, ensuring that words are not cut off.
-     *
-     * @param string $text The input text.
-     * @param int $lineLength The desired length of each line.
-     * @return string The formatted text with line breaks.
      */
     public function addComment(string $text, int $lineLength)
     {

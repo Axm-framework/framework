@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -19,51 +19,37 @@ class SeedDatabase extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'db:seed';
+    protected string $name = 'db:seed';
 
     /**
      * The Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Seed the database with records';
+    protected string $description = 'Seed the database with records';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'db:seed [options]';
+    protected string $usage = 'db:seed [options]';
 
     /**
      * The Command's arguments
-     *
-     * @var array<string, string>
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * The Command's options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
 
     /**
-     * @param array $params
-     * 
-     * @return [type]
+     * Actually execute the command.
      */
     public function run(array $params)
     {

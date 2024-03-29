@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -24,48 +24,36 @@ final class Maintenance extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'maintenance';
+    protected string $name = 'maintenance';
 
     /**
      * The Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Activate or desactivate the app maintenance.';
+    protected string $description = 'Activate or desactivate the app maintenance.';
 
     /**
      * The Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'maintenance [options]';
+    protected string $usage = 'maintenance [options]';
 
     /**
      * The Command's arguments
-     *
-     * @var array<string, string>
      */
-    protected $arguments = [];
+    protected array $arguments = [];
 
     /**
      * The Command's options
-     *
-     * @var array
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
-     * {@inheritDoc}
+     * Actually execute a command.
      */
     public function run(array $params)
     {

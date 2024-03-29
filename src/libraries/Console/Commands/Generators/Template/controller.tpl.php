@@ -12,7 +12,7 @@ class {class} extends BaseController
 
     /**
     * Return view
-    * @return mixed
+    * @return string
     */
     public function index()
     {

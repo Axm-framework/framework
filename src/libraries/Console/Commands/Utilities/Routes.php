@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Utilities;
@@ -25,40 +25,33 @@ class Routes extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
-     */
-    protected $group = 'Axm';
+      */
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     * @var string
-     */
-    protected $name = 'routes';
+      */
+    protected string $name = 'routes';
 
     /**
      * the Command's short description
-     * @var string
-     */
-    protected $description = 'Displays all of user-defined routes. Does NOT display auto-detected routes.';
+      */
+    protected string $description = 'Displays all of user-defined routes. Does NOT display auto-detected routes.';
 
     /**
      * the Command's usage
-     * @var string
-     */
-    protected $usage = 'routes';
+      */
+    protected string $usage = 'routes';
 
     /**
      * the Command's Arguments
-     * @var array
-     */
-    protected $arguments = [];
+      */
+    protected array $arguments = [];
 
     /**
      * the Command's Options
-     * @var array
-     */
-    protected $options = [];
+      */
+    protected array $options = [];
 
     /**
      * @var Router|null
@@ -72,7 +65,7 @@ class Routes extends BaseCommand
     public function run(array $params)
     {
         $collection = $this->router();
-        $methods    = $collection::$verbs;   // get the verbs ['get',post,head....]
+        $methods = $collection::$verbs;   // get the verbs ['get',post,head....]
 
         $tbody = [];
         foreach ($methods as $method) {

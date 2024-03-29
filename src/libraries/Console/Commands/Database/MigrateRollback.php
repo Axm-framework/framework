@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm 4 framework.
+ * Axm Framework PHP.
  *
- * (c) axm Foundation <admin@axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -15,6 +15,7 @@ use Console\BaseCommand;
 use Console\CLI;
 use RuntimeException;
 use Throwable;
+use Illuminate\Support\Str;
 
 /**
  * Runs all of the migrations in reverse order, until they have
@@ -25,35 +26,28 @@ class MigrateRollback extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     * @var string
      */
-    protected $name = 'migrate:rollback';
+    protected string $name = 'migrate:rollback';
 
     /**
      * The Command's short description
-     * @var string
      */
-    protected $description = 'Runs the "down" method for all migrations in the last batch.';
+    protected string $description = 'Runs the "down" method for all migrations in the last batch.';
 
     /**
      * The Command's usage
-     * @var string
      */
-    protected $usage = 'migrate:rollback [options]';
+    protected string $usage = 'migrate:rollback [options]';
 
     /**
      * the Command's Options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '-s' => 'The batch to rollback',
         '-f' => 'Rollback a particular file',
     ];
@@ -61,7 +55,6 @@ class MigrateRollback extends BaseCommand
     /**
      * The number of values to display before the file name in the migration list.
      * This is used for better formatting of the output.
-     * @var int
      */
     private int $numberOfValuesBeforeFileName = 20;
 
@@ -97,18 +90,17 @@ class MigrateRollback extends BaseCommand
         }
     }
 
-
-    protected function processRollback(string $migration, bool $step, bool $file)
+    protected function processRollback(string $migration, bool $step, bool $file): int
     {
         $fileInfo = pathinfo($migration);
         $filename = $fileInfo['filename'];
 
         if (!$file) {
-            $this->down($file, $migration);
+            $this->down($file);
         }
 
         if ($file && $this->shouldRollback($migration, $file)) {
-            $this->down($file, $migration);
+            $this->down($file);
             $this->messageSuccess();
             return 0;
         }
@@ -116,9 +108,8 @@ class MigrateRollback extends BaseCommand
 
     /**
      * Get the list of migration files.
-     * @return array The list of migration files.
      */
-    protected function getMigrationFiles(): array|false
+    protected function getMigrationFiles(): array|bool
     {
         $migrationsPath = config('paths.migrationsPath') . DIRECTORY_SEPARATOR;
         return glob($migrationsPath . "*.php");
@@ -126,21 +117,16 @@ class MigrateRollback extends BaseCommand
 
     /**
      * Check if a migration should be rolled back.
-     *
-     * @param string $migrationFile
-     * @param mixed $rollback
-     * @return bool
      */
-    protected function shouldRollback($migrationFile, $rollback)
+    protected function shouldRollback(string $migrationFile, $rollback): bool
     {
         return str_contains($migrationFile, Str::snake("_create_$rollback.php"));
     }
 
     /**
      * Rolls back a migration by including its file and calling the `up` method.
-     * @param string $filename The filename of the migration.
      */
-    protected function down($filename)
+    protected function down(string $filename)
     {
         try {
 
@@ -162,7 +148,6 @@ class MigrateRollback extends BaseCommand
 
     /**
      * This method is used to display a error message
-     * @param string $file The name of the rollback file
      */
     protected function messageError(string $file)
     {

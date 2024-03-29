@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of axm 4 framework.
+ * Axm Framework PHP.
  *
- * (c) axm Foundation <admin@axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Database;
@@ -23,55 +23,41 @@ class MigrateStatus extends BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Database';
+    protected string $group = 'Database';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'migrate:status';
+    protected string $name = 'migrate:status';
 
     /**
      * the Command's short description
-     *
-     * @var string
      */
-    protected $description = 'Displays a list of all migrations and whether they\'ve been run or not.';
+    protected string $description = 'Displays a list of all migrations and whether they\'ve been run or not.';
 
     /**
      * the Command's usage
-     *
-     * @var string
      */
-    protected $usage = 'migrate:status [options]';
+    protected string $usage = 'migrate:status [options]';
 
     /**
      * the Command's Options
-     *
-     * @var array<string, string>
      */
-    protected $options = [
+    protected array $options = [
         '-g' => 'Set database group',
     ];
 
     /**
      * Namespaces to ignore when looking for migrations.
-     *
-     * @var string[]
      */
-    protected $ignoredNamespaces = [
+    protected array $ignoredNamespaces = [
         'Axm',
         'Psr\Log',
     ];
 
     /**
      * Displays a list of all migrations and whether they've been run or not.
-     *
-     * @param array<string, mixed> $params
      */
     public function run(array $params)
     {

@@ -1,12 +1,12 @@
 <?php
 
 /**
- * This file is part of Axm framework.
+ * Axm Framework PHP.
  *
- * (c) Axm Foundation <admin@Axm.com>
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
+ * @author Juan Cristobal <juancristobalgd1@gmail.com>
+ * @link http://www.axm.com/
+ * @license http://www.axm.com/license/
+ * @package Console
  */
 
 namespace Console\Commands\Generators;
@@ -19,54 +19,42 @@ use Console\GeneratorTrait;
  */
 class FilterGenerator extends BaseCommand
 {
-   use GeneratorTrait;
+    use GeneratorTrait;
 
     /**
      * The Command's Group
-     *
-     * @var string
      */
-    protected $group = 'Generators';
+    protected string $group = 'Generators';
 
     /**
      * The Command's Name
-     *
-     * @var string
      */
-    protected $name = 'make:filter';
+    protected string $name = 'make:filter';
 
     /**
      * The Command's Description
-     *
-     * @var string
      */
-    protected $description = 'Generates a new filter file.';
+    protected string $description = 'Generates a new filter file.';
 
     /**
      * The Command's Usage
-     *
-     * @var string
      */
-    protected $usage = 'make:filter <name> [options]';
+    protected string $usage = 'make:filter <name> [options]';
 
     /**
      * The Command's Arguments
-     *
-     * @var array
      */
-    protected $arguments = [
+    protected array $arguments = [
         'name' => 'The filter class name.',
     ];
 
     /**
      * The Command's Options
-     *
-     * @var array
      */
-    protected $options = [
+    protected array $options = [
         '--namespace' => 'Set root namespace. Default: "APP_NAMESPACE".',
-        '--suffix'    => 'Append the component title to the class name (e.g. User => UserFilter).',
-        '--force'     => 'Force overwrite existing file.',
+        '--suffix' => 'Append the component title to the class name (e.g. User => UserFilter).',
+        '--force' => 'Force overwrite existing file.',
     ];
 
     /**
@@ -76,7 +64,7 @@ class FilterGenerator extends BaseCommand
     {
         $this->component = 'Filter';
         $this->directory = 'Filters';
-        $this->template  = 'filter.tpl.php';
+        $this->template = 'filter.tpl.php';
 
         $this->classNameLang = 'CLI.generator.className.filter';
         $this->execute($params);
