@@ -36,8 +36,3 @@ const APP_NAMESPACE = 'App\\';
                        FILES FOR INITIALIZATION                                     
 -------------------------------------------------------------------------------- */
 require (AXM_PATH . DIRECTORY_SEPARATOR . 'autoload.php');
-require (AXM_PATH . DIRECTORY_SEPARATOR . 'HandlerErrors.php');
-require (AXM_PATH . DIRECTORY_SEPARATOR . 'functions.php');
-
-// Add Composer autoload to load external dependencies
-require VENDOR_PATH . DIRECTORY_SEPARATOR . 'autoload.php';

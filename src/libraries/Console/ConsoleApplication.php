@@ -22,6 +22,7 @@ final class ConsoleApplication
     private static $instance;
     private string $axmRaw;
     private $commands;
+    private static bool $isRunning = false;
     private $colors = [
         'dark_gray'    => '1;30',
         'blue'         => '0;34',
@@ -39,6 +40,11 @@ final class ConsoleApplication
      */
     public function __construct()
     {
+        if (false === self::$isRunning) {
+            \Axm::makeApplication();
+            self::$isRunning = true;
+        }
+
         $this->commands = new Commands();
         $this->version ??= $this->getVersion();
     }
@@ -57,10 +63,6 @@ final class ConsoleApplication
 
     /**
      * Runs the current command discovered on the CLI.
-     *
-     * @throws Exception
-     * @param bool $useSafeOutput Indicates whether to use safe output 
-     * @return mixed The result of command execution 
      */
     public function run()
     {
@@ -80,9 +82,8 @@ final class ConsoleApplication
 
     /**
      * Returns the AxmCli logo.
-     * @return string 
      */
-    public function rawLogo()
+    public function rawLogo(): string
     {
         $this->axmRaw = $this->buildLogo();
         return $this->axmRaw;
@@ -90,9 +91,8 @@ final class ConsoleApplication
 
     /**
      * Build Axm's logo in ASCII art format.
-     * @return string
      */
-    private function buildLogo()
+    private function buildLogo(): string
     {
         return <<<LOGO
    _____                  
@@ -106,7 +106,6 @@ LOGO;
 
     /**
      * Displays basic console information 
-     * @param bool $suppress If set to true, the output is suppressed.
      */
     public function showprocessRequest(bool $suppress = false)
     {
@@ -123,8 +122,7 @@ LOGO;
     }
 
     /**
-     * processRequest
-     * @return void
+     * Process Request
      */
     public function processRequest()
     {
@@ -139,11 +137,8 @@ LOGO;
 
     /**
      * Get the version of a library from the composer.json file and remove the '^' character 
-     * 
-     * @param string $libraryName The name of the library for which you want to get the version 
-     * @return string|null
      */
-    function getVersion()
+    function getVersion(): string
     {
         return app()->version();
     }

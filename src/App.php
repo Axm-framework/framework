@@ -19,22 +19,48 @@ final class App extends Container
      */
     public function __construct()
     {
+        $this->setApp();
+        $this->handlerErrors();
         $this->loadEnv();
         $this->configureEnvironment();
+        $this->internalFunctions();
         $this->registerComponents();
+        $this->includeAutoloadVendor();
         $this->bootServices();
     }
 
     /**
      * Singleton App
      */
-    public static function getInstance(): self
+    private function setApp(): void
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
+        Axm::setApplication($this);
+    }
 
-        return self::$instance;
+    /**
+     * Include the functions file from the AXM directory.
+     */
+    private function internalFunctions()
+    {
+        require (AXM_PATH . DIRECTORY_SEPARATOR . 'functions.php');
+    }
+
+    /**
+     * Include the error handler file from the AXM directory.
+     * This is a private function that serves to include the necessary error handler.
+     */
+    private function handlerErrors()
+    {
+        require (AXM_PATH . DIRECTORY_SEPARATOR . 'HandlerErrors.php');
+    }
+
+    /**
+     * Include the Composer autoload file from the vendor directory.
+     * This is a private function that serves to include the Composer autoload used in the project.
+     */
+    private function includeAutoloadVendor()
+    {
+        require VENDOR_PATH . DIRECTORY_SEPARATOR . 'autoload.php';
     }
 
     /**
@@ -52,8 +78,8 @@ final class App extends Container
     {
         static $initialized = false;
         if (!$initialized) {
-           
-            $environment = env('APP_ENVIRONMENT', 'production');
+
+            $environment = Env::get('APP_ENVIRONMENT', 'production');
             if ($environment === 'debug') {
                 ini_set('display_errors', 1);
                 error_reporting(E_ALL);
@@ -243,8 +269,7 @@ final class App extends Container
      */
     public function version(string $libraryName = 'axm/framework'): ?string
     {
-        $v = \Composer\InstalledVersions::getVersion($libraryName);
-        return $v;
+        return Axm::version($libraryName);
     }
 
     /**
@@ -271,20 +296,7 @@ final class App extends Container
      */
     public function __get(string $name): mixed
     {
-        if ($name == 'config') {
-            return config($name);
-        }
-
         return $this->get($name);
-    }
-
-    /**
-     * Returns a new instance of the ConsoleApplication class
-     */
-    public function createConsoleApplication()
-    {
-        static $console;
-        return $console ??= new \Console\ConsoleApplication;
     }
 
     /**

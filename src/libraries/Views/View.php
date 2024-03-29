@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Views;
 
 use Cache\Cache;
-use Debug\Debug;
 use RuntimeException;
 
 /**
@@ -20,11 +19,11 @@ class View
     protected $layout = 'main';
     public $viewPath;
     protected $data = [];
-    public static $tempData  = [];
+    public static $tempData = [];
     protected bool $viewSaveCache;
     public $layoutPath;
     protected $withLayout = true;
-    protected string $filename;
+    protected string $filename = '';
     private string $contents = '';
     private $resolved = false;
     protected static $sections = [];
@@ -40,11 +39,11 @@ class View
     }
 
     /**
-     * 
+     * Renders the specified view file.
      */
-    public function render(string $view, string $ext = '.php')
+    public function render(string $view, string $ext = '.php'): self
     {
-        $view  = str_replace('.', DIRECTORY_SEPARATOR, trim($view)) . $ext;
+        $view = str_replace('.', DIRECTORY_SEPARATOR, trim($view)) . $ext;
 
         $this->filename = $filename = static::handleFile($view);
         $this->contents = $this->file($filename);
@@ -54,12 +53,8 @@ class View
 
     /**
      * Resolves the file path for a given view,
-     *
-     * @param string $view The name or path of the view file.
-     * @return string The resolved file path for the view file.
-     * @throws RuntimeException If the resolved view file does not exist.
      */
-    public function handleFile(string $file)
+    public function handleFile(string $file): string
     {
         $filename = $this->viewPath . DIRECTORY_SEPARATOR . $file;
         $filename = is_file($filename) ? $filename : $file;
@@ -69,13 +64,22 @@ class View
         return $filename;
     }
 
-    public function layout(string $layout = 'main')
+    /**
+     * Sets the layout for the rendered view.
+     *
+     * This method specifies the layout to be used when rendering the view.
+     * If no layout is provided, it defaults to 'main'.
+     */
+    public function layout(string $layout = 'main'): self
     {
         $this->withLayout = true;
         $this->layout = $layout;
         return $this;
     }
 
+    /**
+     * Adds data to be passed to the view.
+     */
     public function withData(string|array|null $keyOrArray, $value = null): self
     {
         if (is_array($keyOrArray)) {
@@ -87,12 +91,18 @@ class View
         return $this;
     }
 
-    public function withGlobal($key, $value)
+    /**
+     * Adds global data to be passed to all views.
+     */
+    public function withGlobal(string $key, $value): self
     {
         self::$tempData[$key] = $value;
         return $this;
     }
 
+    /**
+     * Specifies whether to render the view with a layout.
+     */
     function withLayout(bool $value = true): self
     {
         $this->withLayout = $value;
@@ -108,6 +118,13 @@ class View
         return $this;
     }
 
+    /**
+     * Resolves the view rendering process.
+     *
+     * This method finalizes the view rendering process by incorporating data, layout, and caching.
+     * It prepares the view content for rendering, including layout integration if specified.
+     * Additionally, it handles caching of the rendered output.
+     */
     public function resolver(): self
     {
         $data = $this->data;
@@ -123,7 +140,7 @@ class View
             $output = $view;
         }
 
-        // $this->saveCache($filename, $output, $data);
+        $this->saveCache($filename, $output, $data);
         $this->contents = $output;
         unset($data, $view, $output);
         $this->resolved = true;
@@ -131,13 +148,18 @@ class View
         return $this;
     }
 
+    /**
+     * Retrieves the rendered view content.
+     *
+     * This method retrieves the rendered view content. If the view has not been resolved yet,
+     * it resolves the view rendering process. It also checks if the rendered output is stored in the cache
+     * and retrieves it from the cache if available. If not, it saves the rendered output to the cache.
+     */
     function get(): string
     {
-        if (!$this->resolved) {
-            $this->resolver();
-        }
+        if (!$this->resolved) $this->resolver();
 
-        //If it is stored in cache
+        // If it is stored in cache
         if (($output = $this->getFromCache($this->filename, $this->data)) !== false) {
             $this->contents = (string) $output;
         } else {
@@ -149,13 +171,14 @@ class View
 
     /**
      * Get the view cache.
-     * @return bool
      */
     protected function getFromCache(string $filename, array $data = []): false|string
     {
-        if (!$this->viewSaveCache) return false;
+        if (!$this->viewSaveCache)
+            return false;
 
-        if (isset($data['cache']) && $data['cache'] !== true) return false;
+        if (isset($data['cache']) && $data['cache'] !== true)
+            return false;
 
         // Creates an instance of the FileCache class
         $cache = Cache::driver()->get($filename);
@@ -164,25 +187,21 @@ class View
 
     /**
      * Save the view in the cache.
-     * @return bool
      */
-    private function saveCache(?string $filename, ?string $output, array $data = [])
+    private function saveCache(?string $filename, ?string $output, array $data = []): ?bool
     {
-        if (!$this->viewSaveCache) return false;
+        if (!$this->viewSaveCache)
+            return false;
 
-        if (isset($data['cache']) && $data['cache'] !== true) return;
+        if (isset($data['cache']) && $data['cache'] !== true)
+            return false;
 
         // Creates an instance of the FileCache class
-        Cache::driver()->set($filename, $output);
+        return Cache::driver()->set($filename, $output);
     }
 
     /**
      * Renderiza un archivo de plantilla y devuelve la salida como cadena.
-     *
-     * @param string $templatePath Ruta al archivo de plantilla
-     * @param array $data Datos para extraer en el ámbito de la plantilla
-     * @return string|null Contenido de la plantilla renderizada, o null si ocurre una excepción
-     * @throws \Throwable Si ocurre una excepción durante el renderizado de la plantilla
      */
     public function file(string $templatePath, array $data = []): ?string
     {
@@ -204,7 +223,13 @@ class View
         }
     }
 
-    public function styles($styles): self
+    /**
+     * Adds CSS styles to the <head> section of the HTML content.
+     *
+     * This method searches for the closing </head> tag in the HTML content and injects
+     * the provided CSS styles just before it.
+     */
+    public function styles(string $styles): self
     {
         $headPattern = '/<\s*\/\s*head\s*>/i';
         $html = preg_replace($headPattern, $styles . '$0', $this->contents);
@@ -213,7 +238,13 @@ class View
         return $this;
     }
 
-    public function scripts($scripts): self
+    /**
+     * Adds JavaScript code to the end of the <body> section of the HTML content.
+     *
+     * This method searches for the closing </body> tag in the HTML content and injects
+     * the provided JavaScript code just before it.
+     */
+    public function scripts(string $scripts): self
     {
         $bodyPattern = '/<\s*\/\s*body\s*>/i';
         $html = preg_replace($bodyPattern, $scripts . '$0', $this->contents);
@@ -244,7 +275,6 @@ class View
 
     /**
      * Starts holds contents for a section within the layout.
-     * @param string $name Section name
      */
     public static function section(string $name)
     {
@@ -257,7 +287,6 @@ class View
 
     /**
      * Captures the last section
-     * @throws AxmException
      */
     public static function endSection()
     {
@@ -276,6 +305,9 @@ class View
         static::$sections[$section][] = $contentss;
     }
 
+    /**
+     * Sets the HTML content of the view.
+     */
     public function setView(?string $view = ''): self
     {
         $this->withLayout = false;
@@ -284,9 +316,14 @@ class View
         return $this;
     }
 
+    /**
+     * Dump and die function.
+     * It is commonly used for debugging purposes to inspect the current state of an object.
+     */
     function dd()
     {
         dd($this->contents);
-        return  $this;
+        return $this;
     }
+
 }

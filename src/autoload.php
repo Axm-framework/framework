@@ -16,6 +16,7 @@ function axm_autoloader(string $class)
 
     $classMap ??= [
 
+        'Axm'          => AXM_PATH . DIRECTORY_SEPARATOR . 'Axm.php',
         'Container'    => AXM_PATH . DIRECTORY_SEPARATOR . 'Container.php',
         'App'          => AXM_PATH . DIRECTORY_SEPARATOR . 'App.php',
         'Config'       => AXM_PATH . DIRECTORY_SEPARATOR . 'Config.php',

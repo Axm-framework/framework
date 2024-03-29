@@ -34,8 +34,7 @@ if (!function_exists('app')) {
      */
     function app(?string $alias = null, $value = null): object
     {
-        static $instance;
-        $instance ??= new App;
+        $instance = Axm::getApp();
 
         if (null === $alias) {
             return $instance;
@@ -280,7 +279,13 @@ if (!function_exists('baseUrl')) {
      **/
     function baseUrl(string $path = '/'): string
     {
-        return app()->router->url($path);
+        $scheme = isset($_SERVER['HTTPS']) ? 'https' : 'http';
+        $scriptPath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+        $baseUrl = "{$scheme}://{$_SERVER['HTTP_HOST']}{$scriptPath}";
+        $path = trim(rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/' . ltrim($path, '/'), '/');
+
+        return "{$baseUrl}/{$path}";
+
     }
 }
 
