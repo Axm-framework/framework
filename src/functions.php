@@ -48,10 +48,13 @@ if (!function_exists('app')) {
     }
 }
 
-function env(string $params, string|bool $default = null)
-{
-    $env = Env::get($params, $default);
-    return $env ?? $default;
+if (!function_exists('env')) {
+
+    function env(string $params, string|bool $default = null)
+    {
+        $env = Env::get($params, $default);
+        return $env ?? $default;
+    }
 }
 
 if (!function_exists('is_cli')) {
