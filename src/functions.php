@@ -216,6 +216,18 @@ if (!function_exists('cVar')) {
     }
 }
 
+if (!function_exists('tap')) {
+    /**
+     * Do some operation after value get.
+     */
+    function tap(mixed $value, callable $callable): mixed
+    {
+        $callable($value);
+
+        return $value;
+    }
+}
+
 if (!function_exists('randomId')) {
 
     /**
