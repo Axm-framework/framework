@@ -50,10 +50,9 @@ if (!function_exists('app')) {
 
 if (!function_exists('env')) {
 
-    function env(string $params, string|bool $default = null)
+    function env(string $params, string|bool $default = null): bool|null|string
     {
-        $env = Env::get($params, $default);
-        return $env ?? $default;
+        return Env::get($params, $default);
     }
 }
 
@@ -137,16 +136,16 @@ if (!function_exists('cleanInput')) {
     function cleanInput(mixed $data): mixed
     {
         return match (true) {
-            is_array($data)  => array_map('cleanInput', $data),
+            is_array($data) => array_map('cleanInput', $data),
             is_object($data) => cleanInput((array) $data),
-            is_email($data)  => filter_var($data, FILTER_SANITIZE_EMAIL),
-            is_url($data)    => filter_var($data, FILTER_SANITIZE_URL),
-            is_ip($data)     => filter_var($data, FILTER_VALIDATE_IP),
+            is_email($data) => filter_var($data, FILTER_SANITIZE_EMAIL),
+            is_url($data) => filter_var($data, FILTER_SANITIZE_URL),
+            is_ip($data) => filter_var($data, FILTER_VALIDATE_IP),
             is_string($data) => preg_replace('/[\x00-\x1F\x7F]/u', '', filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES)),
-            is_int($data)    => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
-            is_float($data)  => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-            is_bool($data)   => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-            is_null($data)   => settype($data, 'NULL'),
+            is_int($data) => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
+            is_float($data) => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+            is_bool($data) => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            is_null($data) => settype($data, 'NULL'),
 
             default => filter_var($data, FILTER_SANITIZE_SPECIAL_CHARS),
         };
@@ -284,8 +283,7 @@ if (!function_exists('baseUrl')) {
     {
         $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $scriptName = basename($_SERVER['SCRIPT_NAME']);
-        $basePath = str_replace($scriptName, '', $_SERVER['SCRIPT_NAME']);
+        $basePath = str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
         $path = trim($basePath . '/' . $path, '/');
 
         return "{$scheme}://{$host}/{$path}";
@@ -297,12 +295,12 @@ if (!function_exists('asset')) {
     /**
      * Generate the URL for an asset.
      */
-    function asset(string $path, ?string $basePath = null): string
+    function asset(string $path, string $basePath = 'app/resources/assets/'): string
     {
-        $basePath = $basePath ?? 'app/resources/assets/';
-        $base = rtrim($basePath, '/') . '/' . ltrim($path, '/');
+        $basePath = rtrim($basePath, '/');
+        $path = ltrim($path, '/');
 
-        return baseUrl($base);
+        return baseUrl("{$basePath}/{$path}");
     }
 }
 
@@ -343,7 +341,7 @@ if (!function_exists('redirect')) {
      * Redirect one page to another, 
      * e.g.: redirect('login'); 
      **/
-    function redirect($url)
+    function redirect(string $url)
     {
         return app()
             ->response
@@ -433,8 +431,7 @@ if (!function_exists('getInfoUser')) {
 if (!function_exists('getUser')) {
 
     /**
-     * Returns a specific info of the user who 
-     * has successfully logged in.
+     * Returns a specific info of the user who has successfully logged in.
      */
     function getUser(string $value = null)
     {
@@ -504,63 +501,64 @@ if (!function_exists('to_object')) {
     }
 }
 
-if (!function_exists('helpers')) {
+/**
+ * Load one or multiple helpers.
+ */
+function helpers($helpers, ?string $customPath = null, string $separator = '_'): bool
+{
+    return (new class ($helpers, $customPath, $separator) {
+        private $helpers;
+        private $customPath;
+        private $separator;
 
-    /**
-     * Load one or multiple helpers.
-     */
-    function helpers(string|array $helpers, ?string $customPath = null, string $separator = '_'): bool
-    {
-        // Convert $helpers to an array if it's a string and split by spaces, commas, or dots
-        if (is_string($helpers)) {
-            $helpers = preg_split('/[\s,\.]+/', $helpers);
-        } elseif (!is_array($helpers)) {
-            throw new InvalidArgumentException('The $helpers variable must be an array.');
+        public function __construct($helpers, ?string $customPath, string $separator)
+        {
+            $this->helpers = $this->normalizeHelpers($helpers);
+            $this->customPath = $customPath ? rtrim($customPath, DIRECTORY_SEPARATOR) : null;
+            $this->separator = $separator;
         }
 
-        $config = config('paths');
+        private function normalizeHelpers($helpers): array
+        {
+            if (is_string($helpers)) {
+                return preg_split('/[\s,\.]+/', $helpers);
+            } elseif (!is_array($helpers)) {
+                throw new InvalidArgumentException('The $helpers variable must be an array.');
+            }
 
-        // Define paths for helper files
-        $appPath = $config['helpersPath'];            // Default application path
-        $axmHelpersPath = $config['helpersAxmPath']; // Axm system path
-
-        // Load custom helpers from the provided path
-        if ($customPath) {
-            $customPath = rtrim($customPath, '/'); // Ensure the path does not end with a slash
+            return $helpers;
         }
 
-        foreach ($helpers as $helper) {
-            $helper = trim($helper) . $separator . 'helper.php';
+        public function __invoke(): bool
+        {
+            $config = config('paths');
+            $appPath = $config['helpersPath'];
+            $axmHelpersPath = $config['helpersAxmPath'];
 
-            // Try to load the helper from the custom path first
-            if ($customPath) {
-                $customHelperFile = $customPath . DIRECTORY_SEPARATOR . $helper;
-                if (is_file($customHelperFile)) {
-                    require_once ($customHelperFile);
+            foreach ($this->helpers as $helper) {
+                $helper = trim($helper) . $this->separator . 'helper.php';
+
+                if ($this->customPath && is_file($customHelperFile = $this->customPath . DIRECTORY_SEPARATOR . $helper)) {
+                    require_once $customHelperFile;
                     continue;
                 }
+
+                if (is_file($appHelperFile = $appPath . DIRECTORY_SEPARATOR . $helper)) {
+                    require_once $appHelperFile;
+                    continue;
+                }
+
+                if (is_file($axmHelperFile = $axmHelpersPath . DIRECTORY_SEPARATOR . $helper)) {
+                    require_once $axmHelperFile;
+                    continue;
+                }
+
+                throw new Exception("The helper '$axmHelperFile' does not exist in any of the specified paths.");
             }
 
-            // Try to load the helper from the default application path
-            $appHelperFile = $appPath . DIRECTORY_SEPARATOR . $helper;
-            if (is_file($appHelperFile)) {
-                require_once ($appHelperFile);
-                continue;
-            }
-
-            // Try to load the helper from the Axm system path
-            $axmHelperFile = $axmHelpersPath . DIRECTORY_SEPARATOR . $helper;
-            if (is_file($axmHelperFile)) {
-                require_once ($axmHelperFile);
-                continue;
-            }
-
-            // If the helper is not found in any of the specified locations, throw an exception
-            throw new Exception("The helper '$axmHelperFile' does not exist in any of the specified paths.");
+            return true;
         }
-
-        return true;
-    }
+    })();
 }
 
 if (!function_exists('getRouteParams')) {
@@ -599,9 +597,9 @@ if (!function_exists('class_basename')) {
      */
     function class_basename($class): string
     {
-        return is_object($class)
+        return (string) is_object($class)
             ? basename(str_replace('\\', '/', get_class($class)))
-            : (string) basename(str_replace('\\', '/', $class));
+            : basename(str_replace('\\', '/', $class));
     }
 }
 
