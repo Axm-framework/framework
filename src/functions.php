@@ -121,9 +121,9 @@ if (!function_exists('partials')) {
     function partials(string $partial_name, array $data = [])
     {
         $partialsPath = config('paths.partialsPath'); // Make sure we have our paths set up!
-
         $partial_file = $partialsPath . DIRECTORY_SEPARATOR . $partial_name . '.php';
         $partials = app()->view->file($partial_file, $data);
+      
         return $partials;
     }
 }
@@ -198,21 +198,6 @@ if (!function_exists('show')) {
 
         echo $output . PHP_EOL;
         return '';
-    }
-}
-
-if (!function_exists('cVar')) {
-
-    /**
-     * Copies the value of an original variable, removes the original variable, 
-     * and returns the copied value.
-     */
-    function cVar(mixed $var): mixed
-    {
-        $result = $var;
-
-        unset($var);
-        return $result;
     }
 }
 
