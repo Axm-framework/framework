@@ -308,19 +308,14 @@ abstract class URI
      */
     public function createNewUrl(string $uri, array $query = []): string
     {
-        // Get the scheme, authority, and fragment components from the current URL
         $scheme = $this->getScheme();
         $authority = $this->getAuthority();
         $fragment = $this->getFragment();
 
-        // Ensure the URI starts with CLEAN_URI_PATH and remove trailing slashes
-        $uri = CLEAN_URI_PATH . trim($uri, '/');
-
-        // Get the query component by processing the provided query parameters
         $query = $this->getQuery($query);
 
         // Create the full URL using the static method createURIString
-        return static::createURIString($scheme, $authority, $uri, $query, $fragment);
+        return static::createURIString($scheme, $authority, trim($uri, '/'), $query, $fragment);
     }
 
     /**
@@ -334,7 +329,7 @@ abstract class URI
         $fragment = $this->getFragment();
 
         // Use the provided $url or default CLEAN_URI_PATH for the path component
-        $cleanedUri = $url ?? CLEAN_URI_PATH ?? '';
+        $cleanedUri = $url ?? '';
 
         // Get the query component from the current URL
         $query = $this->getQuery();
