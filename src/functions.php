@@ -136,16 +136,16 @@ if (!function_exists('cleanInput')) {
     function cleanInput(mixed $data): mixed
     {
         return match (true) {
-            is_array($data) => array_map('cleanInput', $data),
+            is_array($data)  => array_map('cleanInput', $data),
             is_object($data) => cleanInput((array) $data),
-            is_email($data) => filter_var($data, FILTER_SANITIZE_EMAIL),
-            is_url($data) => filter_var($data, FILTER_SANITIZE_URL),
-            is_ip($data) => filter_var($data, FILTER_VALIDATE_IP),
+            is_email($data)  => filter_var($data, FILTER_SANITIZE_EMAIL),
+            is_url($data)    => filter_var($data, FILTER_SANITIZE_URL),
+            is_ip($data)     => filter_var($data, FILTER_VALIDATE_IP),
             is_string($data) => preg_replace('/[\x00-\x1F\x7F]/u', '', filter_var(trim($data), FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_NO_ENCODE_QUOTES)),
-            is_int($data) => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
-            is_float($data) => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-            is_bool($data) => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
-            is_null($data) => settype($data, 'NULL'),
+            is_int($data)    => filter_var($data, FILTER_SANITIZE_NUMBER_INT),
+            is_float($data)  => filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+            is_bool($data)   => filter_var($data, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
+            is_null($data)   => settype($data, 'NULL'),
 
             default => filter_var($data, FILTER_SANITIZE_SPECIAL_CHARS),
         };

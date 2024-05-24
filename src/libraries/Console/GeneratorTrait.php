@@ -128,7 +128,7 @@ trait GeneratorTrait
         $path = $this->buildPath($this->className ?? $class);
 
         // Check if path is empty.
-        if (empty ($path)) {
+        if (empty($path)) {
             return;
         }
 
@@ -258,7 +258,7 @@ trait GeneratorTrait
 
         // Add namespace and class name replacements.
         $replacements['{namespace}'] = $namespace;
-        $replacements['{class}'] = str_replace($namespace . '\\', '', $class);
+        $replacements['{class}'] = trim(str_replace($namespace . '\\', '', $class), '\\');
 
         // Perform the replacements on the template and return it.
         return str_replace(
