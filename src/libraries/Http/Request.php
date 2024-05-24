@@ -16,15 +16,13 @@ class Request extends URI
 {
     /**
      * routeParams
-     * @var array
      */
     private array $routeParams = [];
 
     /**
      * headers
-     * @var array
      */
-    protected $headers = [];
+    protected array $headers = [];
 
     /**
      * contentType
@@ -41,14 +39,12 @@ class Request extends URI
     /**
      * Associative array of supported content types and 
      * their corresponding parsing methods.
-     *
-     * @var array
      */
-    protected $supportedContentTypes = [
+    protected array $supportedContentTypes = [
         'text/xml' => 'parseXML',
         'text/csv' => 'parseCSV',
         'application/json' => 'parseJSON',
-        'application/xml' => 'parseXML',
+        'application/xml'  => 'parseXML',
         'application/x-www-form-urlencoded' => 'parseForm',
     ];
 
@@ -56,10 +52,8 @@ class Request extends URI
      * Holds a map of lower-case header names
      * and their normal-case key as it is in $headers.
      * Used for case-insensitive header access.
-     *
-     * @var array
      */
-    protected $headerMap = [];
+    protected array $headerMap = [];
 
     /**
      * body
@@ -92,7 +86,6 @@ class Request extends URI
 
     /**
      * Gets the $_FILES array of uploaded files 
-     *  @return array|null The $_FILES array or null if no files were provided.
      */
     public function files(string $name = null): ?array
     {
@@ -102,20 +95,15 @@ class Request extends URI
 
     /**
      * Get an uploaded file by its name 
-     * 
-     * @param string $name The name of the file to get 
-     * @return array|null The array of the specific file or null if not found.
      */
-    public function file(string $options): ?array
+    public function file(string $name): ?array
     {
-        $file = $this->files[$options];
-        return isset($file[$options]) ? $file[$options] : null;
+        $file = $this->files[$name];
+        return isset($file[$name]) ? $file[$name] : null;
     }
 
     /**
      * Checks if a file with a specific name has been uploaded 
-     * @param string $name Name of the file to check 
-     * @return bool Indicates if the file has been uploaded.
      */
     public function hasFile(string $name): bool
     {
@@ -125,9 +113,6 @@ class Request extends URI
 
     /**
      * Moves an uploaded file to a destination location 
-     * 
-     * @param string $destination Destination path where the file will be moved 
-     * @return bool Indicates whether the file move operation was successful.
      */
     public function move(string $destination): bool
     {
@@ -167,7 +152,6 @@ class Request extends URI
 
     /**
      * Returns true if the method is get
-     * @return bool
      */
     public function isGet(): bool
     {
@@ -176,7 +160,6 @@ class Request extends URI
 
     /**
      * Returns true if method is HEAD
-     * @return bool
      */
     public function isHead(): bool
     {
@@ -185,7 +168,6 @@ class Request extends URI
 
     /**
      * Returns true if the method is post
-     * @return bool
      */
     public function isPost(): bool
     {
@@ -194,7 +176,6 @@ class Request extends URI
 
     /**
      * Returns true if the method is PUT
-     * @return bool
      */
     public function isPut(): bool
     {
@@ -203,7 +184,6 @@ class Request extends URI
 
     /**
      * Returns true if the method is PATCH
-     * @return bool
      */
     public function isPatch(): bool
     {
@@ -212,7 +192,6 @@ class Request extends URI
 
     /**
      * Returns true if the method is DELETE
-     * @return bool
      */
     public function isDelete(): bool
     {
@@ -221,7 +200,6 @@ class Request extends URI
 
     /**
      * Returns true if method is OPTIONS
-     * @return bool
      */
     public function isOtions(): bool
     {
@@ -246,7 +224,6 @@ class Request extends URI
 
     /**
      * Determine if the request is text/plain.
-     * @return bool
      */
     public function isText(): bool
     {
@@ -255,7 +232,6 @@ class Request extends URI
 
     /**
      * Determine if the request is multipart.
-     * @return bool
      */
     public function isMultipart(): bool
     {
@@ -413,7 +389,7 @@ class Request extends URI
      */
     public function isMobile(): bool
     {
-        return strpos(mb_strtolower($_SERVER['HTTP_USER_AGENT']), 'mobile') ? TRUE : FALSE;
+        return strpos(mb_strtolower($_SERVER['HTTP_USER_AGENT']), 'mobile') ? true : false;
     }
 
     /**
