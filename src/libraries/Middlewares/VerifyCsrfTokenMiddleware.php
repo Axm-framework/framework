@@ -13,13 +13,13 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
 {
     /**
      * The application instance.
-     * @var App
+     * @var \App
      */
     protected $app;
 
     /**
      * The encrypter implementation.
-     * @var Encryption\Encrypter
+     * @var \Encryption\Encrypter
      */
     protected $encrypter;
 
@@ -36,7 +36,7 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  Http\Request $request
+     * @param  \Http\Request $request
      * @return mixed
      * @throws \Exception
      */
@@ -52,7 +52,7 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
     /**
      * Determine if the HTTP request uses a ‘read’ verb.
      *
-     * @param  Http\Request  $request
+     * @param  \Http\Request $request
      * @return bool
      */
     protected function isReading()
@@ -84,19 +84,18 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
     /**
      * Create a new "XSRF-TOKEN" cookie that contains the CSRF token.
      *
-     * @param  \Axm\Http\Request $request
+     * @param  \Http\Request $request
      * @param  array  $config
      */
-    protected function newCookie($request, $config)
+    protected function newCookie(\Http\Request $request, array $config)
     {
         $request->setcookie(
             'XSRF-TOKEN',
             $this->app->getCsrfToken(),
-            $config['expiration'],
+            (int) $config['expiration'],
             $config['path'],
             $config['domain'],
             $config['secure'],
-            false,
             false
         );
     }

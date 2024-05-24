@@ -14,100 +14,84 @@ abstract class URI
 {
     /**
      * List of URI segments.
-     * Starts at 1 instead of 0
-     * @var array
      */
-    protected $segments = [];
+    protected array $segments = [];
 
     /**
      * The URI Scheme.
-     * @var string
      */
-    protected $scheme = 'http';
+    protected string $scheme = 'http';
 
     /**
      * URI User Info
-     * @var string
      */
-    protected $user;
+    protected string $user;
 
     /**
      * URI User Password
-     * @var string
      */
-    protected $password;
+    protected string $password;
 
     /**
      * URI Host
-     * @var string
      */
-    protected $host;
+    protected string $host;
 
     /**
      * URI Port
-     * @var int
      */
-    protected $port;
+    protected int $port;
 
     /**
      * URI path.
-     * @var string
      */
-    protected $path;
+    protected string $path;
 
     /**
      * The name of any fragment.
-     * @var string
      */
-    protected $fragment = '';
+    protected string $fragment = '';
 
     /**
      * The query string.
-     * @var array
      */
-    protected $query = [];
+    protected array $query = [];
 
     /**
      * Default schemes/ports.
-     * @var array
      */
-    protected $defaultPorts = [
-        'http'  => 80,
+    protected array $defaultPorts = [
+        'http' => 80,
         'https' => 443,
-        'ftp'   => 21,
-        'sftp'  => 22,
+        'ftp' => 21,
+        'sftp' => 22,
     ];
 
     /**
      * Whether passwords should be shown in userInfo/authority calls.
      * Default to false because URIs often show up in logs
-     * @var bool
      */
-    protected $showPassword = false;
+    protected bool $showPassword = false;
 
     /**
      * If true, will continue instead of throwing exceptions.
-     * @var bool
      */
-    protected $silent = false;
+    protected bool $silent = false;
 
     /**
      * If true, will use raw query string.
-     * @var bool
      */
-    protected $rawQueryString = false;
+    protected bool $rawQueryString = false;
 
     /**
      * If true, will use raw query string.
-     * @var bool
      */
-    protected $uri;
+    protected bool $uri;
 
     /**
      * The encryption key resolver callable.
-     * @var string
      */
-    protected $key = null;
+    protected ?string $key = null;
 
     /**
      * 
@@ -115,24 +99,12 @@ abstract class URI
     private const HASH_ALGORITHM = 'sha512';
 
     /**
-     * Returns the cleaned and formatted URI for the current request.
-     * @return string The cleaned and formatted URI for the current request.
+     * Returns URI for the request.
      */
-    // public function getUri(): ?string
-    // {
-    //     $uri = rawurldecode($_SERVER['REQUEST_URI']);
-
-    //     if ($pos = strpos($uri, '?')) {
-    //         $uri = substr($uri, 0, $pos);
-    //     }
-
-    //     // Delete the base path
-    //     if (CLEAN_URI_PATH !== '/') {
-    //         $uri = str_replace(CLEAN_URI_PATH, '', $uri);
-    //     }
-
-    //     return '/' . trim($uri, '/');
-    // }
+    public function getUri(): ?string
+    {
+        return app('router')->getUri();
+    }
 
     /**
      * Builds a representation of the string from the component parts.    
@@ -159,9 +131,6 @@ abstract class URI
 
     /**
      * Retrieve the scheme component of the URI.
-     *
-     * If no scheme is present, this method MUST return an empty string.
-     * @return string The URI scheme.
      */
     public function getScheme(): string
     {
@@ -193,7 +162,7 @@ abstract class URI
     /**
      * Retrieve the user information component of the URI.
      */
-    protected function getUserInfo()
+    protected function getUserInfo(): string
     {
         $userInfo = $this->user;
         if ($this->showPassword === true && !empty($this->password)) {
@@ -206,10 +175,8 @@ abstract class URI
     /**
      * Temporarily sets the URI to show a password in userInfo. Will
      * reset itself after the first call to authority().
-     *
-     * @return URI
      */
-    protected function showPassword(bool $val = true)
+    protected function showPassword(bool $val = true): self
     {
         $this->showPassword = $val;
 
@@ -218,9 +185,6 @@ abstract class URI
 
     /**
      * Retrieve the host component of the URI.
-     *
-     * If no host is present, this method MUST return an empty string.
-     * @return string The URI host.
      */
     protected function getHost(): string
     {
@@ -230,14 +194,13 @@ abstract class URI
     /**
      * Retrieve the port component of the URI.
      */
-    protected function getPort()
+    protected function getPort(): int
     {
-        return $this->port ?? $_SERVER['SERVER_PORT'];
+        return $this->port ?? $_SERVER['SERVER_PORT'] ?? $this->defaultPorts['http'];
     }
 
     /**
      * Retrieve the path component of the URI.
-     * @return string The URI path.
      */
     protected function getPath(): string
     {
@@ -251,10 +214,6 @@ abstract class URI
      *                       Possible options:
      *                       - 'except': An array of keys to exclude from the query string.
      *                       - 'only': An array of keys to include in the query string.
-     *
-     * @return array|null The filtered query string based on the provided options.
-     *                    If the options are not provided or not in the expected format, 
-     * the original query is returned.
      */
     protected function getQueryString(array $options = []): ?array
     {
@@ -273,9 +232,6 @@ abstract class URI
 
     /**
      * Retrieve the query string
-     *
-     * @param array $options
-     * @return string
      */
     public function getQuery(array $options = []): string
     {
@@ -349,10 +305,6 @@ abstract class URI
 
     /**
      * Create a new URL by assembling its components.
-     *
-     * @param string $uri The path component of the URL.
-     * @param array $query An associative array representing the query parameters.
-     * @return string The newly constructed URL.
      */
     public function createNewUrl(string $uri, array $query = []): string
     {
@@ -373,10 +325,6 @@ abstract class URI
 
     /**
      * Get a complete URL by combining its components.
-     *
-     * @param string|null $url An optional parameter representing the path component of the URL.
-     *                         If not provided, the default CLEAN_URI_PATH is used.
-     * @return string The fully constructed URL based on the provided or default path, and other components.
      */
     public function getUrl(string $url = null): string
     {
@@ -397,8 +345,6 @@ abstract class URI
 
     /**
      * Get the current URL by combining the base URL and the current URI.
-     * @return string The fully constructed current URL, obtained by appending 
-     * the current URI to the base URL.
      */
     public function getCurrentUrl(): string
     {
@@ -411,24 +357,13 @@ abstract class URI
 
     /**
      * Generate a signed URL by adding a signature and optional expiration time.
-     *
-     * @param string $url The URL to be signed.
-     * @param int|null $expire An optional expiration timestamp for the signed URL.
-     *                         If not provided, a default expiration of 1 hour from the current time is used.
-     * @return string The signed URL with added signature and expiration parameters.
      */
-    public function signed(string $url, $expire = null)
+    public function signed(string $url, int $expire = null): string
     {
-        // Get the current timestamp
-        $now = time();
-
         // Calculate the expiration timestamp (default: 1 hour from now)
-        $expiration = $expire ?: $now + 3600;
+        $expiration = $expire ?:  time() + 3600;
+        $signature  = $this->generateSignature($url);
 
-        // Generate a signature for the URL
-        $signature = $this->generateSignature($url);
-
-        // Prepare query parameters with signature and expiration
         $queryParameters = [
             'signature'  => $signature,
             'expiration' => $expiration
@@ -436,15 +371,11 @@ abstract class URI
 
         // Create a new URL by appending the signature and expiration as query parameters
         $signedUrl = $this->createNewUrl($url . '?' . http_build_query($queryParameters));
-
-        // Return the signed URL
         return $signedUrl;
     }
 
     /**
      * Check if the current request has a valid signature in its query parameters.
-     * @return bool Returns true if the request has a valid signature and has not expired; 
-     * otherwise, returns false.
      */
     public function hasValidSignature(): bool
     {
@@ -487,22 +418,16 @@ abstract class URI
 
     /**
      * Generate a signature for a given URL using HMAC (Hash-based Message Authentication Code).
-     *
-     * @param string $url The URL for which the signature is to be generated.
-     * @return string The generated signature for the given URL.
      */
-    private function generateSignature($url)
+    private function generateSignature(string $url): string
     {
         // Get the secret key from the environment variables
         $this->key = env('APP_KEY');
 
-        // Prepare the data to be signed, which is the provided URL
         $dataToSign = $url;
 
         // Generate the signature using HMAC with the specified hash algorithm and the secret key
         $signature = hash_hmac(self::HASH_ALGORITHM, $dataToSign, $this->key);
-
-        // Return the generated signature
         return $signature;
     }
 
@@ -512,16 +437,12 @@ abstract class URI
      * This function divides the input path into fragments using the directory separator (e.g., '/') as a separator.
      * It then calculates the total number of fragments in the path and removes fragments either from the left (positive count)
      * or the right (negative count) side of the path. If the count is 0, no fragments are removed.
-     * @param string $path The input path to remove fragments from.
-     * @param int $count The number of fragments to remove. Use a positive value to remove fragments from the left,
-     *                   a negative value to remove fragments from the right, or 0 to keep the path unchanged.
-     * @return string The modified path with the specified number of fragments removed.
      * @example
      * $originalPath = "C:/xampp/htdocs/appApp/vendor/axm/raxm/src";
      * $modifiedPath = removePathFragments($originalPath, -3);
      * return "C:/xampp/htdocs/appApp"
      */
-    public function removePathFragments($path, $count)
+    public function removePathFragments(string $path, int $count): string
     {
         // Split the path into fragments using the directory separator.
         $fragments = explode(DIRECTORY_SEPARATOR, $path);
