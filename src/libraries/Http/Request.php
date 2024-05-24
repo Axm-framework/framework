@@ -2,7 +2,6 @@
 
 namespace Http;
 
-// use Axm;
 use Http\URI;
 use RuntimeException;
 
@@ -46,10 +45,10 @@ class Request extends URI
      * @var array
      */
     protected $supportedContentTypes = [
-        'text/xml'                          => 'parseXML',
-        'text/csv'                          => 'parseCSV',
-        'application/json'                  => 'parseJSON',
-        'application/xml'                   => 'parseXML',
+        'text/xml' => 'parseXML',
+        'text/csv' => 'parseCSV',
+        'application/json' => 'parseJSON',
+        'application/xml' => 'parseXML',
         'application/x-www-form-urlencoded' => 'parseForm',
     ];
 
@@ -76,33 +75,19 @@ class Request extends URI
 
     /**
      * Create a URL by combining a base URL and a relative URI.
-     *
-     * @param string $uri
-     * @param string|null $baseUrl
-     * @return string
      */
     public function createUrl(string $uri = '', array $params = null): string
     {
-        // // If a base URL is provided, combine it with the URI
-        // if (!is_null($baseUrl)) {
-        //     // Ensure that the base URL ends with a trailing slash
-        //     $baseUrl = rtrim($baseUrl, '/') . '/';
-
-        //     // Combine the base URL and the URI
-        //     return $baseUrl . ltrim($uri, '/');
-        // }
-
         // If no base URL is provided, return the URI as is
-        return Router::url($uri, $params);
+        return app()->router->url($uri, $params);
     }
 
     /**
-     * Gets the method of the current HTTP request 
-     * @return string The method of the HTTP request.
+     * Gets the method of the current HTTP request
      */
-    public function getMethod(): string
+    public function getMethod(): ?string
     {
-        return $_SERVER['REQUEST_METHOD'];
+        return filter_input(INPUT_SERVER, 'REQUEST_METHOD');
     }
 
     /**
@@ -173,14 +158,11 @@ class Request extends URI
     }
 
     /**
-     * @param mixed $file
-     * @return string
+     * Get extension of file
      */
-    public function get_file_extension($file)
+    public function get_file_extension(array $file): string
     {
-        $filename = $file['name'];
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        return $extension;
+        return pathinfo($file['name'], PATHINFO_EXTENSION);
     }
 
     /**
@@ -301,38 +283,31 @@ class Request extends URI
     }
 
     /**
-     * Parse JSON
      * Converts JSON format to associative array.
-     * @param string $input
-     * @return array|string
      */
-    public function parseJSON($input)
+    public function parseJSON(string $input): mixed
     {
         return json_decode($input, true);
     }
 
     /**
-     * Parse XML 
-     * Convert XML format into an object, this will need to be made standard 
-     * if objects or associative arrays are returned 
-     * @param string $input
-     * @return \SimpleXMLElement|null
+     * Converts XML string into a SimpleXMLElement object.
      */
-    public function parseXML($input)
+    public function parseXML(string $input): \SimpleXMLElement
     {
         try {
-            return new \SimpleXMLElement($input);
+            $xml = new \SimpleXMLElement($input);
         } catch (\Exception $e) {
-            // Do nothing
+            throw new \Exception("Invalid XML: " . $e->getMessage());
         }
+
+        return $xml;
     }
 
     /**
      * Performs Form to Array format conversion.
-     * @param string $input
-     * @return array
      */
-    public function parseForm($input)
+    public function parseForm(string $input): array
     {
         if ($this->hasPost())
             parse_str($input, $vars);
@@ -341,10 +316,9 @@ class Request extends URI
     }
 
     /**
-     * Get a subset containing the provided keys with values
-     * from the input data.
-     * @param  array|mixed $keys
-     * @return array
+     * Convert an array to an object, containing only the provided keys with values.
+     *
+     * @param array $keys
      */
     protected function arrayToObject(array $keys): object
     {
@@ -361,56 +335,35 @@ class Request extends URI
             $data : ($data->{$key} ??
                 throw new RuntimeException(
                     printf('The property %s does not exist in the input data.', [$data->$key ?? $key])
-                ));
-    }
-
-    /**
-     * @param mixed $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->input($key);
+                )
+            );
     }
 
     /**
      * Fetch an item from the COOKIE array.
-     *
-     * @param array|string|null $index  Index for item to be fetched from $_COOKIE
-     * @param int|null          $filter A filter name to be applied
-     * @param mixed             $flags
-     * @return mixed
      */
-    public function getCookie(string $key = null)
+    public function getCookie(?string $key = null): array
     {
         return $_COOKIE[$key] ?? [];
     }
 
     /**
      * Stores a value in a cookie.
-     *
-     * @param string $name The name of the cookie.
-     * @param mixed $value The value to store in the cookie.
-     * @param int $expiration The time in seconds before the cookie expires (default is 30 days).
-     * @param string $path The path where the cookie will be available (default is "/" for the entire site).
-     * @param string $domain The domain where the cookie will be available (default is the current domain).
-     * @param bool $secure Indicates whether the cookie should be sent only over a secure connection (default is false).
-     * @param bool $httpOnly Indicates whether the cookie should be accessible only via HTTP (default is true).
      */
-    public function setCookie($name, $value, $expiration = 2592000, $path = '/', $domain = null, $secure = false, $httpOnly = true)
+    public function setCookie(string $name, string $value, int $expiration = 2592000, string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true): bool
     {
         // Validate and clean input data
-        $name  = cleanInput($name);
+        $name = cleanInput($name);
         $value = cleanInput($value);
 
         // If the domain is not specified, use the current domain
-        if ($domain === null) $domain = $_SERVER['HTTP_HOST'];
+        if ($domain === null)
+            $domain = $_SERVER['HTTP_HOST'];
 
         // Calculate the expiration date
         $expirationTime = time() + $expiration;
 
-        // Configure the cookie
-        setcookie(
+        return setcookie(
             $name,
             $value,
             [
@@ -426,16 +379,8 @@ class Request extends URI
 
     /**
      * Expire a cookie by name.
-     *
-     * This function expires a cookie by setting its expiration date in the past,
-     * causing the browser to remove it.
-     * @param string $name   The name of the cookie to expire.
-     * @param string $value   The path on the server where the cookie is available.
-     *                       Defaults to '/'.
-     * @param string|null $domain The domain for which the cookie is available.
-     *                            If not specified, the current domain is used.
      */
-    function deleteCookie($name, $value = '/', $domain = null)
+    function deleteCookie(string $name, string $value = '/', string|null $domain = null): bool
     {
         // If the domain is not specified, use the current domain
         if ($domain === null) {
@@ -443,12 +388,11 @@ class Request extends URI
         }
 
         // Set the expiration date in the past to delete the cookie
-        setcookie($name, '', time() - 3600, $value, $domain);
+        return setcookie($name, '', time() - 3600, $value, $domain);
     }
 
     /**
      * Indicates if the request is AJAX
-     * @return boolean
      */
     public function isAjax(): bool
     {
@@ -458,7 +402,6 @@ class Request extends URI
 
     /**
      * Indicates whether the request is CLI
-     * @return boolean
      */
     public function isCLI(): bool
     {
@@ -467,7 +410,6 @@ class Request extends URI
 
     /**
      * Detect if the User Agent is a mobile phone
-     * @return boolean
      */
     public function isMobile(): bool
     {
@@ -475,16 +417,15 @@ class Request extends URI
     }
 
     /**
-     * @return string
+     * @return string The operating system name.
      */
     public function getOperatingSystem(): string
     {
-        return php_uname('s');
+        return PHP_OS_FAMILY;
     }
 
     /**
      * Detects if https is secure
-     * @return boolean
      */
     public function isSecure(): bool
     {
@@ -495,7 +436,6 @@ class Request extends URI
 
     /**
      * Get User Agent (User Agent)
-     * @return String
      */
     public function getUserAgent(): string
     {
@@ -504,9 +444,8 @@ class Request extends URI
 
     /**
      * Allows the client's IP to be obtained, even when using a proxy.
-     * @return String
      */
-    public function getIPAddress()
+    public function getIPAddress(): string
     {
         if (!empty($_SERVER['HTTP_CLIENT_IP']))
             return $_SERVER['HTTP_CLIENT_IP'];
@@ -519,9 +458,8 @@ class Request extends URI
 
     /**
      * Returns the version of the HTTP protocol used by client.
-     * @return string the version of the HTTP protocol.
      */
-    public function getHttpVersion()
+    public function getHttpVersion(): float
     {
         return (isset($_SERVER['SERVER_PROTOCOL'])
             && $_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.0')
@@ -531,9 +469,6 @@ class Request extends URI
 
     /**
      * Modify the parameter passed by Url
-     * 
-     * @param $params
-     * @return $this
      */
     public function setRouteParams($params)
     {
@@ -543,7 +478,6 @@ class Request extends URI
 
     /**
      * Returns all the parameters passed by Url
-     * @return array
      */
     public function getRouteParams()
     {
@@ -552,11 +486,10 @@ class Request extends URI
 
     /**
      * Returns a specific parameter from those passed by url
-     * @param string $param array
      */
-    public function getRouteParam($param, $default = null)
+    public function getRouteParam(string $param, $default = [])
     {
-        return $this->routeParams[$param] ?? [];
+        return $this->routeParams[$param] ?? $default;
     }
 
     /**
@@ -565,7 +498,8 @@ class Request extends URI
     private function is_csrf_valid(): bool
     {
         $requestToken = $this->toJson()->csrfToken ?? $_POST['csrfToken'] ?? null;
-        if (!$requestToken) return false;
+        if (!$requestToken)
+            return false;
 
         return $_COOKIE['csrfToken'] === $requestToken;
     }
@@ -582,12 +516,9 @@ class Request extends URI
 
     /**
      * Validate an IP address
-     *
-     * @param string $ip    IP Address
-     * @param string $which IP protocol: 'ipv4' or 'ipv6'
-     * @deprecated Use Validation instead
+     * @param string $ip  IP Address
      */
-    public function isValidIP(?string $ip = null, ?string $type = null): bool
+    public function isValidIP(?string $ip = null): bool
     {
         $Ip = new \Validation\Rules\Ip();
         return ($Ip->validate($ip));
@@ -630,9 +561,6 @@ class Request extends URI
 
     /**
      * Gets a value from the $_POST array
-     *
-     * @param string $var
-     * @return mixed
      */
     public function post(string $key = '')
     {
@@ -640,9 +568,7 @@ class Request extends URI
     }
 
     /**
-     * Gets a value from the $_GET array, applies the default 
-     * FILTER_SANITIZE_STRING filter
-     * @param string $var
+     * Gets a value from the $_GET array, applies the default FILTER_SANITIZE_STRING filter
      * @return mixed
      */
     public function get(string $key = '')
@@ -652,9 +578,6 @@ class Request extends URI
 
     /**
      * Gets a value $value from the array $_REQUEST(Contains $_GET,$_POST,$_COOKIE)
-     *
-     * @param string $var
-     * @return mixed
      */
     public function request(string $key = '')
     {
@@ -663,8 +586,6 @@ class Request extends URI
 
     /**
      * Gets a value $value from the array $_SERVER
-     *
-     * @param string $var
      * @return mixed
      */
     protected function server(string $key = '')
@@ -674,40 +595,25 @@ class Request extends URI
 
     /**
      * Filters/sanitizes a value from an array using a specified filter.
-     *
-     * @param string $key The key of the value to filter.
-     * @param mixed $value The value to filter.
-     * @param int $filter (optional) The filter to apply. Defaults to FILTER_SANITIZE_STRING.
-     * @param array $array (optional) The array containing the value. Defaults to an empty array.
-     * @return mixed The filtered value or null if the value is empty.
-     * @throws RuntimeException If the key does not exist in the array.
      */
     protected function getFilteredValue(string $key, array $array, $default = null): mixed
     {
-        // Verify if the key exists and is not null
         if (isset($array[$key]) && $array[$key] !== null) {
-            // Filter the value of the key using the function h
             $filteredValue = $this->h($array[$key]);
         } else {
-            // The key does not exist or its value is null, apply the function h to the whole array.
             $filteredValue = array_map([$this, 'h'], $array);
         }
 
-        // Return filtered value or default value if key not found
         return $filteredValue ?? $default;
     }
 
     /**
      * Shortcut for htmlspecialchars, defaults to the application's charset.
-     * 
-     * @param string|array $data
-     * @param string $charset
-     * @return string
      */
-    protected function h($data, string $charset = null)
+    protected function h(string|array $data, string $charset = null): ?string
     {
         if (is_string($data)) {
-            $data = htmlspecialchars($data, ENT_QUOTES, $charset ?? APP_CHARSET);
+            $data = htmlspecialchars($data, ENT_QUOTES, $charset ?? config('app.charset'));
         } elseif (is_array($data)) {
             $data = array_map('htmlspecialchars', $data);
         }
@@ -717,7 +623,6 @@ class Request extends URI
 
     /**
      * Parse the request body based on the content type
-     * @return mixed
      */
     public function getBody(): mixed
     {
@@ -756,7 +661,6 @@ class Request extends URI
 
     /**
      * Get the CSRF token from the request header.
-     * @return string|null The CSRF token or null if not present.
      */
     private function getRequestCsrfHeader(): ?string
     {
@@ -766,9 +670,6 @@ class Request extends URI
 
     /**
      * Compare two CSRF tokens for equality.
-     *
-     * @param string|null $tokenFromRequest The CSRF token from the request.
-     * @param string|null $axmCsrfToken     The CSRF token from the Axm application.
      */
     private function compareCsrfTokens(?string $tokenFromRequest, ?string $axmCsrfToken): bool
     {
@@ -777,19 +678,17 @@ class Request extends URI
     }
 
     /**
-     * Returns user browser accept types, null if not present.
-     * @return string user browser accept types, null if not present
+     * Returns the browser's accepted media types, or null if not present.
      */
-    public function getAcceptTypes()
+    public function getAcceptTypes(): ?string
     {
         return isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : null;
     }
 
     /**
      * Returns the URL referrer, null if not present
-     * @return string URL referrer, null if not present
      */
-    public function getUrlReferrer()
+    public function getUrlReferrer(): ?string
     {
         return isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
     }
@@ -799,7 +698,7 @@ class Request extends URI
      */
     private function init()
     {
-        $this->contentType  = $this->getContentType() ?? 'application/json';
+        $this->contentType = $this->getContentType() ?? 'application/json';
     }
 
     /**
@@ -812,7 +711,6 @@ class Request extends URI
 
     /**
      * Gets all the headers from the request and returns it as an associative array.
-     * @return array
      */
     public function getHeaders(): array
     {
@@ -838,10 +736,6 @@ class Request extends URI
 
     /**
      * Get a header line from the request headers.
-     *
-     * @param string $name The name of the header.
-     * @param string $defaultValue The default value to return if the header is not present.
-     * @return string The value of the header or the default value.
      */
     public function getHeaderLine(string $name, string $defaultValue = ''): string
     {
@@ -855,12 +749,8 @@ class Request extends URI
 
     /**
      * Determine if the request has a given header.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return bool
      */
-    public function hasHeader($key, $value = null): bool
+    public function hasHeader(string $key, $value = null): bool
     {
         $headers = $this->getHeaders();
         if (!array_key_exists($key, $headers))
@@ -874,11 +764,8 @@ class Request extends URI
 
     /**
      * Determine if the request has the given headers.
-     *
-     * @param  array|string  $headers
-     * @return bool
      */
-    public function hasHeaders($headers): bool
+    public function hasHeaders(array|string $headers): bool
     {
         if (is_string($headers))
             $headers = [$headers => null];
@@ -892,10 +779,7 @@ class Request extends URI
     }
 
     /**
-     * Modifica um Header específicado por user 
-     * 
-     * @param string $name
-     * @param string $value
+     * Modify a user-specified header
      */
     public function setHeader(string $name, string $value): self
     {
@@ -926,5 +810,13 @@ class Request extends URI
                 $this->headerMap[strtolower($header)] = $header;
             }
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __get(string $key)
+    {
+        return $this->input($key);
     }
 }
