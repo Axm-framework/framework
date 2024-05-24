@@ -432,9 +432,8 @@ class Router
      */
     public function openRoutesUser(): self
     {
-        $ext = '.php';
         $pathConfig = config('paths.routesPath') . DIRECTORY_SEPARATOR;
-        $files = glob($pathConfig . "*$ext");
+        $files = glob($pathConfig . "*.php");
         foreach ($files ?? [] as $file) {
             require_once ($file);
         }
