@@ -106,7 +106,7 @@ class Response
 	/**
 	 * Prepares a Response object with the given content, headers, status, MIME type, andset.
 	 */
-	public function make(string $content = '', array $headers = [], int $status = 200, string $mimeType = 'text/html', string $charset = 'utf-8'): Response
+	public function make(?string $content = '', array $headers = [], int $status = 200, string $mimeType = 'text/html', string $charset = 'utf-8'): Response
 	{
 		$this->status($status)
 			->withHeaders($headers);
