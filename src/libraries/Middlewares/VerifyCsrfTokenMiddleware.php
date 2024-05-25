@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Middlewares;
 
 use Exception;
+use Http\Request;
 use Encryption\Encrypter;
 use App\Middlewares\BaseMiddleware;
 
@@ -13,19 +14,16 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
 {
     /**
      * The application instance.
-     * @var \App
      */
-    protected $app;
+    protected \App $app;
 
     /**
      * The encrypter implementation.
-     * @var \Encryption\Encrypter
      */
-    protected $encrypter;
+    protected Encrypter $encrypter;
 
     /**
      * Create a new middleware instance.
-     * @return void
      */
     public function __construct()
     {
@@ -35,10 +33,6 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
 
     /**
      * Handle an incoming request.
-     *
-     * @param  \Http\Request $request
-     * @return mixed
-     * @throws \Exception
      */
     public function execute()
     {
@@ -51,18 +45,14 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
 
     /**
      * Determine if the HTTP request uses a ‘read’ verb.
-     *
-     * @param  \Http\Request $request
-     * @return bool
      */
-    protected function isReading()
+    protected function isReading(): bool
     {
         return $this->app->request->isRequestMethod(['HEAD', 'GET', 'OPTIONS']);
     }
 
     /**
      * Determine if the session and input CSRF tokens match.
-     * @return bool
      */
     protected function isAxmRequest(): bool
     {
@@ -72,30 +62,26 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
 
     /**
      * Add the CSRF token to the response cookies.
-     * @return void
      */
     protected function addCookieToResponse()
     {
         $request = app()->request;
-        $config  = config('session');
+        $config = config('session');
         $this->newCookie($request, $config);
     }
 
     /**
      * Create a new "XSRF-TOKEN" cookie that contains the CSRF token.
-     *
-     * @param  \Http\Request $request
-     * @param  array  $config
      */
-    protected function newCookie(\Http\Request $request, array $config)
+    protected function newCookie(Request $request, array $config)
     {
         $request->setcookie(
-            'XSRF-TOKEN',
+            $config['header_name_cookie'],
             $this->app->getCsrfToken(),
             (int) $config['expiration'],
-            $config['path'],
-            $config['domain'],
-            $config['secure'],
+            (string) $config['path'],
+            (string) $config['domain'],
+            (bool) $config['secure'],
             false
         );
     }

@@ -25,16 +25,14 @@ class Request extends URI
     protected array $headers = [];
 
     /**
-     * contentType
-     * @var mixed
+     * Content type
      */
-    private $contentType;
+    private ?string $contentType;
 
     /**
      * files
-     * @var mixed
      */
-    private $files;
+    private ?array $files;
 
     /**
      * Associative array of supported content types and 
@@ -44,7 +42,7 @@ class Request extends URI
         'text/xml' => 'parseXML',
         'text/csv' => 'parseCSV',
         'application/json' => 'parseJSON',
-        'application/xml'  => 'parseXML',
+        'application/xml' => 'parseXML',
         'application/x-www-form-urlencoded' => 'parseForm',
     ];
 
@@ -81,7 +79,7 @@ class Request extends URI
      */
     public function getMethod(): ?string
     {
-        return filter_input(INPUT_SERVER, 'REQUEST_METHOD');
+        return strtoupper($_SERVER['REQUEST_METHOD'] ?? '');
     }
 
     /**
@@ -334,7 +332,7 @@ class Request extends URI
 
         // If the domain is not specified, use the current domain
         if ($domain === null)
-            $domain = $_SERVER['HTTP_HOST'];
+            $domain = config('session.domain');
 
         // Calculate the expiration date
         $expirationTime = time() + $expiration;
@@ -348,7 +346,7 @@ class Request extends URI
                 'domain' => $domain,
                 'secure' => $secure,
                 'httponly' => $httpOnly,
-                'samesite' => config('session.samesite') ?? null, // Set SameSite to None
+                'samesite' => config('session.samesite') ?? 'Lax',
             ]
         );
     }
@@ -356,11 +354,11 @@ class Request extends URI
     /**
      * Expire a cookie by name.
      */
-    function deleteCookie(string $name, string $value = '/', string|null $domain = null): bool
+    function deleteCookie(string $name, string $value = '/', string $domain = null): bool
     {
         // If the domain is not specified, use the current domain
         if ($domain === null) {
-            $domain = $_SERVER['HTTP_HOST'];
+            $domain = config('session.domain');
         }
 
         // Set the expiration date in the past to delete the cookie
@@ -393,7 +391,7 @@ class Request extends URI
     }
 
     /**
-     * @return string The operating system name.
+     * The operating system name.
      */
     public function getOperatingSystem(): string
     {
@@ -502,7 +500,6 @@ class Request extends URI
 
     /**
      * Gets the content type of an HTTP request
-     * @return string|null
      */
     public function getContentType(): ?string
     {
@@ -625,7 +622,6 @@ class Request extends URI
 
     /**
      * Determines if the current request is an Axm request.
-     * @return bool True if it's an Axm request, false otherwise.
      */
     public function isAxmRequest(): bool
     {
@@ -678,7 +674,7 @@ class Request extends URI
     }
 
     /**
-     * @return bool
+     * Check security tokens
      */
     private function hasSecurityTokens(): bool
     {
@@ -705,7 +701,7 @@ class Request extends URI
     /**
      * Returns the value of the header by entering the key
      */
-    public function getHeader(string $key)
+    public function getHeader(string $key): array|string|null 
     {
         return $this->getHeaders()[$key] ?? null;
     }
