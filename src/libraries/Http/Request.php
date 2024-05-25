@@ -137,6 +137,7 @@ class Request extends URI
     {
         $file = data_get($this->files(), 'file');
         $extension = pathinfo($file, PATHINFO_EXTENSION);
+
         return $extension;
     }
 
@@ -251,7 +252,7 @@ class Request extends URI
     private function hasPost(): bool
     {
         if ($this->is_csrf_valid())
-            return ($this->isPost()) ? true : false;
+            return $this->isPost();
         else
             return throw new RuntimeException("CSRF token is invalid.");
     }
@@ -291,8 +292,6 @@ class Request extends URI
 
     /**
      * Convert an array to an object, containing only the provided keys with values.
-     *
-     * @param array $keys
      */
     protected function arrayToObject(array $keys): object
     {
@@ -444,7 +443,7 @@ class Request extends URI
     /**
      * Modify the parameter passed by Url
      */
-    public function setRouteParams($params)
+    public function setRouteParams($params): self
     {
         $this->routeParams = $params;
         return $this;
@@ -516,9 +515,6 @@ class Request extends URI
 
     /**
      * Check the method of the request
-     *
-     * @param string $method Http method
-     * @return mixed
      */
     public function isRequestMethod(string|array $methods): bool
     {
@@ -542,7 +538,6 @@ class Request extends URI
 
     /**
      * Gets a value from the $_GET array, applies the default FILTER_SANITIZE_STRING filter
-     * @return mixed
      */
     public function get(string $key = '')
     {
@@ -559,7 +554,6 @@ class Request extends URI
 
     /**
      * Gets a value $value from the array $_SERVER
-     * @return mixed
      */
     protected function server(string $key = '')
     {
@@ -701,7 +695,7 @@ class Request extends URI
     /**
      * Returns the value of the header by entering the key
      */
-    public function getHeader(string $key): array|string|null 
+    public function getHeader(string $key): array|string|null
     {
         return $this->getHeaders()[$key] ?? null;
     }
