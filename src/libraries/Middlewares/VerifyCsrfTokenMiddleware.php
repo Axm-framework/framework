@@ -65,9 +65,7 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
      */
     protected function addCookieToResponse()
     {
-        $request = app()->request;
-        $config = config('session');
-        $this->newCookie($request, $config);
+        $this->newCookie(app()->request, config('session'));
     }
 
     /**
