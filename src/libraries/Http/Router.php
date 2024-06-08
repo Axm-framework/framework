@@ -245,8 +245,8 @@ class Router
 
         return match (true) {
             is_callable($callback) => $this->callCallback($callback),       // if  it's callable - just execute
-            is_array($callback)    => $this->invokeRouteWithMethodCall(),  // If it's an array, assume [ControllerClass, MethodName].
-            is_string($callback)   => $this->invokeRouteWithSingleCallback($callback)  //if  it's just a Myclass::class
+            is_array($callback) => $this->invokeRouteWithMethodCall(),  // If it's an array, assume [ControllerClass, MethodName].
+            is_string($callback) => $this->invokeRouteWithSingleCallback($callback)  //if  it's just a Myclass::class
         };
     }
 
@@ -353,7 +353,7 @@ class Router
      */
     private function extractRegex(string $method, string $uri)
     {
-        foreach (static::$routeMap[$method] as $route => $handler) {
+        foreach (static::$routeMap[$method] ?? [] as $route => $handler) {
             $pattern = '~^' . $this->compileRoute($route) . '$~';
             if (preg_match($pattern, $uri, $params)) {
                 $params = array_filter($params, 'is_string', ARRAY_FILTER_USE_KEY);
@@ -414,7 +414,7 @@ class Router
 
         return "{$baseUrl}/{$path}";
     }
-    
+
     /**
      * Renders the error view based on the specified HTTP error code.
      */
