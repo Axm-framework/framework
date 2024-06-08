@@ -258,7 +258,7 @@ class Router
         return $this->app->isProduction()
             ? $this->response->send($this->renderErrorView(), 404)
             :
-            throw new RuntimeException(sprintf(' "%s" path does not exist.', !empty($this->callback)
+            throw new RuntimeException(sprintf(' [%s]: "%s" path does not exist.', $this->app->request->getMethod(), !empty($this->callback)
                 ? $this->callback : $this->getUri()), 404);
     }
 
