@@ -48,7 +48,7 @@ class VerifyCsrfTokenMiddleware extends BaseMiddleware
      */
     protected function isReading(): bool
     {
-        return $this->app->request->isRequestMethod(['HEAD', 'GET', 'OPTIONS']);
+        return $this->app->request->isRequestMethod(['HEAD', 'GET', 'POST', 'OPTIONS']);
     }
 
     /**
