@@ -7,7 +7,6 @@ namespace App\Middlewares;
 use Fiber;
 use App\Middlewares\BaseMiddleware;
 
-
 /**
  * Class RateLimiterMiddleware
  * This class provides rate limiting functionality for API requests.
@@ -19,29 +18,29 @@ class RateLimiterMiddleware extends BaseMiddleware
     private int $maxBurstRequests = 10;
     private int $burstRequestCount = 0;
     private int $burstRequestsPerRequest = 1;
-    private int $lastBurstReset = 0;
+    private int $lastBurstReset;
     private Fiber $rateLimiterFiber;
-    private array $beforeLimitingHooks;
+    private array $beforeLimitingHooks = [];
+    private bool $shouldRun;
 
     /**
      * RateLimiter constructor.
-     *
-     * @param int $maxRequestsPerSecond Maximum number of requests per second.
-     * @param int $burstRequestsPerRequest Number of burst requests allowed per single request.
      */
-    public function __construct(int $maxRequestsPerSecond, int $burstRequestsPerRequest = 1)
+    public function __construct(int $maxRequestsPerSecond = 10, int $burstRequestsPerRequest = 1)
     {
         $this->maxRequestsPerSecond = $maxRequestsPerSecond;
         $this->lastRequestTime = microtime(true);
         $this->burstRequestsPerRequest = $burstRequestsPerRequest;
+        $this->lastBurstReset = time();
+        $this->shouldRun = true; // Variable to control loop execution
 
-        $this->rateLimiterFiber = new Fiber(function() {
-            while (true) {
+        $this->rateLimiterFiber = new Fiber(function () {
+            while ($this->shouldRun) {
                 $currentTime = microtime(true);
                 $timeSinceLastRequest = $currentTime - $this->lastRequestTime;
 
                 if ($timeSinceLastRequest < 1 / $this->maxRequestsPerSecond) {
-                    usleep((int)((1 / $this->maxRequestsPerSecond - $timeSinceLastRequest) * 1000000));
+                    usleep((int) ((1 / $this->maxRequestsPerSecond - $timeSinceLastRequest) * 1000000));
                 }
 
                 $this->lastRequestTime = microtime(true);
@@ -50,6 +49,15 @@ class RateLimiterMiddleware extends BaseMiddleware
         });
 
         $this->rateLimiterFiber->start();
+    }
+
+    // Method to stop the loop
+    public function stop()
+    {
+        $this->shouldRun = false;
+        if ($this->rateLimiterFiber->isSuspended()) {
+            $this->rateLimiterFiber->resume();
+        }
     }
 
     /**
@@ -66,9 +74,6 @@ class RateLimiterMiddleware extends BaseMiddleware
 
     /**
      * Adds a hook/event before applying limiting.
-     *
-     * @param callable $beforeLimitingHook Function to execute before 
-     * applying the limitation.
      */
     public function addBeforeLimitingHook(callable $beforeLimitingHook)
     {
@@ -77,7 +82,6 @@ class RateLimiterMiddleware extends BaseMiddleware
 
     /**
      * Makes a request, applying the limitation and executing events/hooks.
-     * @param callable $apiCall API call function to be executed.
      */
     public function makeRequest(callable $apiCall)
     {
@@ -98,12 +102,7 @@ class RateLimiterMiddleware extends BaseMiddleware
         }
     }
 
-    /**
-     * @return void
-     */
-    public function execute()
-    {
-        new self(10);
+    public function execute(){
+        sleep(10);
     }
 }
-

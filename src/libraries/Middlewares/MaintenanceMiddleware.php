@@ -12,12 +12,6 @@ use App\Middlewares\BaseMiddleware;
 class MaintenanceMiddleware extends BaseMiddleware
 {
     /**
-     * Configuration property.
-     * @var mixed
-     */
-    protected $config;
-
-    /**
      * Checks if the user is authenticated and has
      * permissions to access the current action.
      *
