@@ -32,24 +32,17 @@ class Compare
             throw new InvalidArgumentException('Invalid operator');
         }
 
-        switch ($operator) {
-            case '>':
-                return $left > $right;
-            case '<':
-                return $left < $right;
-            case '>=':
-                return $left >= $right;
-            case '<=':
-                return $left <= $right;
-            case '==':
-                return $left == $right;
-            case '===':
-                return $left === $right;
-            case '!=':
-                return $left != $right;
-            case '!==':
-                return $left !== $right;
-        }
+        return match ($operator) {
+            
+            '>'    => $left > $right,
+            '<'    => $left < $right,
+            '>='   => $left >= $right,
+            '<='   => $left <= $right,
+            '=='   => $left == $right,
+            '==='  => $left === $right,
+            '!='   => $left != $right,
+            '!==', => $left !== $right,
+        };
     }
 
     public function message()

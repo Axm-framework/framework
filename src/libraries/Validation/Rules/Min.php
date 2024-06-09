@@ -4,24 +4,6 @@ declare(strict_types=1);
 
 namespace Validation\Rules;
 
-use function is_numeric;
-use function is_string;
-use function is_file;
-use function floatval;
-use function mb_strlen;
-use function filesize;
-
-/*
-* Class Min
-
- * (c) Juan Cristobal <juancristobalgd1@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE file
- * that was distributed with this source code.
- * @author  Juan Cristobal <juancristobalgd1@gmail.com>
- * @package Axm\Validation\Rules
- */
-
 class Min
 {
     public function validate($input): bool

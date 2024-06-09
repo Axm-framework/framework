@@ -189,7 +189,7 @@ class CLI
      * @param array|string $validation Validation rules
      * @return string The user input
      */
-    public static function prompt(string $field, $options = null, $validation = null, string $color = 'yellow'): string
+    public static function prompt(string $field, array|string $options = null, string|array $validation = null, string $color = 'yellow'): string
     {
         $extraOutput = '';
         $default = '';
@@ -209,7 +209,7 @@ class CLI
 
             unset($opts[0]);
 
-            if (empty ($opts)) {
+            if (empty($opts)) {
                 $extraOutput = $extraOutputDefault;
             } else {
                 $extraOutput = '[' . $extraOutputDefault . ', ' . implode(', ', $opts) . ']';
@@ -271,21 +271,17 @@ class CLI
     /**
      * Validate one prompt "field" at a time
      *
-     * @param string       $field Prompt "field" output
      * @param string       $value Input value
      * @param array|string $rules Validation rules
      *
      */
-    protected static function validate(string $field, string $value, $rules): bool
+    protected static function validate(string $value, array|string $rules): bool
     {
-        $rules = ['input' => $rules];
-        $data = ['input' => $value];
-        $validator = Validator::make($rules, $data);
+        $validator = Validator::make(['input' => $value], ['input' => $rules]);
 
         if ($validator->fails()) {
-            $msg = $validator->getFirstError();
-            static::error($msg);
-            exit();
+            static::error($validator->getFirstError());
+            return false; // instead of exiting, return false to indicate failure
         }
 
         return true;
@@ -642,7 +638,7 @@ class CLI
     public static function hasColorSupport($resource): bool
     {
         // Follow https://no-color.org/
-        if (isset ($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
+        if (isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
             return false;
         }
 
@@ -652,7 +648,7 @@ class CLI
 
         if (static::isWindows()) {
             return static::streamSupports('sapi_windows_vt100_support', $resource)
-                || isset ($_SERVER['ANSICON'])
+                || isset($_SERVER['ANSICON'])
                 || getenv('ANSICON') !== false
                 || getenv('ConEmuANSI') === 'ON'
                 || getenv('TERM') === 'xterm';
@@ -769,7 +765,7 @@ class CLI
      */
     public static function wrap(?string $string = null, int $max = 0, int $padLeft = 0): string
     {
-        if (empty ($string)) {
+        if (empty($string)) {
             return '';
         }
 
@@ -837,7 +833,7 @@ class CLI
             $arg = ltrim($arg, '-');
             $value = null;
 
-            if (isset ($args[$i + 1]) && mb_strpos($args[$i + 1], '-') !== 0) {
+            if (isset($args[$i + 1]) && mb_strpos($args[$i + 1], '-') !== 0) {
                 $value = $args[$i + 1];
                 $optionValue = true;
             }
@@ -918,7 +914,7 @@ class CLI
      */
     public static function getOptionString(bool $useLongOpts = false, bool $trim = false): string
     {
-        if (empty (static::$options)) {
+        if (empty(static::$options)) {
             return '';
         }
 
@@ -957,7 +953,7 @@ class CLI
         $tableRows = [];
 
         // We need only indexes and not keys
-        if (!empty ($thead)) {
+        if (!empty($thead)) {
             $tableRows[] = array_values($thead);
         }
 
@@ -987,7 +983,7 @@ class CLI
                 // If the current column does not have a value among the larger ones
                 // or the value of this is greater than the existing one
                 // then, now, this assumes the maximum length
-                if (!isset ($maxColsLengths[$column]) || $allColsLengths[$row][$column] > $maxColsLengths[$column]) {
+                if (!isset($maxColsLengths[$column]) || $allColsLengths[$row][$column] > $maxColsLengths[$column]) {
                     $maxColsLengths[$column] = $allColsLengths[$row][$column];
                 }
 
@@ -1030,7 +1026,7 @@ class CLI
             $table .= '| ' . implode(' | ', $tableRows[$row]) . ' |' . PHP_EOL;
 
             // Set the thead and table borders-bottom
-            if (isset ($cols) && (($row === 0 && !empty ($thead)) || ($row + 1 === $totalRows))) {
+            if (isset($cols) && (($row === 0 && !empty($thead)) || ($row + 1 === $totalRows))) {
                 $table .= $cols . PHP_EOL;
             }
         }
@@ -1067,7 +1063,7 @@ class CLI
             return true;
         }
 
-        return !isset ($_SERVER['REMOTE_ADDR']) && !isset ($_SERVER['REQUEST_METHOD']);
+        return !isset($_SERVER['REMOTE_ADDR']) && !isset($_SERVER['REQUEST_METHOD']);
     }
 }
 

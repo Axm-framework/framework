@@ -3,6 +3,7 @@
 namespace Http;
 
 use Http\URI;
+use Validation\Validator;
 use RuntimeException;
 
 /**
@@ -59,6 +60,7 @@ class Request extends URI
      */
     protected $body;
 
+    protected ?string $key;
 
     public function __construct()
     {
@@ -82,40 +84,56 @@ class Request extends URI
         return strtoupper($_SERVER['REQUEST_METHOD'] ?? '');
     }
 
+
     /**
-     * Gets the $_FILES array of uploaded files 
+     * Gets the $_FILES array of uploaded files or a specific file.
      */
     public function files(string $name = null): ?array
     {
-        $this->files = isset($_FILES[$name]) ? $_FILES[$name] : $_FILES;
-        return $this->files ?: null;
+        if ($name !== null) {
+            return $_FILES[$name] ?? null;
+        }
+
+        return $_FILES;
     }
 
     /**
-     * Get an uploaded file by its name 
+     * Get an uploaded file by its name.
      */
     public function file(string $name): ?array
     {
-        $file = $this->files[$name];
-        return isset($file[$name]) ? $file[$name] : null;
+        return $this->files($name);
     }
 
     /**
-     * Checks if a file with a specific name has been uploaded 
+     * Checks if a file with a specific name has been uploaded.
      */
     public function hasFile(string $name): bool
     {
-        $files = $this->files;
-        return isset($files[$name]) && $files[$name]['error'] === UPLOAD_ERR_OK;
+        $file = $this->file($name);
+        return isset($file) && $file['error'] === UPLOAD_ERR_OK;
     }
 
     /**
-     * Moves an uploaded file to a destination location 
+     * Moves an uploaded file to a destination location.
      */
-    public function move(string $destination): bool
+    public function move(string $name, string $destination = ''): bool
     {
-        $sourcePath = $this->files('tmp_name')[0];
-        if (is_uploaded_file($sourcePath) && move_uploaded_file($sourcePath, $destination)) {
+        if (!$file = $this->file($name)) {
+            return false;
+        }
+
+        $uploadPath = config('paths.uploadPath');
+        $destinationPath = rtrim($uploadPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($destination, DIRECTORY_SEPARATOR);
+
+        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0777, true) && !is_dir($destinationPath)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $destinationPath));
+        }
+
+        $uniqueFilename = bin2hex(random_bytes(20)) . time() . '.' . $this->getClientOriginalExtension($name);
+        $destinationFile = $destinationPath . DIRECTORY_SEPARATOR . $uniqueFilename;
+
+        if (is_uploaded_file($file['tmp_name']) && move_uploaded_file($file['tmp_name'], $destinationFile)) {
             return true;
         }
 
@@ -123,28 +141,30 @@ class Request extends URI
     }
 
     /**
-     * Gets the uploaded files.
+     * Gets the original name of the uploaded file.
      */
-    public function getClientOriginalName(): ?string
+    public function getClientOriginalName(string $name): ?string
     {
-        return $_FILES['name'] ?? null;
+        return $this->file($name)['name'] ?? null;
     }
 
     /**
-     * Gets the uploaded files.
+     * Gets the original extension of the uploaded file.
      */
-    public function getClientOriginalExtension()
+    public function getClientOriginalExtension(string $name): ?string
     {
-        $file = data_get($this->files(), 'file');
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        $file = $this->file($name);
+        if ($file) {
+            return pathinfo($file['name'], PATHINFO_EXTENSION);
+        }
 
-        return $extension;
+        return null;
     }
 
     /**
-     * Get extension of file
+     * Gets the extension of a given file array.
      */
-    public function get_file_extension(array $file): string
+    public function getFileExtension(array $file): string
     {
         return pathinfo($file['name'], PATHINFO_EXTENSION);
     }
@@ -475,6 +495,20 @@ class Request extends URI
             return false;
 
         return $_COOKIE['csrfToken'] === $requestToken;
+    }
+
+    /**
+     * Validate data against a set of rules.
+     */
+    public function validate(array $rules, array $data): ?string
+    {
+        $validator = Validator::make($rules, $data);
+
+        if ($validator->fails()) {
+            return $validator->getFirstError();
+        }
+
+        return null;
     }
 
     /**
