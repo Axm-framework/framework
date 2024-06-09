@@ -500,15 +500,12 @@ class Request extends URI
     /**
      * Validate data against a set of rules.
      */
-    public function validate(array $rules, array $data): ?string
+    public function validate(array $rules, array $data): Validator
     {
         $validator = Validator::make($rules, $data);
+        $validator->validate();
 
-        if ($validator->fails()) {
-            return $validator->getFirstError();
-        }
-
-        return null;
+        return $validator;
     }
 
     /**

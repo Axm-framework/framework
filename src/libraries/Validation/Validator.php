@@ -250,7 +250,7 @@ class Validator
      */
     public function fails(): bool
     {
-        return (false === $this->startValidation());
+        return (false === !empty($this->errors));
     }
 
     /**
@@ -363,7 +363,6 @@ class Validator
             default => $this->compileOtherRules($rule, $parameter),
         };
     }
-
 
     /**
      * Compile a "same" validation rule.
