@@ -122,7 +122,6 @@ class Response
 	 */
 	public function send(): void
 	{
-
 		if (func_num_args() > 0) {
 			$this->make(...func_get_args());
 		}
@@ -278,6 +277,30 @@ class Response
 	}
 
 	/**
+	 * Output content encoded as a Html string.
+	 */
+	public function toHtml(?string $content, int $statusCode = 200, string $charset = 'utf-8'): void
+	{
+		if (!is_string($content)) {
+			throw new RuntimeException('Content must be a string to be converted to HTML.');
+		}
+
+		$this->send($content, [], $statusCode, 'text/html; charset=' . $charset);
+	}
+
+	/**
+	 * Output content encoded as a Text string.
+	 */
+	public function toText($content, int $statusCode = 200, string $charset = 'utf-8'): void
+	{
+		if (!is_string($content)) {
+			throw new RuntimeException('Content must be a string to be converted to Text.');
+		}
+
+		$this->send($content, [], $statusCode, 'application/text', $charset);
+	}
+
+	/**
 	 * Output content encoded as a JSON string.
 	 */
 	public function toJson(mixed $content, int $statusCode = 200, string $charset = 'utf-8')
@@ -300,7 +323,7 @@ class Response
 	/** 
 	 * Returns response in XML format 
 	 **/
-	public function toXml(mixed $data, int $statusCode = 200, string $charset = 'utf-8'): void
+	public function toXml(array|object $data, int $statusCode = 200, string $charset = 'utf-8'): void
 	{
 		$xmlContent = $this->convertToXml($data);
 		if ($xmlContent !== null) {
@@ -313,7 +336,7 @@ class Response
 	/** 
 	 * Converts data to XML format 
 	 **/
-	private function convertToXml($data): ?string
+	private function convertToXml(array|object $data): ?string
 	{
 		$xml = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><root></root>');
 		array_walk_recursive($data, [$xml, 'addChild']);

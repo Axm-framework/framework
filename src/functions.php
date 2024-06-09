@@ -639,7 +639,7 @@ if (!function_exists('csrf')) {
      */
     function csrf(): string
     {
-        return '<input type="hidden" name="_token" value="' . app()->getCsrfToken() . '">';
+        return '<input type="hidden" name="csrfToken" value="' . app()->getCsrfToken() . '">';
     }
 
 }
