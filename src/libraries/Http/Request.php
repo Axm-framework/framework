@@ -527,21 +527,19 @@ class Request extends URI
         $Ip = new \Validation\Rules\Ip();
         return ($Ip->validate($ip));
     }
-
     /**
      * Gets the content type of an HTTP request
      */
     public function getContentType(): ?string
     {
-        $contentType = null;
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? null;
 
-        if (isset($_SERVER['CONTENT_TYPE'])) {
-            $contentType = $_SERVER['CONTENT_TYPE'];
-        } elseif (isset($_SERVER['HTTP_CONTENT_TYPE'])) {
-            $contentType = $_SERVER['HTTP_CONTENT_TYPE'];
+        if (!$contentType) {
+            return null;
         }
 
-        return $contentType;
+        $parts = explode(';', $contentType);
+        return trim($parts[0]); // trim to remove any whitespace
     }
 
     /**
