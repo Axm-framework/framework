@@ -637,7 +637,7 @@ class Request extends URI
         $parsedBody = $this->$parser($requestBody);
 
         if (!$parsedBody) {
-            throw new RuntimeException('Input data cannot be processed');
+            throw new RuntimeException('Input data cannot be processed ' . $this->contentType . ' ' . $parser . ' ' . $requestBody);
         }
 
         return $parsedBody;
