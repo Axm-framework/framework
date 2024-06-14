@@ -31,11 +31,6 @@ class Request extends URI
     private ?string $contentType;
 
     /**
-     * files
-     */
-    private ?array $files;
-
-    /**
      * Associative array of supported content types and 
      * their corresponding parsing methods.
      */
@@ -54,10 +49,6 @@ class Request extends URI
      */
     protected array $headerMap = [];
 
-    /**
-     * body
-     * @var mixed
-     */
     protected $body;
 
     protected ?string $key;
@@ -72,7 +63,6 @@ class Request extends URI
      */
     public function createUrl(string $uri = '', array $params = null): string
     {
-        // If no base URL is provided, return the URI as is
         return app()->router->url($uri, $params);
     }
 
@@ -84,17 +74,12 @@ class Request extends URI
         return strtoupper($_SERVER['REQUEST_METHOD'] ?? '');
     }
 
-
     /**
      * Gets the $_FILES array of uploaded files or a specific file.
      */
     public function files(string $name = null): ?array
     {
-        if ($name !== null) {
-            return $_FILES[$name] ?? null;
-        }
-
-        return $_FILES;
+        return $name !== null ? $_FILES[$name] ?? null : $_FILES;
     }
 
     /**
@@ -119,21 +104,20 @@ class Request extends URI
      */
     public function move(string $name, string $destination = ''): bool
     {
-        if (!$file = $this->file($name)) {
+        if (!$file = $this->file($name))
             return false;
-        }
 
         $uploadPath = config('paths.uploadPath');
-        $destinationPath = rtrim($uploadPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($destination, DIRECTORY_SEPARATOR);
+        $destination = rtrim($uploadPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($destination, DIRECTORY_SEPARATOR);
 
-        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0777, true) && !is_dir($destinationPath)) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $destinationPath));
+        if (!is_dir($destination) && !mkdir($destination, 0777, true) && !is_dir($destination)) {
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $destination));
         }
 
-        $uniqueFilename = bin2hex(random_bytes(20)) . time() . '.' . $this->getClientOriginalExtension($name);
-        $destinationFile = $destinationPath . DIRECTORY_SEPARATOR . $uniqueFilename;
+        $uniqueFilename = bin2hex(random_bytes(20)) . time() . '.' . $this->getFileExtension($file);
+        $destinationFile = $destination . DIRECTORY_SEPARATOR . $uniqueFilename;
 
-        if (is_uploaded_file($file['tmp_name']) && move_uploaded_file($file['tmp_name'], $destinationFile)) {
+        if (move_uploaded_file($file['tmp_name'], $destinationFile)) {
             return true;
         }
 
@@ -324,18 +308,13 @@ class Request extends URI
     public function input(string $key = null)
     {
         $data = (object) $this->arrayToObject($this->getBody());
-        return (empty($key)) ?
-            $data : ($data->{$key} ??
-                throw new RuntimeException(
-                    printf('The property %s does not exist in the input data.', [$data->$key ?? $key])
-                )
-            );
+        return empty($key) ? $data : ($data->{$key} ?? throw new RuntimeException(sprintf('The property %s does not exist in the input data.', $key)));
     }
 
     /**
      * Fetch an item from the COOKIE array.
      */
-    public function getCookie(?string $key = null): array
+    public function getCookie(?string $key = null)
     {
         return $_COOKIE[$key] ?? [];
     }
@@ -343,17 +322,9 @@ class Request extends URI
     /**
      * Stores a value in a cookie.
      */
-    public function setCookie(string $name, string $value, int $expiration = 2592000, string $path = '/', string $domain = null, bool $secure = false, bool $httpOnly = true): bool
+    public function setCookie(string $name, string $value, int $expiration = 2592000, string $path = '/', ?string $domain = null, bool $secure = false, bool $httpOnly = true): bool
     {
-        // Validate and clean input data
-        $name = cleanInput($name);
-        $value = cleanInput($value);
-
-        // If the domain is not specified, use the current domain
-        if ($domain === null)
-            $domain = config('session.domain');
-
-        // Calculate the expiration date
+        $domain = $domain ?? config('session.domain');
         $expirationTime = time() + $expiration;
 
         return setcookie(
@@ -373,15 +344,10 @@ class Request extends URI
     /**
      * Expire a cookie by name.
      */
-    function deleteCookie(string $name, string $value = '/', string $domain = null): bool
+    public function deleteCookie(string $name, string $path = '/', ?string $domain = null): bool
     {
-        // If the domain is not specified, use the current domain
-        if ($domain === null) {
-            $domain = config('session.domain');
-        }
-
-        // Set the expiration date in the past to delete the cookie
-        return setcookie($name, '', time() - 3600, $value, $domain);
+        $domain = $domain ?? config('session.domain');
+        return setcookie($name, '', time() - 3600, $path, $domain);
     }
 
     /**
@@ -490,11 +456,10 @@ class Request extends URI
      */
     private function is_csrf_valid(): bool
     {
-        $requestToken = $this->toJson()->csrfToken ?? $_POST['csrfToken'] ?? null;
-        if (!$requestToken)
-            return false;
+        $requestToken = $this->toJson()->csrfToken ?? $_POST['csrfToken'] ?? '';
+        $cookieToken = $this->getCookie('csrfToken') ?? '';
 
-        return $_COOKIE['csrfToken'] === $requestToken;
+        return hash_equals($requestToken, $cookieToken);
     }
 
     /**
@@ -509,9 +474,7 @@ class Request extends URI
     }
 
     /**
-     * A convenience method that grabs the raw input stream and decodes
-     * the JSON into an array.
-     * @return mixed
+     * A convenience method that grabs the raw input stream and decodes the JSON into an array.
      */
     public function toJson(bool $assoc = false, int $depth = 512, int $options = 0)
     {
@@ -520,7 +483,6 @@ class Request extends URI
 
     /**
      * Validate an IP address
-     * @param string $ip  IP Address
      */
     public function isValidIP(?string $ip = null): bool
     {
@@ -539,7 +501,7 @@ class Request extends URI
         }
 
         $parts = explode(';', $contentType);
-        return trim($parts[0]); // trim to remove any whitespace
+        return trim($parts[0]);
     }
 
     /**
@@ -552,17 +514,7 @@ class Request extends URI
         }
 
         $uppercasedMethods = array_map('strtoupper', $methods);
-
-        // Return true if at least one of the methods is matched.
         return in_array(strtoupper($_SERVER['REQUEST_METHOD']), $uppercasedMethods);
-    }
-
-    /**
-     * Gets a value from the $_POST array
-     */
-    public function post(string $key = '')
-    {
-        return isset($_POST) ? $this->getFilteredValue($key, $_POST) : null;
     }
 
     /**
@@ -595,12 +547,10 @@ class Request extends URI
     protected function getFilteredValue(string $key, array $array, $default = null): mixed
     {
         if (isset($array[$key]) && $array[$key] !== null) {
-            $filteredValue = $this->h($array[$key]);
-        } else {
-            $filteredValue = array_map([$this, 'h'], $array);
+            return $this->h($array[$key]);
         }
 
-        return $filteredValue ?? $default;
+        return array_map([$this, 'h'], $array) ?? $default;
     }
 
     /**
@@ -622,25 +572,15 @@ class Request extends URI
      */
     public function getBody(): mixed
     {
-        $supportedContentTypes = $this->supportedContentTypes;
-        if (!in_array($this->contentType, array_keys($supportedContentTypes))) {
-            throw new RuntimeException("Content type {$this->contentType} not supported");
+        $contentType = $this->contentType;
+        $method = $this->supportedContentTypes[$contentType] ?? null;
+
+        if ($method) {
+            $input = file_get_contents('php://input');
+            return $this->{$method}($input);
         }
 
-        try {
-            $requestBody = file_get_contents('php://input');
-        } catch (\Exception $e) {
-            throw new RuntimeException('Error retrieving request body: ' . $e->getMessage());
-        }
-
-        $parser = $supportedContentTypes[$this->contentType];
-        $parsedBody = $this->$parser($requestBody);
-
-        if (!$parsedBody) {
-            throw new RuntimeException('Input data cannot be processed ' . $this->contentType . ' ' . $parser . ' ' . $requestBody);
-        }
-
-        return $parsedBody;
+        return throw new RuntimeException("Content type {$contentType} not supported");
     }
 
     /**
@@ -668,7 +608,6 @@ class Request extends URI
      */
     private function compareCsrfTokens(?string $tokenFromRequest, ?string $axmCsrfToken): bool
     {
-        // Use strict comparison to handle null values
         return $tokenFromRequest === $axmCsrfToken;
     }
 
@@ -735,11 +674,7 @@ class Request extends URI
     public function getHeaderLine(string $name, string $defaultValue = ''): string
     {
         $headerValue = $this->getHeader($name);
-        if (empty($headerValue)) {
-            return $defaultValue;
-        }
-
-        return implode(',', $headerValue);
+        return $headerValue ? implode(',', $headerValue) : $defaultValue;
     }
 
     /**
@@ -793,8 +728,7 @@ class Request extends URI
      */
     public function populategetHeaders(): void
     {
-        $contentType = $this->getContentType();
-        if ($contentType) {
+        if ($contentType = $this->contentType) {
             $this->setHeader('Content-Type:', $contentType);
         }
 
@@ -808,10 +742,10 @@ class Request extends URI
     }
 
     /**
-     * @return mixed
+     * Magic getter to retrieve input values.
      */
-    public function __get(string $key)
+    public function __get(string $key): mixed
     {
-        return $this->input($key);
+        return $this->input($key) ?? null;
     }
 }
