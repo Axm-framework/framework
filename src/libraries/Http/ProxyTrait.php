@@ -7,11 +7,6 @@ trait ProxyTrait
 
     /**
      * Sets the proxy for the cURL request.
-     *
-     * @param string $proxy The proxy URL.
-     * @param string|null $username Optional username for proxy authentication.
-     * @param string|null $password Optional password for proxy authentication.
-     * @return $this
      */
     public function setProxy(string $proxy, ?string $username = null, ?string $password = null)
     {
@@ -26,9 +21,6 @@ trait ProxyTrait
 
     /**
      * Sets the cURL option to tunnel through a proxy.
-     *
-     * @param int $tunnel The tunnel option (1 to enable, 0 to disable).
-     * @return $this
      */
     public function tunnelThroughProxy(int $tunnel = 1)
     {

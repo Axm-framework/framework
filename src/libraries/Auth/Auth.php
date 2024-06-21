@@ -32,11 +32,6 @@ class Auth
 
 	/**
 	 * __construct
-	 *
-	 * @param  App $app
-	 * @param  string $usernameField
-	 * @param  string $passwordField
-	 * @return void
 	 */
 	public function __construct(App $app, string $usernameField = 'email', string $passwordField = 'password')
 	{
@@ -50,10 +45,6 @@ class Auth
 
 	/**
 	 * Attempts to log in a user based on provided data.
-	 *
-	 * @param array[] ...$keyValuePairs An array or nested arrays containing the fields and values to use for the database query.
-	 * @return bool Returns true if the login is successful, false otherwise.
-	 * @throws \Exception Throws an exception in case of an error during the login process.
 	 */
 	public function resolverLogin(array ...$keyValuePairs): bool
 	{
@@ -67,10 +58,6 @@ class Auth
 
 	/**
 	 * Attempts to log in a user based on a single key-value pair.
-	 *
-	 * @param array $data An associative array containing user login data.
-	 * @return bool Returns true if the login is successful, false otherwise.
-	 * @throws \Exception Throws an exception in case of an error during the login process.
 	 */
 	private function loginWithSingleKey(array $data): bool
 	{
@@ -86,11 +73,6 @@ class Auth
 
 	/**
 	 * Attempts to log in a user based on multiple key-value pairs.
-	 *
-	 * @param array $keys An array containing the fields to use for the database query.
-	 * @param array $values An array containing the corresponding values to match in the database query.
-	 * @return bool Returns true if the login is successful, false otherwise.
-	 * @throws \Exception Throws an exception in case of an error during the login process.
 	 */
 	private function loginWithMultipleKeys(array $keys, array $values): bool
 	{
@@ -110,10 +92,6 @@ class Auth
 
 	/**
 	 * Sets the user session based on the provided user ID and data.
-	 *
-	 * @param string $userId The key to use for storing user data in the session.
-	 * @param mixed $result The user data to store in the session.
-	 * @return bool
 	 */
 	private function setUserSession($userId, $result): bool
 	{
@@ -122,11 +100,6 @@ class Auth
 
 	/**
 	 * Retrieves a user from the database based on provided field and value.
-	 *
-	 * @param string $userClass The class representing the user model.
-	 * @param string $field The field to use for the database query.
-	 * @param mixed $value The value to match in the database query.
-	 * @return mixed|null Returns the user object if found, or null if no user is found.
 	 */
 	private function getUserFromDatabase(string $userClass, string $field, $value)
 	{
@@ -135,35 +108,28 @@ class Auth
 	}
 
 	/**
-	 * Performs a login attempt with the provided credentials 
-	 * Returns true if the login was successful, false otherwise.
-	 *
-	 * @param  mixed $username
-	 * @param  mixed $password
-	 * @return bool
+	 * Attempts a login with the given credentials.
 	 */
-	public function attempt(string $username, string $password)
+	public function attemptLogin(string $username, string $password): bool
 	{
 		if ($this->failedAttempts >= $this->maxFailedAttempts) {
-			throw new Exception('You have reached the maximum number of failed attempts.');
+			throw new Exception('Maximum number of failed login attempts reached.');
 		}
 
-		$this->userModel = $this->getUserFromDatabase($this->userClass, $this->usernameField, $username);
+		$user = $this->getUserFromDatabase($this->userClass, $this->usernameField, $username);
 
-		if (!$this->userModel || !password_verify($password, $this->userModel->{$this->passwordField})) {
-			++$this->failedAttempts;
+		if (!$user || !password_verify($password, $user->{$this->passwordField})) {
+			$this->failedAttempts++;
 			return false;
 		}
 
 		$this->failedAttempts = 0;
-		$this->session->write($this->userId, $this->userModel->{$this->userModel->primaryKey});
+		$this->session->write($this->userId, $user->{$this->userModel->getKeyName()});
 		return true;
 	}
 
 	/**
 	 * Checks if there is a currently authenticated user 
-	 * Returns true if there is an authenticated user, false otherwise.
-	 * @return bool
 	 */
 	public function check(): bool
 	{
@@ -173,7 +139,6 @@ class Auth
 	/**
 	 * Returns the currently authenticated user or null if there 
 	 * is no authenticated user.
-	 * @return void
 	 */
 	public function user()
 	{
@@ -184,7 +149,6 @@ class Auth
 
 	/**
 	 * Logs out the current user.
-	 * @return void
 	 */
 	public function logout(string $path = null): void
 	{

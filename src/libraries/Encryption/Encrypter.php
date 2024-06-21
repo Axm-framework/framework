@@ -40,9 +40,6 @@ class Encrypter
 
     /**
      * Encrypt data.
-     *
-     * @param string $data
-     * @return string
      */
     public function encrypt(string $data): string
     {
@@ -76,9 +73,6 @@ class Encrypter
 
     /**
      * Decrypt data.
-     *
-     * @param string $encrypted_payload
-     * @return mixed
      */
     public function decrypt(string $encrypted_payload)
     {
@@ -106,9 +100,6 @@ class Encrypter
 
     /**
      * Generate a hash based on the IV and encryption key.
-     *
-     * @param string $iv
-     * @return string
      */
     protected function generateHash(string $iv): string
     {
@@ -117,9 +108,6 @@ class Encrypter
 
     /**
      * Generate a random encryption key.
-     *
-     * @param int $length
-     * @return string
      */
     public function generateKeyRandom(int $length): string
     {

@@ -18,17 +18,11 @@ interface LangInterface
 {
     /**
      * Get the current locale.
-     *
-     * @return string The current locale.
      */
     public function getLocale(): string;
 
     /**
      * Translate a key with optional parameters.
-     *
-     * @param string $key The translation key.
-     * @param array $params Optional parameters for string interpolation.
-     * @return string The translated message.
      */
     public function trans(string $key, array $params = []): string;
 }
@@ -77,8 +71,6 @@ class Lang implements LangInterface
 
     /**
      * Get the current locale.
-     *
-     * @return string The current locale.
      */
     public function getLocale(): string
     {
@@ -87,10 +79,6 @@ class Lang implements LangInterface
 
     /**
      * Translate a key with optional parameters.
-     *
-     * @param string $key The translation key.
-     * @param array $params Optional parameters for string interpolation.
-     * @return string The translated message.
      */
     public function trans(string $key, array $params = []): string
     {
@@ -109,8 +97,6 @@ class Lang implements LangInterface
 
     /**
      * Load translations from language files.
-     *
-     * @throws RuntimeException If an error occurs while loading language files.
      */
     public function loadTranslationsFromFile(): void
     {

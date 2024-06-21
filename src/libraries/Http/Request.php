@@ -40,6 +40,7 @@ class Request extends URI
         'application/json' => 'parseJSON',
         'application/xml' => 'parseXML',
         'application/x-www-form-urlencoded' => 'parseForm',
+        'multipart/form-data' => 'parseMultipartForm'
     ];
 
     /**
@@ -56,6 +57,16 @@ class Request extends URI
     public function __construct()
     {
         $this->init();
+    }
+
+    /**
+     * Parse multipart/form-data request
+     */
+    public function parseMultipartForm(): array
+    {
+        $formData = compact($this->post(), $this->files()) ?? [];
+
+        return $formData;
     }
 
     /**
@@ -79,7 +90,9 @@ class Request extends URI
      */
     public function files(string $name = null): ?array
     {
-        return $name !== null ? $_FILES[$name] ?? null : $_FILES;
+        $files = isset($_FILES) ? $this->getFilteredValue($name, $_FILES) : null;
+
+        return $name !== null ? $files[$name] ?? null : $files;
     }
 
     /**
@@ -523,6 +536,14 @@ class Request extends URI
     public function get(string $key = '')
     {
         return isset($_GET) ? $this->getFilteredValue($key, $_GET) : null;
+    }
+
+    /**
+     * Gets a value from the $_POST array, applies the default FILTER_SANITIZE_STRING filter
+     */
+    public function post(string $key = '')
+    {
+        return isset($_POST) ? $this->getFilteredValue($key, $_POST) : null;
     }
 
     /**

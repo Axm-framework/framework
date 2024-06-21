@@ -21,7 +21,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Constructor.
-     * @param mixed $key The session key.
      */
     public function __construct($key = null)
     {
@@ -31,7 +30,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Initializes the session.
-     * @return void
      */
     public function init(): void
     {
@@ -40,10 +38,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Opens the session.
-     *
-     * @param string|null $savePath The path where session data is stored. If null, the default storage path is used.
-     * @param string $sessionName The name of the session (default: 'axmSesionApp').
-     * @return bool True if the session is successfully opened, false otherwise.
      */
     public function open(string $savePath = null, string $sessionName = 'axmSesionApp'): bool
     {
@@ -60,9 +54,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Reads the session data.
-     *
-     * @param string $sessionId The session ID.
-     * @return string The session data.
      */
     public function read(string $sessionId): string
     {
@@ -71,21 +62,14 @@ class Session implements SessionHandlerInterface
 
     /**
      * Deletes the session data.
-     *
-     * @param string $sessionId The session ID.
-     * @return bool True if the session data is successfully deleted, false otherwise.
      */
-    public function delete(string $sessionId)
+    public function delete(string $sessionId): bool
     {
         return $this->remove($sessionId);
     }
 
     /**
      * Writes session data.
-     *
-     * @param string $sessionId The session ID.
-     * @param string $data The session data.
-     * @return bool True if the session data is successfully written, false otherwise.
      */
     public function write(string $sessionId, string $data): bool
     {
@@ -94,7 +78,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Closes the session.
-     * @return bool True if the session is successfully closed, false otherwise.
      */
     public function close(): bool
     {
@@ -103,9 +86,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Destroys a session.
-     *
-     * @param string $sessionId The session ID.
-     * @return bool True if the session is successfully destroyed, false otherwise.
      */
     public function destroy(string $sessionId): bool
     {
@@ -115,9 +95,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Performs garbage collection on the session.
-     *
-     * @param int $maxLifeTime The maximum lifetime of a session.
-     * @return int The session expiration configuration.
      */
     public function gc(int $maxLifeTime): int
     {
@@ -127,7 +104,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Creates the $_SESSION flash messages.
-     * @return void
      */
     public function sessionFlashMessage()
     {
@@ -136,7 +112,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Destroys the current session.
-     * @return void
      */
     public function clear()
     {
@@ -145,7 +120,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Returns the session ID.
-     * @return string
      */
     public function sessionId()
     {
@@ -154,9 +128,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Regenerates the session ID.
-     *
-     * @param bool $destroy Should old session data be destroyed?
-     * @return void
      */
     public function regenerate(bool $destroy = false)
     {
@@ -166,12 +137,8 @@ class Session implements SessionHandlerInterface
 
     /**
      * Modifies a message in the $_SESSION flash_messages.
-     *
-     * @param string $key
-     * @param mixed  $message
-     * @return void
      */
-    public function setFlash($key, $message)
+    public function setFlash(string $key, $message)
     {
         $_SESSION[self::FLASH_KEY][$key] = [
             'remove' => false,
@@ -181,33 +148,22 @@ class Session implements SessionHandlerInterface
 
     /**
      * Gets the value of a flash message.
-     *
-     * @param string $key
-     * @return mixed|false The value of the flash message, or false if not set.
      */
-    public function getFlashValue($key)
+    public function getFlashValue(string $key): ?bool
     {
         return $_SESSION[self::FLASH_KEY][$key]['value'] ?? false;
     }
 
     /**
      * Gets a flash message.
-     *
-     * @param string $key
-     * @return mixed|false The flash message, or false if not set.
      */
-    public function getFlash($key)
+    public function getFlash($key): ?bool
     {
         return $_SESSION[self::FLASH_KEY][$key] ?? false;
     }
 
     /**
      * Modifies a session variable.
-     *
-     * @param string $key
-     * @param mixed  $value
-     * @param bool   $encrypt Whether to encrypt the value.
-     * @return bool True if the session variable is successfully set, false otherwise.
      */
     public function set(string $key, $value, bool $encrypt = false): bool
     {
@@ -221,10 +177,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Gets the value of a session variable.
-     *
-     * @param string $key
-     * @param bool   $decrypt Whether to decrypt the value.
-     * @return mixed|null The value of the session variable, or null if not set.
      */
     public function get(string $key, bool $decrypt = false)
     {
@@ -238,23 +190,16 @@ class Session implements SessionHandlerInterface
 
     /**
      * Checks if a session variable is set.
-     *
-     * @param string $key
-     * @return bool True if the session variable is set, false otherwise.
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return isset($_SESSION[$key]);
     }
 
     /**
      * Gets the value of a session variable and removes it from the session.
-     *
-     * @param string $key
-     * @param mixed  $default The default value if the key is not set.
-     * @return mixed The value of the session variable.
      */
-    public function pull($key, $default = null)
+    public function pull(string $key, $default = null)
     {
         $value = $this->get($key, $default);
         $this->remove($key);
@@ -264,18 +209,14 @@ class Session implements SessionHandlerInterface
 
     /**
      * Gets all session variables.
-     * @return array All session variables.
      */
-    public function all()
+    public function all(): array
     {
         return $_SESSION;
     }
 
     /**
      * Removes the specified session or all sessions if $key is empty.
-     *
-     * @param string $key
-     * @return bool
      */
     public function remove(string $key = ''): bool
     {
@@ -292,8 +233,6 @@ class Session implements SessionHandlerInterface
     /**
      * Destructor method called when the object is no longer referenced.
      * Removes expired flash messages after displaying them.
-     *
-     * @return void
      */
     public function __destruct()
     {
@@ -302,7 +241,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Gets the current time as a Unix timestamp.
-     * @return int The current time as a Unix timestamp.
      */
     private function getCurrentTime(): int
     {
@@ -311,7 +249,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Removes expired flash messages after displaying them.
-     * @return void
      */
     private function removeExpiredFlashMessages()
     {
@@ -322,7 +259,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Frees all session variables.
-     * @return void
      */
     public function flush()
     {
@@ -332,13 +268,8 @@ class Session implements SessionHandlerInterface
     /**
      * Monitors session inactivity time and redirects to the specified URL
      * if it exceeds the given session expiration time.
-     *
-     * @param string $key
-     * @param string $url
-     * @param int    $sessionExpiration
-     * @return bool True if the session expired, false otherwise.
      */
-    public function police(string $key, string $url = '', int $sessionExpiration = 300)
+    public function police(string $key, string $url = '', int $sessionExpiration = 300): bool
     {
         $currentTime = $this->getCurrentTime();
 
@@ -361,8 +292,6 @@ class Session implements SessionHandlerInterface
     /**
      * Handles the expiration by logging out if the URL is empty 
      * or redirecting to the specified URL.
-     *
-     * @param string|null $url The URL to redirect to in case it is not empty.
      */
     private function handleExpiration(?string $url = null): void
     {
@@ -371,10 +300,6 @@ class Session implements SessionHandlerInterface
 
     /**
      * Checks if the countdown session time has reached the specified limit.
-     *
-     * @param string $key
-     * @param int    $time
-     * @return bool True if the countdown session time has reached the limit, false otherwise.
      */
     public function countDownSession(string $key, int $time): bool
     {

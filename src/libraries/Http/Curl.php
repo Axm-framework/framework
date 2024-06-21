@@ -48,11 +48,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sends a GET request.
-     *
-     * @param string $url     The URL to send the GET request to.
-     * @param array  $headers Optional headers to include in the request.
-     * @return array The response and cURL info.
-     * @throws \Exception If there is an error in the cURL request.
      */
     public function get(string $url, array $headers = []): array
     {
@@ -61,9 +56,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sends a POST request.
-     *
-     * @return array The response and cURL info.
-     * @throws \Exception If there is an error in the cURL request.
      */
     public function post(string $url, array $data = [], array $headers = []): array
     {
@@ -72,9 +64,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sends a PUT request.
-     *
-     * @return array The response and cURL info.
-     * @throws \Exception If there is an error in the cURL request.
      */
     public function put(string $url, array $data = [], array $headers = []): array
     {
@@ -83,9 +72,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sends a DELETE request.
-     *
-     * @return array The response and cURL info.
-     * @throws \Exception If there is an error in the cURL request.
      */
     public function delete(string $url, array $data = [], array $headers = []): array
     {
@@ -94,9 +80,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sends a HEAD request.
-     *
-     * @return array The response and cURL info.
-     * @throws \Exception If there is an error in the cURL request.
      */
     public function head(string $url, array $headers = []): array
     {
@@ -105,9 +88,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Performs the cURL request.
-     *
-     * @return array The response and cURL info.
-     * @throws \Exception If there is an error in the cURL request.
      */
     private function request(string $method, string $url, array $data = [], array $headers = [])
     {
@@ -137,7 +117,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Builds the response array.
-     * @return array The response and cURL info.
      */
     private function buildResponse(string $response, array $info): array
     {
@@ -161,7 +140,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sets a cURL option.
-     * @param mixed $value  The value to set for the option.
      */
     public function setCurlOption(int $option, $value)
     {
@@ -181,9 +159,8 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Prepares POST data for the request.
-     * @return mixed The prepared data.
      */
-    private function preparePostData(array $data, string $contentType = 'json')
+    private function preparePostData(array $data, string $contentType = 'json'): mixed
     {
         return match ($contentType) {
             'json'  => json_encode($data),
@@ -300,7 +277,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sets the number of retry attempts in case of failures.
-     * @param int $attempts The number of retry attempts.
      */
     public function setRetryAttempts(int $attempts)
     {
@@ -310,7 +286,6 @@ class Curl implements CurlHandlerInterface
 
     /**
      * Sets the HTTP status codes considered as transient errors for retry attempts.
-     * @param array $codes The array of HTTP status codes.
      */
     public function setTransientErrorCodes(array $codes)
     {

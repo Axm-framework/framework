@@ -7,11 +7,6 @@ trait CacheTrait
 
     /**
      * Enables response caching and sets cache options.
-     *
-     * @param bool   $enableCache  Whether to enable response caching.
-     * @param int    $cacheTime    The time in seconds to consider the response cache as valid.
-     * @param string $etag         The ETag value for cache validation.
-     * @param int    $expires      The expiration time in seconds for the cached response.
      * @return $this
      */
     public function enableResponseCache(bool $enableCache = true, int $cacheTime = 60, string $etag = null, int $expires = null)
@@ -37,8 +32,6 @@ trait CacheTrait
 
     /**
      * Disables response caching.
-     *
-     * @return $this
      */
     public function disableResponseCache()
     {

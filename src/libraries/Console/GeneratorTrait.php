@@ -22,80 +22,67 @@ trait GeneratorTrait
 {
     /**
      * Component Name
-     * @var string
      */
-    protected $component;
+    protected string $component;
 
     /**
      * File directory
-     * @var string
      */
-    protected $directory;
+    protected string $directory;
 
     /**
      * View template name
-     * @var string
      */
-    protected $template;
+    protected string $template;
 
     /**
      * namespace the class
      */
-    protected $namespace;
+    protected string $namespace;
 
     /**
      * Language string key for required class names.
-     * @var string
      */
-    protected $classNameLang = '';
+    protected string $classNameLang = '';
 
     /**
      *  class names.
-     * @var string
      */
-    protected $className;
+    protected string $className;
 
     /**
      * Whether to require class name.
-     *
      * @internal
-     * @var bool
      */
-    private $hasClassName = true;
+    private bool $hasClassName = true;
 
     /**
      * Whether to sort class imports.
-     *
      * @internal
-     * @var bool
      */
-    private $sortImports = true;
+    private bool $sortImports = true;
 
     /**
      * Whether the `--suffix` option has any effect.
-     *
      * @internal
-     * @var bool
      */
-    private $enabledSuffixing = true;
+    private bool $enabledSuffixing = true;
 
     /**
      * The params array for easy access by other methods.
-     *
      * @internal
-     * @var array
      */
-    private $params = [];
+    private array $params = [];
 
     /**
      * Data passed to templates
      */
-    protected $data = [];
+    protected array $data = [];
 
     /**
      * Data passed to templates
      */
-    protected $replace = [];
+    protected array $replace = [];
 
     protected bool $phpOutputOnly = true;
 
@@ -107,65 +94,69 @@ trait GeneratorTrait
     protected function execute(array $params): void
     {
         $this->params = $params;
-        if ($this->getOption('namespace') === 'Axm') {
-            CLI::write(self::ARROW_SYMBOL . 'CLI generator using [ Axm ] Namespace. ⚠ ', 'yellow');
-            CLI::newLine();
+        $namespace = $this->getOption('namespace');
+        $isAxmNamespace = $namespace === 'Axm';
 
-            if (CLI::prompt(self::ARROW_SYMBOL . 'Are you sure you want to continue? ❓ ', ['y', 'n'], 'required') === 'n') {
-                CLI::newLine();
-                CLI::write(self::ARROW_SYMBOL . 'CLI generator cancel Operation ', 'yellow');
-                CLI::newLine();
-                return;
-            }
-
-            CLI::newLine();
+        if ($isAxmNamespace) {
+            $this->promptUserToContinue($namespace);
         }
 
-        // Get the fully qualified class name from the input.
         $class = $this->qualifyClassName();
+        $path = $this->buildPath($class);
 
-        // Get the file path from class name.
-        $path = $this->buildPath($this->className ?? $class);
-
-        // Check if path is empty.
         if (empty($path)) {
             return;
         }
 
-        $isFile = is_file($path);
+        $isFile = file_exists($path);
 
-        // Overwriting files unknowingly is a serious annoyance, So we'll check if
-        // we are duplicating things, If 'force' option is not supplied, we bail.
         if (!$this->getOption('force') && $isFile) {
             CLI::error(self::ARROW_SYMBOL . 'File exist: ' . realpath($path) . ' ❌ ', 'light_gray');
-            CLI::newLine();
             return;
         }
 
-        // Check if the directory to save the file is existing.
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
+        $this->createDirectory(dirname($path));
 
-        helpers('filesystem');
-
-        // Build the class based on the details we have, We'll be getting our file
-        // contents from the template, and then we'll do the necessary replacements.
-        if (!writeFile($path, $this->buildContent($class, $this->replace ?? [], $this->data ?? []))) {
+        $content = $this->buildContent($class, $this->replace ?? [], $this->data ?? []);
+        if (!$this->writeFile($path, $content)) {
             CLI::error(self::ARROW_SYMBOL . 'File Error: ' . realpath($path) . ' ❌ ', 'light_gray');
-            CLI::newLine();
             return;
         }
 
         if ($this->getOption('force') && $isFile) {
-            CLI::write(self::ARROW_SYMBOL . 'File Over write: ' . realpath($path) . ' 🤙', 'yellow');
-            CLI::newLine();
+            CLI::write(self::ARROW_SYMBOL . 'File Overwrite: ' . realpath($path) . ' 🤙', 'yellow');
             return;
         }
 
-        CLI::write(self::ARROW_SYMBOL . 'File Create: ' . realpath($path) . ' 🤙', 'green');
+        CLI::write(self::ARROW_SYMBOL . 'File Created: ' . realpath($path) . ' 🤙', 'green');
+    }
+
+    private function promptUserToContinue(string $namespace): void
+    {
+        CLI::write(self::ARROW_SYMBOL . "CLI generator using [ $namespace ] Namespace. ⚠ ", 'yellow');
         CLI::newLine();
+
+        if (CLI::prompt(self::ARROW_SYMBOL . 'Are you sure you want to continue? ❓ ', ['y', 'n'], 'required') === 'n') {
+            CLI::newLine();
+            CLI::write(self::ARROW_SYMBOL . 'CLI generator cancelled', 'yellow');
+            CLI::newLine();
+            exit;
+        }
+
+        CLI::newLine();
+    }
+
+    private function createDirectory(string $directory): void
+    {
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+    }
+
+    private function writeFile(string $path, string $content): bool
+    {
+        helpers('filesystem');
+        return writeFile($path, $content);
     }
 
     /**
@@ -190,43 +181,28 @@ trait GeneratorTrait
      */
     protected function qualifyClassName(): string
     {
-        // Gets the class name from input.
-        $class = CLI::getSegment(2) ?? $this->className ?? null;
+        $className = CLI::getSegment(2) ?? $this->className;
 
-        if ($class === null && $this->hasClassName) {
-            $nameLang = $this->classNameLang ?: ' Class name ❓';
-            $class = CLI::prompt($nameLang, null, 'required');
-            CLI::newLine();
+        if ($className === null && $this->hasClassName) {
+            $className = CLI::prompt('Class name ❓', null, 'required');
         }
 
         helpers('inflector');
-
         $component = singular($this->component);
+        $classPattern = sprintf('/([a-z][a-z0-9_\/\\\\]+)(%s)/i', $component);
 
-        /**
-         * @see https://regex101.com/r/a5KNCR/1
-         */
-        $pattern = sprintf('/([a-z][a-z0-9_\/\\\\]+)(%s)/i', $component);
-
-        if (preg_match($pattern, $class, $matches) === 1) {
-            $class = $matches[1] . ucfirst($matches[2]);
+        if (preg_match($classPattern, $className, $matches) === 1) {
+            $className = $matches[1] . ucfirst($matches[2]);
         }
 
-        if ($this->enabledSuffixing && $this->getOption('suffix') && !strripos($class, $component)) {
-            $class .= ucfirst($component);
+        if ($this->enabledSuffixing && $this->getOption('suffix') && !strripos($className, $component)) {
+            $className .= ucfirst($component);
         }
 
-        // Trims input, normalize separators, and ensure that all paths are in Pascalcase.
-        $class = ltrim(implode('\\', array_map('pascalize', explode('\\', str_replace('/', '\\', trim($class))))), '\\/');
+        $className = ltrim(implode('\\', array_map('pascalize', explode('\\', str_replace(['/', '\\'], '\\', trim($className))))), '\\');
+        $namespace = trim(str_replace(['/', '\\'], '\\', $this->getOption('namespace') ?? $this->namespace ?? APP_NAMESPACE), '\\') . '\\';
 
-        // Gets the namespace from input. Don't forget the ending backslash!
-        $namespace = trim(str_replace('/', '\\', $this->getOption('namespace') ?? $this->namespace ?? APP_NAMESPACE), '\\') . '\\';
-
-        if (strncmp($class, $namespace, strlen($namespace)) === 0) {
-            return $class;
-        }
-
-        return $namespace . $this->directory . '\\' . str_replace('/', '\\', $class);
+        return $namespace . $this->directory . '\\' . $className;
     }
 
     /**
@@ -245,11 +221,6 @@ trait GeneratorTrait
 
     /**
      * Perform replacements in a template using a single associative array of search and replace values.
-     *
-     * @param string $class The fully qualified class name.
-     * @param array $replacements An associative array where the keys are the search patterns and the values are the replacement strings.
-     * @param array $data Additional data for template rendering.
-     * @return string The modified template.
      */
     protected function parseTemplate(string $class, array $replacements = [], array $data = []): string
     {
@@ -270,11 +241,8 @@ trait GeneratorTrait
 
     /**
      * Get the full namespace for a given class, without the class name.
-     *
-     * @param  string  $name
-     * @return string
      */
-    protected function getNamespace($name)
+    protected function getNamespace(string $name): string
     {
         return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
     }
@@ -324,7 +292,6 @@ trait GeneratorTrait
 
     /**
      * Allows child generators to modify the internal `$hasClassName` flag.
-     * @return $this
      */
     protected function setHasClassName(bool $hasClassName)
     {
@@ -334,7 +301,6 @@ trait GeneratorTrait
 
     /**
      * Allows child generators to modify the internal `$sortImports` flag.
-     * @return $this
      */
     protected function setSortImports(bool $sortImports)
     {
@@ -344,9 +310,8 @@ trait GeneratorTrait
 
     /**
      * Allows child generators to modify the internal `$enabledSuffixing` flag.
-     * @return $this
      */
-    protected function setEnabledSuffixing(bool $enabledSuffixing)
+    protected function setEnabledSuffixing(bool $enabledSuffixing): self
     {
         $this->enabledSuffixing = $enabledSuffixing;
         return $this;
@@ -355,8 +320,6 @@ trait GeneratorTrait
     /**
      * Gets a single command-line option. Returns TRUE if the option exists,
      * but doesn't have a value, and is simply acting as a flag.
-     *
-     * @return mixed
      */
     protected function getOption(string $name)
     {
@@ -374,10 +337,8 @@ trait GeneratorTrait
      * - Removes any characters that are not letters, numbers, or underscores.
      * - Ensures the first character is a letter or underscore.
      * - Converts the name to CamelCase format.
-     * @param string $className The name of the class to be formatted.
-     * @return string The formatted and valid PHP class name.
      */
-    function formatClassName($className)
+    function formatClassName(?string $className): string
     {
         // Remove characters that are not letters, numbers, or underscores
         $filteredName = preg_replace('/[^\p{L}\p{N}_]/u', '', $className);

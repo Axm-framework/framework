@@ -17,7 +17,6 @@ namespace Console;
 use Console\CLI;
 use Console\Commands;
 use Psr\Log\LoggerInterface;
-use ReflectionException;
 
 
 /**
@@ -37,37 +36,31 @@ abstract class BaseCommand
     /**
      * The group the command is lumped under
      * when listing commands.
-     * @var string
      */
     protected string $group;
 
     /**
      * The Command's name
-     * @var string
      */
     protected string $name;
 
     /**
      * the Command's usage description
-     * @var string
      */
     protected string $usage;
 
     /**
      * the Command's short description
-     * @var string
      */
     protected string $description;
 
     /**
      * the Command's options description
-     * @var array
      */
     protected array $options = [];
 
     /**
      * the Command's Arguments description
-     * @var array
      */
     protected array $arguments = [];
 
@@ -78,9 +71,6 @@ abstract class BaseCommand
      */
     protected $commands = [];
 
-    /**
-     * @var array
-     */
     private array $params = [];
 
     protected const ARROW_SYMBOL = '➜ ';
@@ -88,13 +78,11 @@ abstract class BaseCommand
 
     /**
      * Actually execute a command.
-     * @param array<string, mixed> $params
      */
     abstract public function run(array $params);
 
     /** 
      * Define a protected method commands that returns a new instance of the Commands class
-     * if it hasn't been set yet
      */
     protected function commands()
     {
@@ -107,9 +95,6 @@ abstract class BaseCommand
 
     /**
      * Can be used by a command to run other commands.
-     *
-     * @throws ReflectionException
-     * @return mixed
      */
     protected function call(string $command, array $params = [])
     {
@@ -123,14 +108,10 @@ abstract class BaseCommand
     {
         CLI::write('CLI help Usage: ', 'yellow');
 
-        if (!empty ($this->usage)) {
-            $usage = $this->usage;
-        } else {
-            $usage = $this->name;
+        $usage = $this->usage ?? $this->name;
 
-            if (!empty ($this->arguments)) {
-                $usage .= ' [arguments]';
-            }
+        if (!empty ($this->arguments)) {
+            $usage .= ' [arguments]';
         }
 
         CLI::write($this->setPad($usage, 0, 0, 2));
@@ -166,7 +147,6 @@ abstract class BaseCommand
 
     /**
      * Pads our string out so that all titles are the same length to nicely line up descriptions.
-     * @param int $extra How many extra spaces to add at the end
      */
     public function setPad(string $item, int $max, int $extra = 2, int $indent = 0): string
     {
@@ -176,9 +156,6 @@ abstract class BaseCommand
 
     /**
      * Get pad for $key => $value array output
-     *
-     * @deprecated Use setPad() instead.
-     * @codeCoverageIgnore
      */
     public function getPad(array $array, int $pad): int
     {
@@ -192,7 +169,6 @@ abstract class BaseCommand
 
     /**
      * Makes it simple to access our protected properties.
-     * @return mixed
      */
     public function __get(string $key)
     {

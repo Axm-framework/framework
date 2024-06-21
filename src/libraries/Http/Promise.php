@@ -36,10 +36,6 @@ class Promise implements PromiseInterface
 
     /**
      * Attaches a callback to be executed when the promise is fulfilled or rejected.
-     *
-     * @param callable $onFulfilled Callback to execute when the promise is fulfilled.
-     * @param callable|null $onRejected Callback to execute when the promise is rejected.
-     * @return PromiseInterface
      */
     public function then(callable $onFulfilled, callable $onRejected = null): PromiseInterface
     {
@@ -66,7 +62,6 @@ class Promise implements PromiseInterface
 
     /**
      * Handles the result of a callback.
-     * @param mixed $result Result of the callback.
      */
     private function handleCallbackResult($result)
     {
@@ -86,11 +81,8 @@ class Promise implements PromiseInterface
 
     /**
      * Resolves the promise with a value.
-     *
-     * @param mixed $result Value to resolve the promise with.
-     * @return PromiseInterface
      */
-    public function resolve($result): PromiseInterface
+    public function resolve(mixed $result): PromiseInterface
     {
         $this->validateResolveOrRejectArgument($result);
 
@@ -112,11 +104,8 @@ class Promise implements PromiseInterface
 
     /**
      * Rejects the promise with a reason.
-     *
-     * @param mixed $reason Reason to reject the promise with.
-     * @return PromiseInterface
      */
-    public function reject($reason): PromiseInterface
+    public function reject(mixed $reason): PromiseInterface
     {
         $this->validateResolveOrRejectArgument($reason);
 
@@ -138,9 +127,6 @@ class Promise implements PromiseInterface
 
     /**
      * Creates a promise that is resolved with the result of a callback.
-     *
-     * @param callable $callback Callback to execute.
-     * @return PromiseInterface
      */
     public static function async(callable $callback): PromiseInterface
     {
@@ -161,9 +147,6 @@ class Promise implements PromiseInterface
 
     /**
      * Waits for multiple promises to settle and returns an array of their results.
-     *
-     * @param array $promises Promises to wait for.
-     * @return PromiseInterface
      */
     public static function all(array $promises): PromiseInterface
     {
@@ -195,9 +178,6 @@ class Promise implements PromiseInterface
 
     /**
      * Attaches a callback to be executed when the promise settles, regardless of whether it is fulfilled or rejected.
-     *
-     * @param callable $onFinally Callback to execute when the promise settles.
-     * @return PromiseInterface
      */
     public function finally(callable $onFinally): PromiseInterface
     {
@@ -207,7 +187,7 @@ class Promise implements PromiseInterface
             function ($result) use ($onFinally) {
                 try {
                     $onFinally();
-                } catch (\Throwable $th) {
+                } catch (Throwable $th) {
                     throw $th;
                 }
                 return $result;
@@ -221,9 +201,6 @@ class Promise implements PromiseInterface
 
     /**
      * Validates the arguments passed to the `then` method.
-     *
-     * @param callable $onFulfilled Callback to execute when the promise is fulfilled.
-     * @param callable|null $onRejected Callback to execute when the promise is rejected.
      */
     private function validateThenArguments(callable $onFulfilled, callable $onRejected = null): void
     {
@@ -238,9 +215,8 @@ class Promise implements PromiseInterface
 
     /**
      * Validates the argument passed to the `resolve` and `reject` methods.
-     * @param mixed $argument Argument to validate.
      */
-    private function validateResolveOrRejectArgument($argument): void
+    private function validateResolveOrRejectArgument(mixed $argument): void
     {
         if ($argument === null || is_scalar($argument)) {
             return;
@@ -253,7 +229,6 @@ class Promise implements PromiseInterface
 
     /**
      * Validates the callback passed to the `async` method.
-     * @param callable $callback Callback to validate.
      */
     private static function validateAsyncCallback(callable $callback): void
     {
@@ -264,7 +239,6 @@ class Promise implements PromiseInterface
 
     /**
      * Validates the array of promises passed to the `all` method.
-     * @param array $promises Array of promises to validate.
      */
     private static function validatePromisesArray(array $promises): void
     {
@@ -277,7 +251,6 @@ class Promise implements PromiseInterface
 
     /**
      * Validates the callback passed to the `finally` method.
-     * @param callable $callback Callback to validate.
      */
     private function validateFinallyCallback(callable $callback): void
     {

@@ -7,7 +7,7 @@ use Console\BaseCommand;
  *
  * CI Help command for the axm script.
  *
- * Lists the basic usage information for the axm script,
+ * Lists the basic usage information for The axm script,
  * and provides a way to list help for other commands.
  *
  * @author Juan Cristobal <juancristobalgd1@gmail.com>
@@ -18,52 +18,40 @@ use Console\BaseCommand;
 class Help extends BaseCommand
 {
     /**
-     * The group the command is lumped under
+     * The group The command is lumped under
      * when listing commands.
-     *
-     * @var string
      */
-    protected $group = 'Axm';
+    protected string $group = 'Axm';
 
     /**
      * The Command's name
-     *
-     * @var string
      */
-    protected $name = 'help';
+    protected string $name = 'help';
 
     /**
-     * the Command's short description
-     *
-     * @var string
+     * The Command's short description
      */
-    protected $description = 'Displays basic usage information.';
+    protected string $description = 'Displays basic usage information.';
 
     /**
-     * the Command's usage
-     *
-     * @var string
+     * The Command's usage
      */
-    protected $usage = 'help command_name';
+    protected string $usage = 'help command_name';
 
     /**
-     * the Command's Arguments
-     *
-     * @var array
+     * The Command's Arguments
      */
-    protected $arguments = [
+    protected array $arguments = [
         'command_name' => 'The command name [default: "help"]',
     ];
 
     /**
-     * the Command's Options
-     *
-     * @var array
+     * The Command's Options
      */
-    protected $options = [];
+    protected array $options = [];
 
     /**
-     * Displays the help for axm commands.
+     * Displays The help for axm commands.
      */
     public function run(array $params)
     {

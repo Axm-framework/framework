@@ -7,9 +7,6 @@ trait OAuthTrait
 {
     /**
      * Sets the OAuth token for authentication.
-     *
-     * @param string $token The OAuth token.
-     * @return $this
      */
     public function setOAuthToken(string $token)
     {
@@ -19,9 +16,6 @@ trait OAuthTrait
 
     /**
      * Sets the OAuth token secret for authentication.
-     *
-     * @param string $tokenSecret The OAuth token secret.
-     * @return $this
      */
     public function setOAuthTokenSecret(string $tokenSecret)
     {

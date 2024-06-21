@@ -8,7 +8,7 @@ use RuntimeException;
 /**
  * FileCache is a caching driver that stores cache data in files.
  *
- * @package Axm\Cache\Drivers
+ * @package Cache\Drivers
  */
 class FileCache extends Cache
 {
@@ -18,58 +18,55 @@ class FileCache extends Cache
     public const DEFAULT_EXPIRE = 31536000; // 1 year
 
     /**
-     * @var string|null The path to the cache directory.
+     * The path to the cache directory.
      */
-    public $cachePath;
+    public ?string $cachePath;
 
     /**
-     * @var int The permission for creating the cache directory.
+     * The permission for creating the cache directory.
      */
-    public $cachePathPermission = self::DEFAULT_CACHE_PATH_PERMISSION;
+    public int $cachePathPermission = self::DEFAULT_CACHE_PATH_PERMISSION;
 
     /**
-     * @var string The suffix for cache file names.
+     * The suffix for cache file names.
      */
-    public $cacheFileSuffix = self::DEFAULT_CACHE_FILE_SUFFIX;
+    public string $cacheFileSuffix = self::DEFAULT_CACHE_FILE_SUFFIX;
 
     /**
-     * @var int The permission for creating cache files.
+     * The permission for creating cache files.
      */
-    public $cacheFilePermission = self::DEFAULT_CACHE_FILE_PERMISSION;
+    public int $cacheFilePermission = self::DEFAULT_CACHE_FILE_PERMISSION;
 
     /**
-     * @var int The number of directory levels to create within the cache directory.
+     * The number of directory levels to create within the cache directory.
      */
-    public $directoryLevels = 0;
+    public int $directoryLevels = 0;
 
     /**
-     * @var bool Whether to embed expiry information in the cache file.
+     * Whether to embed expiry information in the cache file.
      */
-    public $embedExpiry = false;
+    public bool $embedExpiry = false;
 
     /**
-     * @var int The default expiration time for cache items (1 year by default).
+     * The default expiration time for cache items (1 year by default).
      */
-    public $expire = self::DEFAULT_EXPIRE;
+    public int $expire = self::DEFAULT_EXPIRE;
 
     /**
-     * @var int The garbage collection probability (default is 100).
-     * Higher values increase the likelihood of garbage collection.
+     * The garbage collection probability (default is 100).
      */
-    private $_gcProbability = 100;
+    private int $_gcProbability = 100;
 
     /**
-     * @var bool Internal flag to track whether garbage collection has been performed.
+     * Internal flag to track whether garbage collection has been performed.
      */
-    private $_gced = false;
+    private bool $_gced = false;
 
     /**
      * Initializes the cache component.
      *
      * If the cache path is not set, it defaults to the 'cacheViewPath' configuration.
      * If the cache directory doesn't exist, it will be created with the specified permission.
-     *
-     * @throws RuntimeException If the cache path is not writable.
      */
     public function init(): void
     {
@@ -86,7 +83,6 @@ class FileCache extends Cache
 
     /**
      * Clears all cached data.
-     * @return bool Whether the operation was successful.
      */
     public function flush(): bool
     {
@@ -96,11 +92,8 @@ class FileCache extends Cache
 
     /**
      * Retrieves a cached value based on a given key.
-     *
-     * @param string $key The key for the cached value.
-     * @return mixed|false The cached value if found, or false if not found or expired.
      */
-    public function get(string $key)
+    public function get(string $key): false|string|int|array|object|null
     {
         $cacheFile = $this->getCacheFile($key);
         if (file_exists($cacheFile) && !$this->isExpired($cacheFile)) {
@@ -115,11 +108,6 @@ class FileCache extends Cache
 
     /**
      * Stores a value in the cache with a specified key and optional expiration time.
-     *
-     * @param string $key The key for the cached value.
-     * @param mixed $value The value to be cached.
-     * @param int $expire The expiration time for the cache entry in seconds.
-     * @return bool Whether the operation was successful.
      */
     public function set(string $key, $value, int $expire = 0): bool
     {
@@ -139,9 +127,6 @@ class FileCache extends Cache
 
     /**
      * Deletes a cached value based on a given key.
-     *
-     * @param string $key The key for the cached value.
-     * @return bool Whether the operation was successful.
      */
     public function delete(string $key): bool
     {
@@ -151,9 +136,6 @@ class FileCache extends Cache
 
     /**
      * Gets the absolute path to the cache file for a given key.
-     *
-     * @param string $key The key for the cached value.
-     * @return string The absolute path to the cache file.
      */
     private function getCacheFile(string $key): string
     {
@@ -171,7 +153,6 @@ class FileCache extends Cache
 
     /**
      * Performs garbage collection on expired cache files.
-     * @param bool $expiredOnly If true, only expired files will be deleted.
      */
     private function gc(bool $expiredOnly = true): void
     {
@@ -193,7 +174,6 @@ class FileCache extends Cache
 
     /**
      * Gets the garbage collection (GC) probability.
-     * @return int The GC probability.
      */
     private function getGCProbability(): int
     {
@@ -202,7 +182,6 @@ class FileCache extends Cache
 
     /**
      * Sets the garbage collection (GC) probability.
-     * @param int $value The GC probability to set, clamped between 0 and 1,000,000.
      */
     private function setGCProbability(int $value): void
     {
@@ -211,9 +190,6 @@ class FileCache extends Cache
 
     /**
      * Checks whether a cached file has expired.
-     *
-     * @param string $cacheFile The absolute path to the cache file.
-     * @return bool Whether the cache file has expired.
      */
     private function isExpired(string $cacheFile): bool
     {
@@ -230,7 +206,6 @@ class FileCache extends Cache
 
     /**
      * Gets the default expiration time for cache files.
-     * @return int The default expiration time in seconds.
      */
     public function getExpire(): int
     {
@@ -239,7 +214,6 @@ class FileCache extends Cache
 
     /**
      * Gets all cache files in the cache directory.
-     * @return array An array of cache file paths.
      */
     public function getAllFiles(): array
     {

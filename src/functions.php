@@ -30,21 +30,21 @@ if (!function_exists('config')) {
 
 if (!function_exists('app')) {
     /**
-     * Return the Axm instance
+     * Returns the Axm instance or a value from the instance by alias.
      */
-    function app(?string $alias = null, $value = null): object
+    function app(string $alias = null, mixed $value = null): object
     {
-        $instance = Axm::getApp();
+        $axmInstance = Axm::getApp();
 
         if (null === $alias) {
-            return $instance;
+            return $axmInstance;
         }
 
         if (null !== $value) {
-            return $instance->$alias = $value;
+            $axmInstance->$alias = $value;
         }
 
-        return $instance->$alias;
+        return $axmInstance->$alias;
     }
 }
 
@@ -87,9 +87,9 @@ if (!function_exists('view')) {
     function view(string $view, string|array $params = null, bool $show = false, bool $withLayout = false, string $ext = '.php'): ?string
     {
         return app('view', new View)
-            ->render($view, $ext)
             ->withData($params)
             ->withLayout($withLayout)
+            ->render($view, $ext)
             ->get();
     }
 }
@@ -392,13 +392,12 @@ if (!function_exists('isLogged')) {
 if (!function_exists('old')) {
 
     /**
-     *  Used to show again if the data sent in 
-     *  html elements (input, select, textarea, etc) sent by the POST method exist. 
-     * e.g.: old('name); **/
-    function old(string $value): string
+     * Returns the previously submitted value of a form field with the given name, if it exists.
+     */
+    function old(string $fieldName): string
     {
-        $input = app()->request->post();
-        return (isset($input[$value]) && !empty($input[$value])) ? $input[$value] : '';
+        $submittedValues = app()->request->post();
+        return $submittedValues[$fieldName] ?? '';
     }
 }
 
@@ -452,22 +451,15 @@ if (!function_exists('str')) {
 
     /**
      * Create a new string helper instance or operate on a string.
-     * @return Stringable|object Returns a Stringable instance if a string argument is provided.
      */
-    function str(?string $string = null)
+    function str(?string $string = null): Stringable
     {
-        if (is_null($string)) {
-            // Return a new class instance for chaining string methods
-            return new class {
-                public function __call($method, $params)
-                {
-                    // Delegate method calls to the Str class
-                    return Str::$method(...$params);
-                }
-            };
-        }
-        // Return a Stringable instance for the provided string
-        return Str::of($string);
+        return is_null($string) ? new class {
+            public function __call(string $method, array $arguments)
+            {
+                return Str::$method(...$arguments);
+            }
+        } : Str::of($string);
     }
 }
 
@@ -498,64 +490,41 @@ if (!function_exists('to_object')) {
     }
 }
 
-/**
- * Load one or multiple helpers.
- */
-function helpers($helpers, ?string $customPath = null, string $separator = '_'): bool
-{
-    return (new class ($helpers, $customPath, $separator) {
-        private $helpers;
-        private $customPath;
-        private $separator;
+if (!function_exists('helpers')) {
 
-        public function __construct($helpers, ?string $customPath, string $separator)
-        {
-            $this->helpers = $this->normalizeHelpers($helpers);
-            $this->customPath = $customPath ? rtrim($customPath, DIRECTORY_SEPARATOR) : null;
-            $this->separator = $separator;
-        }
+    /**
+     * Load one or multiple helpers.
+     */
+    function helpers($helpers, ?string $customPath = null, string $separator = '_'): bool
+    {
+        $helpers = is_string($helpers) ? preg_split('/[\s,\.]+/', $helpers) : $helpers;
+        $customPath = $customPath ? rtrim($customPath, DIRECTORY_SEPARATOR) : null;
 
-        private function normalizeHelpers($helpers): array
-        {
-            if (is_string($helpers)) {
-                return preg_split('/[\s,\.]+/', $helpers);
-            } elseif (!is_array($helpers)) {
-                throw new InvalidArgumentException('The $helpers variable must be an array.');
+        $config = config('paths');
+        $appHelpersPath = $config['helpersPath'];
+        $axmHelpersPath = $config['helpersAxmPath'];
+
+        foreach ($helpers as $helper) {
+            $helperFile = "$helper$separator" . 'helper.php';
+
+            if ($customPath && is_file($customPath . DIRECTORY_SEPARATOR . $helperFile)) {
+                require_once "$customPath/$helperFile";
+                continue;
             }
 
-            return $helpers;
-        }
-
-        public function __invoke(): bool
-        {
-            $config = config('paths');
-            $appPath = $config['helpersPath'];
-            $axmHelpersPath = $config['helpersAxmPath'];
-
-            foreach ($this->helpers as $helper) {
-                $helper = trim($helper) . $this->separator . 'helper.php';
-
-                if ($this->customPath && is_file($customHelperFile = $this->customPath . DIRECTORY_SEPARATOR . $helper)) {
-                    require_once $customHelperFile;
-                    continue;
+            $paths = [$appHelpersPath, $axmHelpersPath];
+            foreach ($paths as $path) {
+                if (is_file("$path/$helperFile")) {
+                    require_once "$path/$helperFile";
+                    continue 2;
                 }
-
-                if (is_file($appHelperFile = $appPath . DIRECTORY_SEPARATOR . $helper)) {
-                    require_once $appHelperFile;
-                    continue;
-                }
-
-                if (is_file($axmHelperFile = $axmHelpersPath . DIRECTORY_SEPARATOR . $helper)) {
-                    require_once $axmHelperFile;
-                    continue;
-                }
-
-                throw new Exception("The helper '$axmHelperFile' does not exist in any of the specified paths.");
             }
 
-            return true;
+            throw new Exception("The helper '$helperFile' does not exist in any of the specified paths.");
         }
-    })();
+
+        return true;
+    }
 }
 
 if (!function_exists('getRouteParams')) {

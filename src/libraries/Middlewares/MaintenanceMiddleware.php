@@ -14,25 +14,24 @@ class MaintenanceMiddleware extends BaseMiddleware
     /**
      * Checks if the user is authenticated and has
      * permissions to access the current action.
-     *
-     * @return void
      */
     public function execute()
     {
         $maintenance = env('APP_DOWN', false);
         if ($maintenance === true)
-            return $this->showViewMaintenance();
+            return $this->showMaintenanceView();
     }
 
     /**
      * Displays the maintenance view.
-     * @return void
      */
-    private function showViewMaintenance()
+    private function showMaintenanceView()
     {
-        $viewFile = config('paths.viewsErrorsPath') .
-            DIRECTORY_SEPARATOR . config('view.errorPages.503');
+        $errorViewPath = config('paths.viewsErrorsPath');
+        $maintenanceView = config('view.errorPages.503');
+
+        $viewFile = $errorViewPath . DIRECTORY_SEPARATOR . $maintenanceView;
         $output = app()->controller->renderView($viewFile);
-        die($output);
+        exit($output);
     }
 }

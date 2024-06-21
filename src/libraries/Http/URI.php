@@ -425,44 +425,4 @@ abstract class URI
         $signature = hash_hmac(self::HASH_ALGORITHM, $dataToSign, $this->key);
         return $signature;
     }
-
-    /**
-     * Removes a specified number of path fragments from a given path.
-     *
-     * This function divides the input path into fragments using the directory separator (e.g., '/') as a separator.
-     * It then calculates the total number of fragments in the path and removes fragments either from the left (positive count)
-     * or the right (negative count) side of the path. If the count is 0, no fragments are removed.
-     * @example
-     * $originalPath = "C:/xampp/htdocs/appApp/vendor/axm/raxm/src";
-     * $modifiedPath = removePathFragments($originalPath, -3);
-     * return "C:/xampp/htdocs/appApp"
-     */
-    public function removePathFragments(string $path, int $count): string
-    {
-        // Split the path into fragments using the directory separator.
-        $fragments = explode(DIRECTORY_SEPARATOR, $path);
-
-        // Calculate the total number of fragments in the path.
-        $totalFragments = count($fragments);
-
-        // Determine whether to remove fragments from the left or right.
-        if ($count > 0) {
-            // Remove fragments from the left.
-            $resultFragments = array_slice($fragments, $count);
-        } elseif ($count < 0) {
-            // Calculate the number of fragments to remove from the right.
-            $removeCount = abs($count);
-
-            // Remove fragments from the right.
-            $resultFragments = array_slice($fragments, 0, $totalFragments - $removeCount);
-        } else {
-            // If $count is 0, no fragments are removed.
-            $resultFragments = $fragments;
-        }
-
-        // Reconstruct the path from the remaining fragments.
-        $resultPath = implode(DIRECTORY_SEPARATOR, $resultFragments);
-
-        return $resultPath;
-    }
 }

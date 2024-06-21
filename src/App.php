@@ -76,21 +76,20 @@ final class App extends Container
      */
     private function configureEnvironment(): void
     {
-        static $initialized = false;
-        if (!$initialized) {
+        static $isInitialized = false;
 
-            $environment = Env::get('APP_ENVIRONMENT', 'production');
-            if ($environment === 'debug') {
-                ini_set('display_errors', 1);
-                error_reporting(E_ALL);
-            } else {
-                error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED
-                    & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-                ini_set('display_errors', 0);
-            }
+        if ($isInitialized)
+            return;
 
-            $initialized = true;
-        }
+        $environment = Env::get('APP_ENVIRONMENT', 'production');
+        $isInDebugMode = $environment === 'debug';
+
+        error_reporting(
+            $isInDebugMode ? E_ALL : (E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED)
+        );
+        ini_set('display_errors', $isInDebugMode ? 1 : 0);
+
+        $isInitialized = true;
     }
 
     /**

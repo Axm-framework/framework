@@ -14,14 +14,14 @@ use RuntimeException;
 class MemcachedCache extends Cache
 {
     /**
-     * @var Memcached The Memcached instance.
+     * The Memcached instance.
      */
-    protected $memcached;
+    protected Memcached $memcached;
 
     /**
-     * @var array Memcached server configurations.
+     * Memcached server configurations.
      */
-    protected $servers = [
+    protected array $servers = [
         [
             'host' => 'localhost',
             'port' => 11211,
@@ -34,8 +34,6 @@ class MemcachedCache extends Cache
 
     /**
      * Initializes the connection to Memcached.
-     *
-     * @throws \Exception If failed to connect to Memcached.
      */
     public function init()
     {
@@ -54,19 +52,14 @@ class MemcachedCache extends Cache
                 );
             }
         } catch (\Exception $e) {
-            // Handle the Memcached connection exception as needed
             throw new \Exception('Failed to connect to Memcached: ' . $e->getMessage());
         }
     }
 
     /**
      * Gets a value from Memcached for the given key.
-     *
-     * @param string $key The key to retrieve the value.
-     * @return mixed|null The stored value or null if not found.
-     * @throws \RuntimeException If an error occurs during the operation with Memcached.
      */
-    public function get($key)
+    public function get(string $key): false|string|int|array|object|null
     {
         try {
             $value = $this->memcached->get($key);
@@ -80,14 +73,8 @@ class MemcachedCache extends Cache
 
     /**
      * Stores a value in Memcached with the given key.
-     *
-     * @param string $key The key to store the value.
-     * @param mixed $value The value to store.
-     * @param int $expire The expiration time in seconds (0 for never expire).
-     * @return bool True if stored successfully, false otherwise.
-     * @throws \RuntimeException If an error occurs during the operation with Memcached.
      */
-    public function set($key, $value, $expire = 0)
+    public function set(string $key, mixed $value, int $expire = 0): bool
     {
         try {
             // Automatically serialize objects
@@ -95,40 +82,30 @@ class MemcachedCache extends Cache
 
             return $this->memcached->set($key, $serializedValue, $expire);
         } catch (\Exception $e) {
-            // Handle the Memcached operation exception as needed
             throw new RuntimeException('Error setting value in Memcached: ' . $e->getMessage());
         }
     }
 
     /**
      * Deletes a value from Memcached with the given key.
-     *
-     * @param string $key The key of the value to be deleted.
-     * @return bool True if deleted successfully, false otherwise.
-     * @throws \RuntimeException If an error occurs during the operation with Memcached.
      */
-    public function delete($key)
+    public function delete(string $key): bool
     {
         try {
             return $this->memcached->delete($key);
         } catch (\Exception $e) {
-            // Handle the Memcached operation exception as needed
             throw new RuntimeException('Error deleting value from Memcached: ' . $e->getMessage());
         }
     }
 
     /**
      * Flushes all values from Memcached.
-     *
-     * @return bool True if the flush operation was successful, false otherwise.
-     * @throws \RuntimeException If an error occurs during the operation with Memcached.
      */
-    public function flush()
+    public function flush(): bool
     {
         try {
             return $this->memcached->flush();
         } catch (\Exception $e) {
-            // Handle the Memcached operation exception as needed
             throw new \Exception('Error flushing Memcached cache: ' . $e->getMessage());
         }
     }

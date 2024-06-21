@@ -12,28 +12,27 @@ use RuntimeException;
 
 /**
  * RedisCache - Implementation of the class for handling cache with Redis.
- *
- * @package Axm\Cache\Drivers
+ * @package Cache\Drivers
  */
 class RedisCache extends Cache
 {
     /**
-     * @var Redis|RedisCluster Redis client instance.
+     * Redis client instance.
      */
     protected $redis;
 
     /**
-     * @var bool Indicates whether Redis is configured as a cluster.
+     * Indicates whether Redis is configured as a cluster.
      */
-    protected $cluster;
+    protected bool $cluster;
 
     /**
-     * @var array Redis connection options.
+     * Redis connection options.
      */
-    protected $options = [
+    protected array $options = [
         'scheme' => 'tcp',
-        'host'   => '127.0.0.1',
-        'port'   => 6379,
+        'host' => '127.0.0.1',
+        'port' => 6379,
         'timeout' => 2.5,
         'read_timeout' => 2.5,
     ];
@@ -62,19 +61,14 @@ class RedisCache extends Cache
                 );
             }
         } catch (RedisException $e) {
-            // Handle the Redis connection exception as needed
             throw new \Exception('Failed to connect to Redis: ' . $e->getMessage());
         }
     }
 
     /**
      * Gets the value associated with a key from Redis.
-     *
-     * @param string $key The key to look up in Redis.
-     * @return mixed The value associated with the key, or null if not found.
-     * @throws RuntimeException If an error occurs while getting the value.
      */
-    public function get(string $key)
+    public function get(string $key): false|string|int|array|object|null
     {
         try {
             return $this->redis->get($key);
@@ -85,12 +79,6 @@ class RedisCache extends Cache
 
     /**
      * Sets a value identified by a key into Redis.
-     *
-     * @param string $key The key identifying the value to be cached.
-     * @param mixed $value The value to be cached.
-     * @param int $expire The number of seconds until the cached value will expire. 0 means never expire.
-     * @return bool True if the value is successfully stored in Redis, false otherwise.
-     * @throws RuntimeException If an error occurs while setting the value.
      */
     public function set(string $key, $value, int $expire = 0): bool
     {
@@ -101,33 +89,24 @@ class RedisCache extends Cache
                 return $this->redis->set($key, $value);
             }
         } catch (RedisException $e) {
-            // Handle the Redis operation exception as needed
             throw new RuntimeException('Error setting value in Redis: ' . $e->getMessage());
         }
     }
 
     /**
      * Deletes a value with the specified key from Redis.
-     *
-     * @param string $key The key of the value to be deleted.
-     * @return bool True if the value is successfully deleted, false otherwise.
-     * @throws RuntimeException If an error occurs while deleting the value.
      */
     public function delete(string $key): bool
     {
         try {
             return $this->redis->del($key) > 0;
         } catch (RedisException $e) {
-            // Handle the Redis operation exception as needed
             throw new RuntimeException('Error deleting value from Redis: ' . $e->getMessage());
         }
     }
 
     /**
      * Flushes all values from Redis cache.
-     *
-     * @return bool True if the flush operation was successful, false otherwise.
-     * @throws \Exception If an error occurs while flushing the cache.
      */
     public function flush(): bool
     {
@@ -138,42 +117,30 @@ class RedisCache extends Cache
                 return $this->redis->flushDB();
             }
         } catch (RedisException $e) {
-            // Handle the Redis operation exception as needed
             throw new \Exception('Error flushing Redis cache: ' . $e->getMessage());
         }
     }
 
     /**
      * Sets the expiration time for a key in Redis.
-     *
-     * @param string $key The key for which to set the expiration time.
-     * @param int $expire The number of seconds until the key will expire.
-     * @return bool True if the expiration time is set successfully, false otherwise.
-     * @throws \Exception If an error occurs while setting the expiration time.
      */
     public function expire(string $key, int $expire): bool
     {
         try {
             return $this->redis->expire($key, $expire);
         } catch (RedisException $e) {
-            // Handle the Redis operation exception as needed
             throw new \Exception('Error setting expiration for key in Redis: ' . $e->getMessage());
         }
     }
 
     /**
      * Gets multiple values from Redis with the specified keys.
-     *
-     * @param array $keys A list of keys identifying the cached values.
-     * @return array A list of cached values indexed by the keys.
-     * @throws \Exception If an error occurs while getting multiple values.
      */
     public function mget(array $keys): array
     {
         try {
             return $this->redis->mget($keys);
         } catch (RedisException $e) {
-            // Handle the Redis operation exception as needed
             throw new \Exception('Error getting multiple values from Redis: ' . $e->getMessage());
         }
     }

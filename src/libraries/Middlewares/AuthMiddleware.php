@@ -22,9 +22,6 @@ class AuthMiddleware extends BaseMiddleware
     /**
      * __construct
      *
-     * @param  mixed $actions
-     * @param  mixed $allowedAction
-     * @return void
      */
     public function __construct(array $actions = [], bool $allowedAction = self::NOT_ALLOWED_ACTION)
     {
@@ -34,7 +31,6 @@ class AuthMiddleware extends BaseMiddleware
 
     /**
      * Execute the action, checking authentication and permissions.
-     * @throws RuntimeException If the user does not have sufficient permissions.
      */
     public function execute()
     {
@@ -45,9 +41,6 @@ class AuthMiddleware extends BaseMiddleware
 
     /**
      * Validates if the user has permissions to access the current action.
-     * 
-     * @throws RuntimeException If the user doesn't have permissions
-     * to access the current action.
      */
     private function validatePermission()
     {
@@ -65,7 +58,6 @@ class AuthMiddleware extends BaseMiddleware
 
     /**
      * Throws a RuntimeException indicating insufficient permissions.
-     * @throws RuntimeException If the user does not have sufficient permissions.
      */
     private function throwPermissionException()
     {

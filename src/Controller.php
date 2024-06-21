@@ -59,9 +59,9 @@ class Controller
     public function __construct()
     {
         $app = app();
-        $this->request  = $app->request;
+        $this->request = $app->request;
         $this->response = $app->response;
-        $this->view     = $app->view;
+        $this->view = $app->view;
 
         $this->registerDefaultMiddleware();
     }
@@ -122,9 +122,13 @@ class Controller
     /**
      * Render the view.
      */
-    public function renderView(string $view, string|array $params = null, bool $withLayout = true, string $ext = '.php'): ?string
+    public function renderView(string $viewName, $viewData = null, bool $withLayout = true, string $fileExtension = '.php'): ?string
     {
-        return $this->view->render($view, $ext)->withData($params)->withLayout($withLayout)->get();
+        return $this->view
+            ->withData($viewData)
+            ->withLayout($withLayout)
+            ->render($viewName, $fileExtension)
+            ->get();
     }
 
     /**
