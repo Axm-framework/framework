@@ -191,7 +191,7 @@ class Session implements SessionHandlerInterface
     /**
      * Checks if a session variable is set.
      */
-    public function has(string $key): bool
+    public function has(?string $key): bool
     {
         return isset($_SESSION[$key]);
     }
