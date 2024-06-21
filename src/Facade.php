@@ -35,22 +35,14 @@ abstract class Facade
     /**
      * Handle dynamic, static calls to the object.
      */
-    public static function __callStatic(string  $method, array $args): mixed
+    public static function __callStatic(string $name, array $arguments): mixed
     {
         $instance = self::getInstance(static::getAlias());
+
         if (!$instance) {
             throw new \RuntimeException('A facade root has not been set.');
         }
 
-        switch (count($args)) {
-            case 0:
-                return $instance->$method();
-            case 1:
-                return $instance->$method($args[0]);
-            case 2:
-                return $instance->$method($args[0], $args[1]);
-            default:
-                return call_user_func_array([$instance, $method], $args);
-        }
+        return $instance->{$name}(...$arguments);
     }
 }
