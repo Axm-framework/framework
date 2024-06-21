@@ -127,25 +127,45 @@ class View
      */
     public function resolver(): self
     {
-        $data = $this->data;
-        $view = $this->contents;
-        $filename = $this->filename;
-
-        $_content = app()->isProduction()
-            ? $view : "<!--VIEW START . $filename -->\n $view \n<!-- VIEW END $filename -->\n\n";
-
-        if ($this->withLayout) {
-            $output = $this->file($this->layoutPath . DIRECTORY_SEPARATOR . $this->layout . '.php', ['_content' => $_content]);     // include layout
-        } else {
-            $output = $view;
-        }
-
-        $this->saveCache($filename, $output, $data);
+        $content = $this->renderView();
+        $output = $this->includeLayout($content);
+        $this->saveCache($this->filename, $output, $this->data);
         $this->contents = $output;
-        unset($data, $view, $output);
         $this->resolved = true;
 
         return $this;
+    }
+
+    /**
+     * Renders the view content based on the current environment.
+     */
+    private function renderView(): string
+    {
+        $content = $this->isProduction()
+            ? $this->contents
+            : "<!--VIEW START . {$this->filename} -->\n {$this->contents} \n<!-- VIEW END {$this->filename} -->\n\n";
+
+        return $content;
+    }
+
+    /**
+     * Includes the layout file if the layout is enabled.
+     */
+    private function includeLayout(string $content): string
+    {
+        if ($this->withLayout) {
+            return $this->file($this->layoutPath . DIRECTORY_SEPARATOR . $this->layout . '.php', ['_content' => $content]);
+        }
+
+        return $content;
+    }
+
+    /**
+     * Determines if the application is running in production mode.
+     */
+    private function isProduction(): bool
+    {
+        return app()->isProduction();
     }
 
     /**
@@ -157,7 +177,8 @@ class View
      */
     function get(): string
     {
-        if (!$this->resolved) $this->resolver();
+        if (!$this->resolved)
+            $this->resolver();
 
         // If it is stored in cache
         if (($output = $this->getFromCache($this->filename, $this->data)) !== false) {
@@ -201,21 +222,21 @@ class View
     }
 
     /**
-     * Renderiza un archivo de plantilla y devuelve la salida como cadena.
+     * Renders a template file and returns the output as a string.
      */
     public function file(string $templatePath, array $data = []): ?string
     {
-        extract(array_merge(self::$tempData, $this->data, $data), EXTR_OVERWRITE);
-
+        $mergedData = array_merge(self::$tempData, $this->data, $data);
+        extract($mergedData, EXTR_OVERWRITE);
         ob_start();
-        $_outputLevel = ob_get_level();
+        $outputLevel = ob_get_level();
 
         try {
             ob_implicit_flush(false);
             require $templatePath;
-            return (string) ob_get_clean();
+            return ob_get_clean();
         } catch (\Throwable $e) {
-            while (ob_get_level() >= $_outputLevel) {
+            while (ob_get_level() >= $outputLevel) {
                 ob_end_clean();
             }
 
@@ -225,9 +246,6 @@ class View
 
     /**
      * Adds CSS styles to the <head> section of the HTML content.
-     *
-     * This method searches for the closing </head> tag in the HTML content and injects
-     * the provided CSS styles just before it.
      */
     public function styles(string $styles): self
     {
@@ -240,9 +258,6 @@ class View
 
     /**
      * Adds JavaScript code to the end of the <body> section of the HTML content.
-     *
-     * This method searches for the closing </body> tag in the HTML content and injects
-     * the provided JavaScript code just before it.
      */
     public function scripts(string $scripts): self
     {
