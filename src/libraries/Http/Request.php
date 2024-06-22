@@ -64,7 +64,7 @@ class Request extends URI
      */
     public function parseMultipartForm(): array
     {
-        $formData = compact($this->post(), $this->files()) ?? [];
+        $formData = array_merge($this->post(), $this->files());
 
         return $formData;
     }
@@ -90,7 +90,7 @@ class Request extends URI
      */
     public function files(string $name = null): ?array
     {
-        $files = isset($_FILES) ? $this->getFilteredValue($name, $_FILES) : null;
+        $files = isset($_FILES) ? $this->h($_FILES) : null;
 
         return $name !== null ? $files[$name] ?? null : $files;
     }
@@ -480,10 +480,15 @@ class Request extends URI
      */
     public function validate(array $rules, array $data): Validator
     {
-        $validator = Validator::make($rules, $data);
+        $validator = $this->validator()::make($rules, $data);
         $validator->validate();
 
         return $validator;
+    }
+
+    public function validator()
+    {
+        return Validator::getInstance();
     }
 
     /**
@@ -575,17 +580,15 @@ class Request extends URI
     }
 
     /**
-     * Shortcut for htmlspecialchars, defaults to the application's charset.
+     * Filters a value with htmlspecialchars using the application's charset.
      */
-    protected function h(string|array $data, string $charset = null): ?string
+    private function h(string|array $value, ?string $charset = null): string|array
     {
-        if (is_string($data)) {
-            $data = htmlspecialchars($data, ENT_QUOTES, $charset ?? config('app.charset'));
-        } elseif (is_array($data)) {
-            $data = array_map('htmlspecialchars', $data);
+        if (is_string($value)) {
+            return htmlspecialchars($value, ENT_QUOTES, $charset ?? config('app.charset'));
         }
 
-        return $data;
+        return array_map([$this, 'h'], $value);
     }
 
     /**
