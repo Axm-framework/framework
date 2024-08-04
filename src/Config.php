@@ -67,9 +67,8 @@ class Config
      */
     public function read(string $file, string $path = null, bool $force = false): array
     {
-        if ($force) {
+        if ($force)
             return self::$config[$file] = self::load($file, $path);
-        }
 
         return self::$config[$file] ??= self::load($file, $path);
     }
@@ -80,9 +79,8 @@ class Config
     public static function load(string $name, string $path = null): array
     {
         $path = $path ?? self::DEFAULT_DIR;
-        if (is_file($fileConfig = $path . $name . '.php')) {
+        if (is_file($fileConfig = $path . $name . '.php'))
             return require $fileConfig;
-        }
 
         throw new \Exception(sprintf('Error when opening the configuration file [ %s ] ', $fileConfig));
     }
