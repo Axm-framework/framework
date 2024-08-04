@@ -24,18 +24,20 @@ function axm_autoloader(string $class)
     'BaseModel'  => AXM_PATH . DIRECTORY_SEPARATOR . 'BaseModel.php',
     ];
 
+    
     if (isset($classMap[$class])) {
         include $classMap[$class];
         return;
     }
-
-    if (is_file(AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . $class . '.php')) {
-        include AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . $class . '.php';
+    
+    $lclass = ucfirst(strtolower($class));
+    if (is_file(AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . $lclass . '.php')) {
+        include AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . $lclass . '.php';
         return;
     }
 
-    if (is_file(AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . $class . DIRECTORY_SEPARATOR . $class . '.php')) {
-        include AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . $class . DIRECTORY_SEPARATOR . $class . '.php';
+    if (is_file(AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . $lclass . DIRECTORY_SEPARATOR . $lclass . '.php')) {
+        include AXM_PATH . DIRECTORY_SEPARATOR . 'libraries' . $lclass . DIRECTORY_SEPARATOR . $lclass . '.php';
         return;
     }
 
