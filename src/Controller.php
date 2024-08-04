@@ -73,9 +73,8 @@ class Controller
     {
         $middlewares = BaseMiddleware::$httpMiddlewares;
         foreach ($middlewares as $middleware) {
-            if (is_subclass_of($middleware, BaseMiddleware::class)) {
+            if (is_subclass_of($middleware, BaseMiddleware::class))
                 $this->middlewares[] = new $middleware;
-            }
         }
     }
 
@@ -185,10 +184,9 @@ class Controller
      */
     public function __call(string $name, array $params)
     {
-        if (method_exists($this, $name)) {
+        if (method_exists($this, $name))
             return $this->$name(...$params);
-        }
-
+        
         throw new BadMethodCallException(sprintf('Method [%s] does not exist', $name));
     }
 }
