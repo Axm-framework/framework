@@ -14,9 +14,8 @@ if (!function_exists('config')) {
      */
     function config(string $key = null, mixed $value = null)
     {
-        if (null === $key) {
+        if (null === $key)
             return new Config;
-        }
 
         if (null !== $value) {
             Config::set($key, $value);
@@ -36,13 +35,11 @@ if (!function_exists('app')) {
     {
         $axmInstance = Axm::getApp();
 
-        if (null === $alias) {
+        if (null === $alias)
             return $axmInstance;
-        }
 
-        if (null !== $value) {
+        if (null !== $value)
             $axmInstance->$alias = $value;
-        }
 
         return $axmInstance->$alias;
     }
@@ -234,9 +231,8 @@ if (!function_exists('lang')) {
     {
         // Get an instance of Lang
         $lang = Lang::make();
-        if (empty($args)) {
+        if (empty($args))
             return $lang->trans($key);
-        }
 
         return $lang->trans($key, $args);
     }
@@ -263,9 +259,8 @@ if (!function_exists('generateUrl')) {
     function generateUrl(string $dir = ''): string
     {
         $url = baseUrl($dir);
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        if (!filter_var($url, FILTER_VALIDATE_URL))
             throw new RuntimeException(sprintf('Invalid URL: %s', $url));
-        }
 
         return $url;
     }
@@ -370,9 +365,8 @@ if (!function_exists('post')) {
         if (!($post = app()->request->post()))
             return false;
 
-        if ($key !== null) {
+        if ($key !== null)
             return htmlspecialchars($post[$key], ENT_QUOTES, 'UTF-8');
-        }
 
         return htmlspecialchars($post, ENT_QUOTES, 'UTF-8');
     }
