@@ -17,9 +17,8 @@ class Container
 
     public static function getInstance()
     {
-        if (!isset(static::$instances)) {
+        if (!isset(static::$instances))
             static::$instances = new self();
-        }
 
         return static::$instances;
     }
@@ -32,18 +31,16 @@ class Container
 
     public function singleton(string $key, object $value)
     {
-        if (!$this->has($key)) {
+        if (!$this->has($key))
             return $this->bind($key, $value);
-        }
 
         return $this->storage[$key];
     }
 
     public function key(string $key)
     {
-        if ($this->has($key)) {
+        if ($this->has($key))
             return $key;
-        }
 
         throw new \Exception("Key '{$key}' not found in container.");
     }
