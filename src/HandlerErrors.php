@@ -30,9 +30,8 @@ function handlerErrors($errno, $errstr, $errfile, $errline)
     if (error_reporting() === 0)
         return false;
 
-    if (php_sapi_name() === 'cli') {
+    if (php_sapi_name() === 'cli')
         handleCliError($errno, $errstr, $errfile, $errline);
-    }
 
     handleWebError($errno, $errstr, $errfile, $errline);
 }
@@ -44,13 +43,11 @@ function handlerException(Throwable $e)
 
     $log = Config::get('app.initLogReportings');
 
-    if ($log === true) {
+    if ($log === true)
         error_log((string) theme($e), 3, getDirectory());
-    }
 
-    if (php_sapi_name() === 'cli') {
+    if (php_sapi_name() === 'cli')
         handleCliException($e);
-    }
 
     handleWebException($e);
 }
@@ -94,9 +91,9 @@ function handleCliError($errno, $errstr, $errfile, $errline)
 
     $log = Config::get('app.initLogReportings');
 
-    if ($log === true) {
+    if ($log === true)
         error_log((string) theme($e), 3, getDirectory());
-    }
+
     exit;
 }
 
