@@ -39,9 +39,8 @@ abstract class Facade
     {
         $instance = self::getInstance(static::getAlias());
 
-        if (!$instance) {
+        if (!$instance)
             throw new \RuntimeException('A facade root has not been set.');
-        }
 
         return $instance->{$name}(...$arguments);
     }
