@@ -31,9 +31,8 @@ abstract class Axm
      */
     public static function setApplication(App $app): void
     {
-        if (self::$_app !== null) {
+        if (self::$_app !== null)
             throw new Exception('Axm application can only be created once.');
-        }
 
         self::$_app = $app;
     }
